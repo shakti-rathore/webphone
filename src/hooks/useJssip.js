@@ -79,7 +79,7 @@ const useJssip = () => {
           setStatus("calling");
           
       setHistory((prev) => {
-        [
+        return    [
           ...prev,
           {
             phoneNumber:"800",
