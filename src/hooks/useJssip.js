@@ -74,18 +74,19 @@ const useJssip = () => {
         console.log(e.session);
         console.log(e.session.direction);
         if (e.session.direction === "incoming") {
+          const incomingnumber = e.request.from._uri._user;
           e.session.answer();
           setSession(e.session);
           reset();
           setStatus("calling");
 
           setHistory((prev) => {
-            setPhoneNumber("888");
-            console.log("phoneNUmber", phoneNumber);
+            setPhoneNumber(incomingnumber);
+            console.log("phoneNUmber", incomingnumber);
             return [
               ...prev,
               {
-                phoneNumber,
+                phoneNumber:incomingnumber,
                 type: "incoming",
                 status: "Success",
                 start: new Date().getTime(),
