@@ -58,7 +58,9 @@ const useJssip = () => {
 
   useEffect(() => {
     try {
-      var socket = new JsSIP.WebSocketInterface("wss://samwad.iotcom.io:8089/ws");
+      var socket = new JsSIP.WebSocketInterface(
+        "wss://samwad.iotcom.io:8089/ws"
+      );
       var configuration = {
         sockets: [socket],
         session_timers: false,
@@ -74,24 +76,23 @@ const useJssip = () => {
         if (e.session.direction === "incoming") {
           e.session.answer();
           setSession(e.session);
-          setPhoneNumber("800");
           reset();
           setStatus("calling");
-          
-      setHistory((prev) => {
-        console.log("phoneNUmber",phoneNumber);
-        return    [
-          ...prev,
-          {
-            phoneNumber:"800",
-            type : "incoming",
-            status: "Success",
-            start: new Date().getTime(),
-            startTime : new Date (),
-          },
-        ]
 
-      }  );
+          setHistory((prev) => {
+            setPhoneNumber("800");
+            console.log("phoneNUmber", phoneNumber);
+            return [
+              ...prev,
+              {
+                phoneNumber,
+                type: "incoming",
+                status: "Success",
+                start: new Date().getTime(),
+                startTime: new Date(),
+              },
+            ];
+          });
 
           e.session.connection.addEventListener("addstream", (event) => {
             audioRef.current.srcObject = event.stream;
@@ -102,22 +103,17 @@ const useJssip = () => {
               ...prev.slice(0, -1),
               { ...prev[prev.length - 1], end: new Date().getTime() },
             ]);
-      
+
             pause();
             setStatus("start");
             setPhoneNumber("");
-           
           });
-
-        }else{
+        } else {
           setSession(e.session);
           e.session.connection.addEventListener("addstream", (event) => {
             audioRef.current.srcObject = event.stream;
           });
         }
-      
-       
-       
       });
 
       setUa(ua);
