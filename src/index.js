@@ -1,13 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
-import { HistoryProvider } from "./context/HistoryContext";
+import { GlobalContextProvide } from "./ContextHooks/GlobalContextProvide";
+import Routes from "./Routes/Routes";
 
 ReactDOM.render(
   <React.StrictMode>
-    <HistoryProvider>
-      <App />
-    </HistoryProvider>
+   <GlobalContextProvide>
+   <Routes/>
+   </GlobalContextProvide>
   </React.StrictMode>,
   document.getElementById("root")
 );
