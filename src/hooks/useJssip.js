@@ -74,7 +74,7 @@ const useJssip = () => {
         if (e.session.direction === "incoming") {
           e.session.answer();
           setSession(e.session);
-          setPhoneNumber("600");
+          setPhoneNumber("800");
           reset();
           setStatus("calling");
       setHistory((prev) => [
