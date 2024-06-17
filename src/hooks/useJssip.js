@@ -84,6 +84,7 @@ const useJssip = () => {
           type : "incoming",
           status: "Success",
           start: new Date().getTime(),
+          startTime : new Date (),
         },
       ]);
           e.session.connection.addEventListener("addstream", (event) => {
