@@ -3,7 +3,7 @@ import HistoryContext from "../context/HistoryContext";
 
 import { useStopwatch } from "react-timer-hook";
 import JsSIP from "jssip";
-import { AppContext } from "./GlobalContextProvide";
+import { AppContext } from "../context/GlobalContextProvide";
 
 const useJssip = () => {
   const {

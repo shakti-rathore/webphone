@@ -1,8 +1,8 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../Login/login.css";
-import ContextHelper from "../../ContextHooks/ContextHelper";
+import "login.css";
+import ContextHelper from "./context/ContextHelper";
 
 function Login() {
   //---------- state, veriable, context and hooks

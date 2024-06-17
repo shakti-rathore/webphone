@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import RouteProtecter from './RouteProtecter';
 import Login from '../login';
 import App from '../App';
-import { HistoryProvider } from "./context/HistoryContext";
+import { HistoryProvider } from '../context/HistoryContext';
 import ContextHelper from '../context/ContextHelper';
 
 //---------- main route
