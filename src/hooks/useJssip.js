@@ -69,10 +69,10 @@ const useJssip = () => {
       ua.on("newRTCSession", function (e) {
         console.log(e.session.direction);
         console.log(e.session);
-        setSession(e.session);
         console.log(e.session.direction);
         if (e.session.direction === "incoming") {
           e.session.answer();
+          setSession(e.session);
           setPhoneNumber("600");
           reset();
           setStatus("calling");
@@ -89,6 +89,7 @@ const useJssip = () => {
             audioRef.current.srcObject = event.stream;
           });
         }else{
+          setSession(e.session);
           e.session.connection.addEventListener("addstream", (event) => {
             audioRef.current.srcObject = event.stream;
           });
