@@ -57,12 +57,12 @@ const useJssip = () => {
 
   useEffect(() => {
     try {
-      var socket = new JsSIP.WebSocketInterface("wss://sbc03.tel4vn.com:7444");
+      var socket = new JsSIP.WebSocketInterface("wss://samwad.iotcom.io:8089/ws");
       var configuration = {
         sockets: [socket],
         session_timers: false,
-        uri: "105@2-test1.gcalls.vn:50061",
-        password: "test1105",
+        uri: "demo-surya@samwad.iotcom.io:8089",
+        password: "Demo@123",
       };
       var ua = new JsSIP.UA(configuration);
       ua.start();
