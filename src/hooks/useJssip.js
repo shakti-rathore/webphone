@@ -3,6 +3,7 @@ import HistoryContext from "../context/HistoryContext";
 
 import { useStopwatch } from "react-timer-hook";
 import JsSIP from "jssip";
+import {username,password,login} from "../login"
 
 const useJssip = () => {
   const audioRef = useRef();
@@ -57,15 +58,17 @@ const useJssip = () => {
   };
 
   useEffect(() => {
+    if(login){
     try {
       var socket = new JsSIP.WebSocketInterface(
         "wss://samwad.iotcom.io:8089/ws"
       );
+      const uriName = username.replace('@', '-');
       var configuration = {
         sockets: [socket],
         session_timers: false,
-        uri: "demo-surya@samwad.iotcom.io:8089",
-        password: "Demo@123",
+        uri: `${uriName}@devapp.iotcom.io:8089`,
+        password: password,
       };
       var ua = new JsSIP.UA(configuration);
       ua.start();
@@ -121,7 +124,8 @@ const useJssip = () => {
     } catch (e) {
       console.error(e);
     }
-  }, []);
+  }
+  }, [login]);
 
   const handleCall = () => {
     setSpeakerOff(false);
