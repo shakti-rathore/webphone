@@ -1,74 +1,127 @@
-// src/Login.js
-import React, { useState } from 'react';
-//import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [login,setLogin] = useState(Boolean);
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../Login/login.css";
+import ContextHelper from "../../ContextHooks/ContextHelper";
 
-  const handleSubmit = (event) => {
+function Login() {
+  //---------- state, veriable, context and hooks
+  const {
+ setCurrentUser,
+  setislogin,
+  setPassword,
+  storeDataInLocalStorage,
+  } = ContextHelper();
+  const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState({});
+
+
+
+ 
+
+  //--------- user Login
+
+  const handleLogin = (event) => {
     event.preventDefault();
-    if(username && password){
-
-        const url = `https:/devapp.iotcom.io/userlogin/${username}`;
-        // Make a edit request to the server
-        fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            //"Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
-          },
-          body: JSON.stringify({ password: password }),
-        })
-          .then((response) => {
-            return response.json();
-          })
-          .then((data) => {
-            //const data={message:"success,Proceed to login"};
-            console.log(data.message);
-            if (data.message === 'success,Proceed to login') {
-             setLogin(true);
-            }  else {
-             alert(data.message);
-            }
-          })
-          .catch((error) => {
-            console.error('Error sending login rquest:', error);
-          });
-
-    }else{
-        alert("please fill all of details");
+    let data = {
+      username: event.target.username.value,
+      password: event.target.password.value,
+    };
+    if (!data?.username) {
+      setErrorMessage({
+        username: "Please provide a valid username.",
+      });
+      return;
     }
-    
-    
+    if (!data?.password) {
+      setErrorMessage({
+        password: "Please provide a valid password.",
+      });
+      return;
+    } else {
+      setErrorMessage();
+    }
+
+    const url = `https://devapp.iotcom.io/userlogin/${data.username}`;
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then ((data)=>{
+        if (data.message==="success,Proceed to login") {
+         
+      
+            storeDataInLocalStorage({ key: "current_user", value: data.username });
+      
+            setCurrentUser(data.username);
+            setPassword(data.password);
+            setislogin(true);
+      
+            navigate("/app");
+          } else {
+           
+              setErrorMessage({
+                error: "Please Enter Valid Details",
+              });
+              console.log(data.message);
+            } 
+          }
+        
+      ).catch((err)=>{
+        console.log("error fetching data from devserver",err)
+      });
+   
   };
 
+
+
   return (
-    <div className="login-container">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Username:</label>
-          <input 
-            type="text" 
-            value={username} 
-            onChange={(e) => setUsername(e.target.value)} 
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input 
-            type="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-    </div>,
-    username,password,login
+    <div className="main_containar">
+      <div className="auth-inner">
+        <form onSubmit={handleLogin}>
+          {errorMessage?.error && (
+            <div className="errorMassage">{errorMessage?.error}</div>
+          )}
+
+          <h3>Sign In</h3>
+          <div className="mb-3">
+            <label>Email</label>
+            <input
+              // type="email"
+              name="username"
+              className="form-control"
+              placeholder="Enter email"
+            />
+            {errorMessage?.username && (
+              <div className="errorMassage">{errorMessage?.username}</div>
+            )}
+          </div>
+          <div className="mb-3">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              className="form-control"
+              placeholder="Enter password"
+            />
+            {errorMessage?.password && (
+              <div className="errorMassage">{errorMessage?.password}</div>
+            )}
+          </div>
+          <div className="d-grid mt-4">
+            <button type="submit" className="btn btn-primary">
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
-};
+}
 
 export default Login;
