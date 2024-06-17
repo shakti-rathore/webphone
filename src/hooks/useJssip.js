@@ -80,7 +80,7 @@ const useJssip = () => {
       setHistory((prev) => [
         ...prev,
         {
-          phoneNumber,
+          phoneNumber:phoneNumber,
           type : "incoming",
           status: "Success",
           start: new Date().getTime(),
