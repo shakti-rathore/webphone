@@ -77,16 +77,21 @@ const useJssip = () => {
           setPhoneNumber("800");
           reset();
           setStatus("calling");
-      setHistory((prev) => [
-        ...prev,
-        {
-          phoneNumber:phoneNumber,
-          type : "incoming",
-          status: "Success",
-          start: new Date().getTime(),
-          startTime : new Date (),
-        },
-      ]);
+          
+      setHistory((prev) => {
+        [
+          ...prev,
+          {
+            phoneNumber:"800",
+            type : "incoming",
+            status: "Success",
+            start: new Date().getTime(),
+            startTime : new Date (),
+          },
+        ]
+
+      }  );
+
           e.session.connection.addEventListener("addstream", (event) => {
             audioRef.current.srcObject = event.stream;
           });
