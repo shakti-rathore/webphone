@@ -16,7 +16,9 @@ const ContextHelper = () => {
         password,
         setPassword,
         islogin,
-        setislogin
+        setislogin,
+        storeDataInLocalStorage,
+        getDataFromLocalStorage
         
     } = useContext(AppContext);
 
@@ -28,7 +30,9 @@ const ContextHelper = () => {
         password,
         setPassword,
         islogin,
-        setislogin
+        setislogin,
+        storeDataInLocalStorage,
+        getDataFromLocalStorage
     }
 
 }
