@@ -74,12 +74,14 @@ const useJssip = () => {
         if (e.session.direction === "incoming") {
           e.session.answer();
           setPhoneNumber("600");
+          setSpeakerOff(false);
           reset();
           setStatus("calling");
       setHistory((prev) => [
-        ...prev.slice(0, -1),
+        ...prev,
         {
-          ...prev[prev.length - 1],
+          phoneNumber,
+          type : "incoming",
           status: "Success",
           start: new Date().getTime(),
         },
