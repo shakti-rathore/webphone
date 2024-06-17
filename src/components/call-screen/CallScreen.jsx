@@ -90,6 +90,7 @@ const CallScreen = ({
         <button
           className="cancel"
           onClick={() => {
+            console.log("button clicked");
             session.terminate();
           }}
         >
