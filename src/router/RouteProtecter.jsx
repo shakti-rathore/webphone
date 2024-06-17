@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import ContextHelper from '../ContextHooks/ContextHelper';
+import ContextHelper from '../context/ContextHelper';
 
 const RouteProtecter = ({ children, currentRoute }) => {
 
