@@ -9,7 +9,7 @@ function Login() {
   const {
  setCurrentUser,
   setislogin,
-  setPassword,
+  setpassword,
   storeDataInLocalStorage,
   } = ContextHelper();
   const navigate = useNavigate();
@@ -59,7 +59,7 @@ function Login() {
             storeDataInLocalStorage({ key: "current_user", value: data.username });
       
             setCurrentUser(data.username);
-            setPassword(data.password);
+            setpassword(data.password);
             setislogin(true);
       
             navigate("/app");
