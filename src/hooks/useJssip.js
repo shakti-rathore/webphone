@@ -70,22 +70,20 @@ const useJssip = () => {
         console.log(e.session.direction);
         console.log(e.session);
         setSession(e.session);
-        if(e.session.direction === "incoming"){
+        console.log(e.session.direction);
+        if (e.session.direction === "incoming") {
           e.session.answer();
+          setStatus("calling");
           e.session.connection.addEventListener("addstream", (event) => {
             audioRef.current.srcObject = event.stream;
           });
-          console.log("answered")
-        } else {
-          
+        }else{
           e.session.connection.addEventListener("addstream", (event) => {
             audioRef.current.srcObject = event.stream;
           });
-
         }
+      
        
-        
-        
        
       });
 
