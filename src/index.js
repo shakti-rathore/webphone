@@ -1,12 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { GlobalContextProvide } from "./ContextHooks/GlobalContextProvide";
-import Routes from "./Routes/Routes";
+import { GlobalContextProvide } from "./context/GlobalContextProvide";
+import Router from "./router/route";
 
 ReactDOM.render(
   <React.StrictMode>
    <GlobalContextProvide>
-   <Routes/>
+   <Router/>
    </GlobalContextProvide>
   </React.StrictMode>,
   document.getElementById("root")
