@@ -68,12 +68,21 @@ const useJssip = () => {
       ua.start();
       ua.on("newRTCSession", function (e) {
         setSession(e.session);
-        e.session.connection.addEventListener("addstream", (event) => {
-          audioRef.current.srcObject = event.stream;
-        });
+        console.log(e.session.direction);
         if (e.session.direction === "incoming") {
           e.session.answer();
+          setStatus("calling");
+          e.session.connection.addEventListener("addstream", (event) => {
+            audioRef.current.srcObject = event.stream;
+          });
+        }else{
+          e.session.connection.addEventListener("addstream", (event) => {
+            audioRef.current.srcObject = event.stream;
+          });
         }
+      
+       
+       
       });
 
       setUa(ua);
