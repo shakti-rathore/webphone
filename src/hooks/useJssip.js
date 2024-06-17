@@ -61,19 +61,32 @@ const useJssip = () => {
       var configuration = {
         sockets: [socket],
         session_timers: false,
-        uri: "heartbeat@samwad.iotcom.io:8089",
-        password: "heartbeat",
+        uri: "demo-surya@samwad.iotcom.io:8089",
+        password: "Demo@123",
       };
       var ua = new JsSIP.UA(configuration);
       ua.start();
       ua.on("newRTCSession", function (e) {
+        console.log(e.session.direction);
+        console.log(e.session);
         setSession(e.session);
-        e.session.connection.addEventListener("addstream", (event) => {
-          audioRef.current.srcObject = event.stream;
-        });
-        if (e.session.direction === "incoming") {
+        if(e.session.direction === "incoming"){
           e.session.answer();
+          e.session.connection.addEventListener("addstream", (event) => {
+            audioRef.current.srcObject = event.stream;
+          });
+          console.log("answered")
+        } else {
+          
+          e.session.connection.addEventListener("addstream", (event) => {
+            audioRef.current.srcObject = event.stream;
+          });
+
         }
+       
+        
+        
+       
       });
 
       setUa(ua);
