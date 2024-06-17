@@ -71,6 +71,9 @@ const useJssip = () => {
         e.session.connection.addEventListener("addstream", (event) => {
           audioRef.current.srcObject = event.stream;
         });
+        if (e.session.direction === "incoming") {
+          e.session.answer();
+        }
       });
 
       setUa(ua);
