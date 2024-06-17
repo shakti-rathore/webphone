@@ -27,6 +27,7 @@ const useJssip = () => {
     },
 
     ended: function (e) {
+      console.log("call ended");
       setHistory((prev) => [
         ...prev.slice(0, -1),
         { ...prev[prev.length - 1], end: new Date().getTime() },
