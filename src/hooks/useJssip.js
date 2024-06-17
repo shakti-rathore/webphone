@@ -89,6 +89,19 @@ const useJssip = () => {
           e.session.connection.addEventListener("addstream", (event) => {
             audioRef.current.srcObject = event.stream;
           });
+          e.session.once("ended", (e) => {
+            console.log("Call ended local event");
+            setHistory((prev) => [
+              ...prev.slice(0, -1),
+              { ...prev[prev.length - 1], end: new Date().getTime() },
+            ]);
+      
+            pause();
+            setStatus("start");
+            setPhoneNumber("");
+           
+          });
+
         }else{
           setSession(e.session);
           e.session.connection.addEventListener("addstream", (event) => {
