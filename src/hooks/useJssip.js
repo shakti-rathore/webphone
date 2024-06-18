@@ -136,7 +136,16 @@ const useJssip = () => {
           phoneNumber,
         },
       ]);
-      ua.call(phoneNumber.replace(" ", ""), options);
+      //ua.call(phoneNumber.replace(" ", ""), options);
+
+      fetch(`https://samwad.iotcom.io/dialnumber`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ caller:username, receiver: phoneNumber})
+      }).then(()=>{console.log("dail api called")} );
+
       setStatus("calling");
     }
   };
