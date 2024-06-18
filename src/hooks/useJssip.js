@@ -64,7 +64,7 @@ const useJssip = () => {
       var configuration = {
         sockets: [socket],
         session_timers: false,
-        uri: "demo-surya@samwad.iotcom.io:8089",
+        uri: `${(JSON.parse(localStorage.getItem('token')).userData.userid).replace("@","-")}@samwad.iotcom.io:8089`,
         password: "Demo@123",
       };
       var ua = new JsSIP.UA(configuration);
