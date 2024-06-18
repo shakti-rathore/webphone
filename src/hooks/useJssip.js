@@ -1,12 +1,13 @@
 import { useContext, useEffect, useState, useRef } from "react";
 import HistoryContext from "../context/HistoryContext";
+import { useNavigate } from 'react-router-dom';
 
 import { useStopwatch } from "react-timer-hook";
 import JsSIP from "jssip";
 
 const useJssip = () => {
   const audioRef = useRef();
-  const { setHistory } = useContext(HistoryContext);
+  const { setHistory , username,password} = useContext(HistoryContext);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [ua, setUa] = useState(null);
   const [session, setSession] = useState(null);
@@ -15,6 +16,7 @@ const useJssip = () => {
   const { seconds, minutes, isRunning, pause, reset } = useStopwatch({
     autoStart: false,
   });
+  const navigate = useNavigate();
 
   var eventHandlers = {
     failed: function (e) {
@@ -64,8 +66,8 @@ const useJssip = () => {
       var configuration = {
         sockets: [socket],
         session_timers: false,
-        uri: `${(JSON.parse(localStorage.getItem('token')).userData.userid).replace("@","-")}@samwad.iotcom.io:8089`,
-        password: "Demo@123",
+        uri: `${(username).replace("@","-")}@samwad.iotcom.io:8089`,
+        password: password,
       };
       var ua = new JsSIP.UA(configuration);
       ua.start();
@@ -120,6 +122,7 @@ const useJssip = () => {
       setUa(ua);
     } catch (e) {
       console.error(e);
+      navigate("/login")
     }
   }, []);
 

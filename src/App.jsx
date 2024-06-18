@@ -4,8 +4,7 @@ import CallScreen from "./components/call-screen/CallScreen";
 import HistoryScreen from "./components/history-screen/HistoryScreen";
 import useJssip from "./hooks/useJssip";
 import { useState } from "react";
-import Login  from "./components/home/Login";
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+
 
 function App() {
   const [
@@ -28,41 +27,30 @@ function App() {
   const minuteTime = minutes < 10 ? `0${minutes}` : `${minutes}`;
 
   return (
-
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login/>} />
-        <Route path="/dashboard" element={
-           <div className="App">
-           {      
-           seeLogs ? (
-             <HistoryScreen setSeeLogs={setSeeLogs} />
-           ) : status !== "calling" ? (
-             <Home
-               phoneNumber={phoneNumber}
-               setPhoneNumber={setPhoneNumber}
-               handleCall={handleCall}
-               setSeeLogs={setSeeLogs}
-             />
-           ) : (
-             <CallScreen
-               phoneNumber={phoneNumber}
-               session={session}
-               speakerOff={speakerOff}
-               setSpeakerOff={setSpeakerOff}
-               seconds={secondTime}
-               minutes={minuteTime}
-               isRunning={isRunning}
-             />
-           )}
-           <audio ref={audioRef} autoPlay hidden={true} muted={speakerOff} />
-         </div>
-        } />
-        <Route path="*" element={<Navigate to="/login" />} />
-      </Routes>
-    </Router>
-
-   
+    <div className="App">
+      {
+        seeLogs ? (
+          <HistoryScreen setSeeLogs={setSeeLogs} />
+        ) : status !== "calling" ? (
+          <Home
+            phoneNumber={phoneNumber}
+            setPhoneNumber={setPhoneNumber}
+            handleCall={handleCall}
+            setSeeLogs={setSeeLogs}
+          />
+        ) : (
+          <CallScreen
+            phoneNumber={phoneNumber}
+            session={session}
+            speakerOff={speakerOff}
+            setSpeakerOff={setSpeakerOff}
+            seconds={secondTime}
+            minutes={minuteTime}
+            isRunning={isRunning}
+          />
+        )}
+      <audio ref={audioRef} autoPlay hidden={true} muted={speakerOff} />
+    </div>
   );
 }
 

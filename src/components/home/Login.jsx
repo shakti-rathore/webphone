@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import HistoryContext from "../../context/HistoryContext"
 
 function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  
   const [error, setError] = useState(null);
+  const { username,setUsername,password,setPassword } = useContext(HistoryContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -29,12 +30,26 @@ function Login() {
       console.log("ok");
       // Store JWT token (for example, in localStorage)
       //setIsLogin(true);
-      localStorage.setItem('token', JSON.stringify(data));
+      if(data.message==="wrong login info"){
+
+        console.log("error",data.message);
+        navigate("/login")
+
+        
+
+      } else {
+
+        localStorage.setItem('token', JSON.stringify(data));
 
 
-      // Redirect to the dashboard
-      //window.location.href = '/dashboard';
-      navigate("/dashboard")
+        // Redirect to the dashboard
+        //window.location.href = '/dashboard';
+        navigate("/dashboard")
+        
+
+      }
+      
+     
     } else {
        console.log("error");
       // Show error message
