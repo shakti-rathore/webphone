@@ -5,7 +5,6 @@ import HistoryScreen from "./components/history-screen/HistoryScreen";
 import useJssip from "./hooks/useJssip";
 import { useState } from "react";
 
-
 function App() {
   const [
     seconds,
@@ -28,27 +27,26 @@ function App() {
 
   return (
     <div className="App">
-      {
-        seeLogs ? (
-          <HistoryScreen setSeeLogs={setSeeLogs} />
-        ) : status !== "calling" ? (
-          <Home
-            phoneNumber={phoneNumber}
-            setPhoneNumber={setPhoneNumber}
-            handleCall={handleCall}
-            setSeeLogs={setSeeLogs}
-          />
-        ) : (
-          <CallScreen
-            phoneNumber={phoneNumber}
-            session={session}
-            speakerOff={speakerOff}
-            setSpeakerOff={setSpeakerOff}
-            seconds={secondTime}
-            minutes={minuteTime}
-            isRunning={isRunning}
-          />
-        )}
+      {seeLogs ? (
+        <HistoryScreen setSeeLogs={setSeeLogs} />
+      ) : status !== "calling" ? (
+        <Home
+          phoneNumber={phoneNumber}
+          setPhoneNumber={setPhoneNumber}
+          handleCall={handleCall}
+          setSeeLogs={setSeeLogs}
+        />
+      ) : (
+        <CallScreen
+          phoneNumber={phoneNumber}
+          session={session}
+          speakerOff={speakerOff}
+          setSpeakerOff={setSpeakerOff}
+          seconds={secondTime}
+          minutes={minuteTime}
+          isRunning={isRunning}
+        />
+      )}
       <audio ref={audioRef} autoPlay hidden={true} muted={speakerOff} />
     </div>
   );
