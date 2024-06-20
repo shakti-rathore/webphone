@@ -1,9 +1,8 @@
-import "./App.scss";
-import Home from "./components/home/Home";
-import CallScreen from "./components/call-screen/CallScreen";
-import HistoryScreen from "./components/history-screen/HistoryScreen";
-import useJssip from "./hooks/useJssip";
-import { useState } from "react";
+import Home from './components/Home';
+import CallScreen from './components/CallScreen';
+import HistoryScreen from './components/HistoryScreen';
+import useJssip from './hooks/useJssip';
+import { useState } from 'react';
 
 function App() {
   const [
@@ -29,7 +28,7 @@ function App() {
     <div className="App">
       {seeLogs ? (
         <HistoryScreen setSeeLogs={setSeeLogs} />
-      ) : status !== "calling" ? (
+      ) : status !== 'calling' ? (
         <Home
           phoneNumber={phoneNumber}
           setPhoneNumber={setPhoneNumber}

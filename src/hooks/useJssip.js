@@ -1,18 +1,18 @@
-import { useContext, useEffect, useState, useRef } from "react";
-import HistoryContext from "../context/HistoryContext";
+import { useContext, useEffect, useState, useRef } from 'react';
+import HistoryContext from '../context/HistoryContext';
 import { useNavigate } from 'react-router-dom';
 
-import { useStopwatch } from "react-timer-hook";
-import JsSIP from "jssip";
+import { useStopwatch } from 'react-timer-hook';
+import JsSIP from 'jssip';
 
 const useJssip = () => {
   const audioRef = useRef();
-  const { setHistory , username,password} = useContext(HistoryContext);
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const { setHistory, username, password } = useContext(HistoryContext);
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [ua, setUa] = useState(null);
   const [session, setSession] = useState(null);
   const [speakerOff, setSpeakerOff] = useState(false);
-  const [status, setStatus] = useState("start");
+  const [status, setStatus] = useState('start');
   const { seconds, minutes, isRunning, pause, reset } = useStopwatch({
     autoStart: false,
   });
@@ -20,24 +20,18 @@ const useJssip = () => {
 
   var eventHandlers = {
     failed: function (e) {
-      setStatus("fail");
-      setPhoneNumber("");
-      setHistory((prev) => [
-        ...prev.slice(0, -1),
-        { ...prev[prev.length - 1], status: "Fail", start: 0, end: 0 },
-      ]);
+      setStatus('fail');
+      setPhoneNumber('');
+      setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], status: 'Fail', start: 0, end: 0 }]);
     },
 
     ended: function (e) {
-      console.log("call ended");
-      setHistory((prev) => [
-        ...prev.slice(0, -1),
-        { ...prev[prev.length - 1], end: new Date().getTime() },
-      ]);
+      console.log('call ended');
+      setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
 
       pause();
-      setStatus("start");
-      setPhoneNumber("");
+      setStatus('start');
+      setPhoneNumber('');
     },
 
     confirmed: function (e) {
@@ -46,7 +40,7 @@ const useJssip = () => {
         ...prev.slice(0, -1),
         {
           ...prev[prev.length - 1],
-          status: "Success",
+          status: 'Success',
           start: new Date().getTime(),
         },
       ]);
@@ -60,60 +54,55 @@ const useJssip = () => {
 
   useEffect(() => {
     try {
-      var socket = new JsSIP.WebSocketInterface(
-        "wss://samwad.iotcom.io:8089/ws"
-      );
+      var socket = new JsSIP.WebSocketInterface('wss://samwad.iotcom.io:8089/ws');
       var configuration = {
         sockets: [socket],
         session_timers: false,
-        uri: `${(username).replace("@","-")}@samwad.iotcom.io:8089`,
+        uri: `${username.replace('@', '-')}@samwad.iotcom.io:8089`,
         password: password,
       };
       var ua = new JsSIP.UA(configuration);
       ua.start();
-      ua.on("newRTCSession", function (e) {
+      ua.on('newRTCSession', function (e) {
         console.log(e.session.direction);
         console.log(e.session);
         console.log(e.session.direction);
-        if (e.session.direction === "incoming") {
+        if (e.session.direction === 'incoming') {
           const incomingnumber = e.request.from._uri._user;
           e.session.answer();
           setSession(e.session);
           reset();
-          setStatus("calling");
+          setStatus('calling');
 
           setHistory((prev) => {
             setPhoneNumber(incomingnumber);
-            console.log("phoneNUmber", incomingnumber);
+            console.log('phoneNUmber', incomingnumber);
             return [
               ...prev,
               {
-                phoneNumber:incomingnumber,
-                type: "incoming",
-                status: "Success",
+                phoneNumber: incomingnumber,
+                type: 'incoming',
+                status: 'Success',
                 start: new Date().getTime(),
                 startTime: new Date(),
               },
             ];
           });
 
-          e.session.connection.addEventListener("addstream", (event) => {
+          e.session.connection.addEventListener('addstream', (event) => {
             audioRef.current.srcObject = event.stream;
           });
-          e.session.once("ended", (e) => {
-            console.log("Call ended local event");
-            setHistory((prev) => [
-              ...prev.slice(0, -1),
-              { ...prev[prev.length - 1], end: new Date().getTime() },
-            ]);
+          e.session.once('ended', (e) => {
+            console.log('Call ended local event');
+            setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
 
             pause();
-            setStatus("start");
-            setPhoneNumber("");
+            setStatus('start');
+            setPhoneNumber('');
           });
         } else {
           setSession(e.session);
-          e.session.connection.addEventListener("addstream", (event) => {
+          e.session.connection.addEventListener('addstream', (event) => {
             audioRef.current.srcObject = event.stream;
           });
         }
@@ -122,7 +111,7 @@ const useJssip = () => {
       setUa(ua);
     } catch (e) {
       console.error(e);
-      navigate("/login")
+      navigate('/login');
     }
   }, []);
 
@@ -141,12 +130,14 @@ const useJssip = () => {
       fetch(`https://samwad.iotcom.io/dialnumber`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ caller:username, receiver: phoneNumber})
-      }).then(()=>{console.log("dail api called")} );
+        body: JSON.stringify({ caller: username, receiver: phoneNumber }),
+      }).then(() => {
+        console.log('dail api called');
+      });
 
-      setStatus("calling");
+      setStatus('calling');
     }
   };
 
