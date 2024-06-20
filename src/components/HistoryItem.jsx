@@ -20,7 +20,7 @@ const HistoryItem = ({ date, phone, status, start, end, index }) => {
           <span className="text-sm text-gray-600">{format(new Date(date), 'MM/dd/yyyy')}</span>
           <span className="text-sm text-gray-600">{format(new Date(date), 'hh:mm bbbb')}</span>
         </div>
-        <div className="gap-x-4 flex mb-2">
+        <div className="gap-x-4 flex md:mb-2 flex-wrap">
           <span className="phone-numbe text-teal-dark font-semibold">{phone}</span>
           <div>
             <span className="text-gray-600 mr-2">Status:</span>

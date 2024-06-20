@@ -31,7 +31,7 @@ const HistoryScreen = ({ setSeeLogs }) => {
           </div>
         </div>
 
-        <div className="overflow-x-auto max-h-[60vh] p-3">
+        <div className="overflow-x-auto lg:max-h-[60vh] p-3">
           {history.length === 0 ? (
             <p className="text-gray-600">No recent calls</p>
           ) : (
