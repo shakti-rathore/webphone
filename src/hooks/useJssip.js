@@ -78,6 +78,29 @@ const useJssip = () => {
         if (e.session.direction === "incoming") {
           const incomingnumber = e.request.from._uri._user;
           e.session.answer();
+          fetch(`https://samwad.iotcom.io/useroncall/${username}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              //"Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+            },
+          })
+            .then((response) => {
+              return response.json();
+            })
+            .then((data) => {
+              if (data.message === 'Sucess answer the call') {
+                //answer the call and proceed
+                console.log(data.message);
+                
+              } else { 
+                console.log('response error from server');         
+              }
+            })
+            .catch((error) => {
+              console.error('Error sending call answer request:', error);
+            })
+
           setSession(e.session);
           reset();
           setStatus("calling");
@@ -110,6 +133,22 @@ const useJssip = () => {
             pause();
             setStatus("start");
             setPhoneNumber("");
+            fetch(`https://samwad.iotcom.io/user/callended${username}`, {
+              method: 'POST',
+            }).then(()=>{
+              console.log("call ended API Called");
+              fetch(`https://samwad.iotcom.io/user/disposition${username}`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  //"Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+                },
+                body: JSON.stringify({
+                  bridgeID: "web-phone-test",
+                  Disposition : "Webponecall"
+              }),
+              }).then(()=>{console.log("dispo req send to server")});
+            });
           });
         } else {
           setSession(e.session);

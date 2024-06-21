@@ -45,6 +45,46 @@ function Login() {
         // Redirect to the dashboard
         //window.location.href = '/dashboard';
         navigate("/dashboard")
+
+        const url = `https://samwad.iotcom.io/userready/${username}`;
+          // Make a edit request to the server
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              //"Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+            },
+          })
+            .then((response) => {
+              return response.json();
+            })
+            .then((data) => {
+              //const data1={message:"success"};
+              console.log(data.message);
+              if (data.message === 'success') {
+                console.log('user ready to take call');
+                // we can use this in future to create login session for agents
+                //userlogin = true;
+                //console.log(ua);
+                //connectionTime = Date.now();
+                const keeplive = setInterval(() => {
+                  fetch('https://samwad.iotcom.io/userconnection', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ user: username }),
+                  }).then(()=>{})
+                  
+                }, 2000);
+                
+              } else if (data.message === 'failed,logout and login again') {
+                alert(data.message);
+              }
+            })
+            .catch((error) => {
+              console.error('Error sending login rquest:', error);
+            });
         
 
       }
