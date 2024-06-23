@@ -7,10 +7,10 @@ module.exports = {
         sans: ['Poppins', 'sans-serif'],
       },
       colors: {
-        teal: {
-          light: '#64ffda',
-          DEFAULT: '#1de9b6',
-          dark: '#00bfa5',
+        blue: {
+          light: '#ecf5fe',
+          DEFAULT: '#2196f3',
+          dark: '#0b77cd',
         },
       },
     },

@@ -10,12 +10,12 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs }) => {
   const formatPhoneNumber = useFormatPhoneNumber();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-teal-50">
-      <div className="w-full max-w-sm p-4 bg-white rounded-lg shadow-lg">
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="w-full max-w-72 p-4 bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className="flex justify-between items-center mb-4">
-          <div className="text-xl font-bold text-teal-dark">WebPhone</div>
+          <div className="text-xl font-bold text-blue-dark">WebPhone</div>
           <div
-            className="cursor-pointer text-teal-dark"
+            className="cursor-pointer text-blue-dark"
             onClick={() => {
               setSeeLogs(true);
             }}
@@ -31,11 +31,11 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs }) => {
               setPhoneNumber(e.target.value);
             }}
             placeholder="Phone number"
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal"
+            className="w-full outline-none text-xl indent-1.5"
           />
           {phoneNumber && (
             <div
-              className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-teal-dark"
+              className="absolute inset-y-0 right-0 flex items-center cursor-pointer text-blue-dark"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               onClick={() => setPhoneNumber((prev) => prev.slice(0, -1).trim())}
@@ -46,14 +46,14 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs }) => {
         </div>
 
         <KeyPad setPhoneNumber={setPhoneNumber} />
-
-        <button
-          className="flex items-center justify-center w-full py-2 mt-4 bg-teal text-white rounded-md hover:bg-teal-dark focus:outline-none focus:ring-2 focus:ring-teal focus:ring-opacity-50"
-          onClick={handleCall}
-        >
-          <FiPhone className="mr-2" size={20} />
-          Call
-        </button>
+        <div className="text-center">
+          <button
+            className="p-4 mt-4 bg-green-500 text-white rounded-full hover:bg-green-600 focus:outline-none focus:bg-green-500"
+            onClick={handleCall}
+          >
+            <FiPhone size={20} />
+          </button>
+        </div>
       </div>
     </div>
   );

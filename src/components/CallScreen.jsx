@@ -14,13 +14,13 @@ const CallScreen = ({ phoneNumber, session, speakerOff, setSpeakerOff, seconds, 
 
   const formatPhoneNumber = useFormatPhoneNumber();
   return (
-    <div className="flex items-center justify-center min-h-screen bg-teal-50 p-4">
-      <div className="flex flex-col items-center w-full max-w-sm p-6 bg-white rounded-lg shadow-lg">
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-20 h-20 rounded-full bg-teal-dark flex items-center justify-center mb-4">
-            <BsPersonFill className="text-white text-4xl" />
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center w-full max-w-72 p-6 bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
+        <div className={`flex flex-col items-center ${showKeyPad ? '' : 'mb-24'}`}>
+          <div className="w-12 h-12 rounded-full bg-blue-dark flex items-center justify-center mb-4">
+            <BsPersonFill className="text-white text-2xl" />
           </div>
-          <div className="text-2xl font-bold text-teal-dark mb-2">{formatPhoneNumber(phoneNumber)}</div>
+          <div className="text-2xl font-bold text-blue-dark mb-2">{formatPhoneNumber(phoneNumber)}</div>
           {!isRunning ? (
             <span className="text-gray-500">Calling...</span>
           ) : (
@@ -33,13 +33,13 @@ const CallScreen = ({ phoneNumber, session, speakerOff, setSpeakerOff, seconds, 
           {!showKeyPad ? (
             <div className="flex justify-around mb-6">
               <button
-                className={`p-4 rounded-full ${speakerOff ? 'bg-teal-dark text-white' : 'bg-gray-200 text-teal-dark'}`}
+                className={`p-4 rounded-full ${speakerOff ? 'bg-blue-dark text-white' : 'text-gray-600'}`}
                 onClick={() => setSpeakerOff(!speakerOff)}
               >
                 <IoVolumeMuteSharp className="text-3xl" />
               </button>
               <button
-                className={`p-4 rounded-full ${muted ? 'bg-teal-dark text-white' : 'bg-gray-200 text-teal-dark'}`}
+                className={`p-4 rounded-full ${muted ? 'bg-blue-dark text-white' : 'text-gray-600'}`}
                 onClick={() => {
                   muted ? session.unmute() : session.mute();
                   setMuted(!muted);
@@ -47,16 +47,16 @@ const CallScreen = ({ phoneNumber, session, speakerOff, setSpeakerOff, seconds, 
               >
                 <BsMicMute className="text-3xl" />
               </button>
-              <button className="p-4 bg-gray-200 text-teal-dark rounded-full" onClick={() => setShowKeyPad(true)}>
+              <button className="p-4 text-gray-600 rounded-full" onClick={() => setShowKeyPad(true)}>
                 <IoIosKeypad className="text-3xl" />
               </button>
             </div>
           ) : (
-            <div className="flex flex-col items-center mb-4">
-              <div className="text-xl font-bold text-teal-dark mb-2">{currNum}</div>
+            <div className="flex flex-col items-center mb-4 relative">
+              <div className="text-xl font-bold text-blue-dark mb-2">{currNum}</div>
               <KeyPad setPhoneNumber={setCurrNum} />
               <div
-                className="flex items-center justify-center mt-4 text-teal-dark cursor-pointer"
+                className="flex items-center justify-center mt-4 text-blue-dark cursor-pointer absolute -top-6 right-1"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={() => {
@@ -70,13 +70,12 @@ const CallScreen = ({ phoneNumber, session, speakerOff, setSpeakerOff, seconds, 
           )}
         </div>
         <button
-          className="mt-6 p-4 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600"
+          className="p-4 bg-red-500 text-white rounded-full hover:bg-red-600 focus:outline-none"
           onClick={() => {
-            console.log('button clicked');
             session.terminate();
           }}
         >
-          <ImPhoneHangUp className="text-3xl" />
+          <ImPhoneHangUp size={20} />
         </button>
       </div>
     </div>
