@@ -7,7 +7,7 @@ import JsSIP from "jssip";
 
 const useJssip = () => {
   const audioRef = useRef();
-  const { setHistory , username,password} = useContext(HistoryContext);
+  const { setHistory, username, password } = useContext(HistoryContext);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [ua, setUa] = useState(null);
   const [session, setSession] = useState(null);
@@ -66,7 +66,7 @@ const useJssip = () => {
       var configuration = {
         sockets: [socket],
         session_timers: false,
-        uri: `${(username).replace("@","-")}@samwad.iotcom.io:8089`,
+        uri: `${(username).replace("@", "-")}@samwad.iotcom.io:8089`,
         password: password,
       };
       var ua = new JsSIP.UA(configuration);
@@ -77,46 +77,68 @@ const useJssip = () => {
         console.log(e.session.direction);
         if (e.session.direction === "incoming") {
           const incomingnumber = e.request.from._uri._user;
-          e.session.answer();
-          setSession(e.session);
-          reset();
-          setStatus("calling");
-
-          setHistory((prev) => {
-            setPhoneNumber(incomingnumber);
-            console.log("phoneNUmber", incomingnumber);
-            return [
-              ...prev,
-              {
-                phoneNumber:incomingnumber,
-                type: "incoming",
-                status: "Success",
-                start: new Date().getTime(),
-                startTime: new Date(),
-              },
-            ];
-          });
-
-          e.session.connection.addEventListener("addstream", (event) => {
-            audioRef.current.srcObject = event.stream;
-          });
-          e.session.once("ended", (e) => {
-            console.log("Call ended local event");
-            setHistory((prev) => [
-              ...prev.slice(0, -1),
-              { ...prev[prev.length - 1], end: new Date().getTime() },
-            ]);
-
-            pause();
-            setStatus("start");
-            setPhoneNumber("");
-          });
+          if (true) {
+            console.log("handle  fresh incoming call ");
+            setStatus("Incalling");
+            setSession(e.session);
+            reset();
+            setHistory((prev) => {
+              setPhoneNumber(incomingnumber);
+              console.log("phoneNUmber", incomingnumber);
+              return [
+                ...prev,
+                {
+                  phoneNumber: incomingnumber,
+                  type: "incoming",
+                  status: "Success",
+                  start: new Date().getTime(),
+                  startTime: new Date(),
+                },
+              ];
+            });
+          } else {
+            e.session.answer();
+            setSession(e.session);
+            reset();
+            setStatus("calling");
+    
+            setHistory((prev) => {
+              setPhoneNumber(incomingnumber);
+              console.log("phoneNUmber", incomingnumber);
+              return [
+                ...prev,
+                {
+                  phoneNumber: incomingnumber,
+                  type: "incoming",
+                  status: "Success",
+                  start: new Date().getTime(),
+                  startTime: new Date(),
+                },
+              ];
+            });
+    
+            e.session.connection.addEventListener("addstream", (event) => {
+              audioRef.current.srcObject = event.stream;
+            });
+            e.session.once("ended", (e) => {
+              console.log("Call ended local event");
+              setHistory((prev) => [
+                ...prev.slice(0, -1),
+                { ...prev[prev.length - 1], end: new Date().getTime() },
+              ]);
+    
+              pause();
+              setStatus("start");
+              setPhoneNumber("");
+            });
+          }
         } else {
           setSession(e.session);
           e.session.connection.addEventListener("addstream", (event) => {
             audioRef.current.srcObject = event.stream;
           });
         }
+    
       });
 
       setUa(ua);
@@ -143,8 +165,8 @@ const useJssip = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ caller:username, receiver: phoneNumber})
-      }).then(()=>{console.log("dail api called")} );
+        body: JSON.stringify({ caller: username, receiver: phoneNumber })
+      }).then(() => { console.log("dail api called") });
 
       setStatus("calling");
     }
@@ -162,6 +184,7 @@ const useJssip = () => {
     setSpeakerOff,
     isRunning,
     audioRef,
+    setStatus,
   ];
 };
 
