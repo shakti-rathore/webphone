@@ -1,10 +1,10 @@
-import "./index.css";
-import Home from "./components/Home";
-import CallScreen from "./components/CallScreen";
-import HistoryScreen from "./components/HistoryScreen";
-import useJssip from "./hooks/useJssip";
-import { useState } from "react";
-import  InCallScreen from "./components/InCallScreen";
+import './index.css';
+import Home from './components/Home';
+import CallScreen from './components/CallScreen';
+import HistoryScreen from './components/HistoryScreen';
+import useJssip from './hooks/useJssip';
+import { useState } from 'react';
+import InCallScreen from './components/InCallScreen';
 
 function App() {
   const [
@@ -19,7 +19,7 @@ function App() {
     setSpeakerOff,
     isRunning,
     audioRef,
-    setStatus
+    setStatus,
   ] = useJssip();
   const [seeLogs, setSeeLogs] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
@@ -31,14 +31,14 @@ function App() {
     <div className="App">
       {seeLogs ? (
         <HistoryScreen setSeeLogs={setSeeLogs} />
-      ) : status ==="start" ? (
+      ) : status === 'start' ? (
         <Home
           phoneNumber={phoneNumber}
           setPhoneNumber={setPhoneNumber}
           handleCall={handleCall}
           setSeeLogs={setSeeLogs}
         />
-      ) : status === "calling" ? (
+      ) : status === 'calling' ? (
         <CallScreen
           phoneNumber={phoneNumber}
           session={session}
@@ -48,22 +48,21 @@ function App() {
           minutes={minuteTime}
           isRunning={isRunning}
         />
-      ) : status === "Incalling" ? (
+      ) : status === 'Incalling' ? (
         <InCallScreen
-      phoneNumber={phoneNumber}
-      session={session}
-      speakerOff={speakerOff}
-      setSpeakerOff={setSpeakerOff}
-      setPhoneNumber={setPhoneNumber}
-      seconds={secondTime}
-      minutes={minuteTime}
-      isRunning={isRunning}
-      setStatus={setStatus}
-      />): <div>
-        Nothing 
-      </div>
-      
-      }
+          phoneNumber={phoneNumber}
+          session={session}
+          speakerOff={speakerOff}
+          setSpeakerOff={setSpeakerOff}
+          setPhoneNumber={setPhoneNumber}
+          seconds={secondTime}
+          minutes={minuteTime}
+          isRunning={isRunning}
+          setStatus={setStatus}
+        />
+      ) : (
+        <div>Nothing</div>
+      )}
       <audio ref={audioRef} autoPlay hidden={true} muted={speakerOff} />
     </div>
   );

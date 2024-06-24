@@ -1,9 +1,9 @@
 import { format } from 'date-fns';
-import { BsTrash } from 'react-icons/bs';
+import { BsTelephoneInboundFill, BsTelephoneMinusFill, BsTelephoneOutboundFill, BsTrash } from 'react-icons/bs';
 import HistoryContext from '../context/HistoryContext';
 import { useContext } from 'react';
 
-const HistoryItem = ({ date, phone, status, start, end, index }) => {
+const HistoryItem = ({ date, phone, status, type, start, end, index, handleCall, setPhoneNumber }) => {
   const { setHistory } = useContext(HistoryContext);
 
   const range = (end - start) / 1000;
@@ -13,9 +13,14 @@ const HistoryItem = ({ date, phone, status, start, end, index }) => {
     setHistory((prev) => prev.filter((item, idx) => prev.length - 1 - index !== idx));
   };
 
+  // function call(phone) {
+  //   setPhoneNumber(phone);
+  //   handleCall();
+  // }
+
   return (
     <div className="bg-white p-2 flex items-baseline border-b justify-between">
-      <div>
+      <div >
         <div className="gap-x-4 flex mb-2">
           <span className="text-sm text-gray-600">{format(new Date(date), 'MM/dd/yyyy')}</span>
           <span className="text-sm text-gray-600">{format(new Date(date), 'hh:mm bbbb')}</span>
@@ -29,9 +34,20 @@ const HistoryItem = ({ date, phone, status, start, end, index }) => {
             </em>
           </div>
         </div>
-        <p className="duration text-gray-600">
-          Duration: <em>{duration}</em>
-        </p>
+        <div className="flex gap-5 items-center">
+          <p className="duration text-gray-600">
+            Duration: <em>{duration}</em>
+          </p>
+          <p className="text-blue">
+            {type === 'outgoing' ? (
+              <BsTelephoneOutboundFill />
+            ) : type === 'incoming' ? (
+              <BsTelephoneInboundFill />
+            ) : (
+              <BsTelephoneMinusFill className="text-red-600" />
+            )}
+          </p>
+        </div>
       </div>
 
       <div className="hover:text-red-800 cursor-pointer text-red-600" onClick={handleDelete}>

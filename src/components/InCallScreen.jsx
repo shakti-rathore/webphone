@@ -1,29 +1,38 @@
-import { BsPersonFill, BsMicMute } from 'react-icons/bs';
+import { BsPersonFill, BsMicMute, BsX } from 'react-icons/bs';
 import { IoIosKeypad } from 'react-icons/io';
 import { IoCloseCircleOutline, IoCloseCircle, IoVolumeMuteSharp } from 'react-icons/io5';
 import { ImPhoneHangUp } from 'react-icons/im';
 import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
-import { useState,useRef,useContext } from 'react';
+import { useState, useRef, useContext } from 'react';
 import KeyPad from './KeyPad';
-import HistoryContext from "../context/HistoryContext";
-import { useStopwatch } from "react-timer-hook";
+import HistoryContext from '../context/HistoryContext';
+import { useStopwatch } from 'react-timer-hook';
 
-
-
-const InCallScreen = ({ setPhoneNumber,phoneNumber, session, speakerOff, setSpeakerOff, seconds, minutes, isRunning, setStatus }) => {
+const InCallScreen = ({
+  setPhoneNumber,
+  phoneNumber,
+  session,
+  speakerOff,
+  setSpeakerOff,
+  seconds,
+  minutes,
+  isRunning,
+  setStatus,
+}) => {
   const [currNum, setCurrNum] = useState('');
   const [isHovered, setIsHovered] = useState(false);
   const [showKeyPad, setShowKeyPad] = useState(false);
   const [muted, setMuted] = useState(false);
   const audioRefIn = useRef();
-  const { setHistory,username } = useContext(HistoryContext);
+  const { setHistory, username } = useContext(HistoryContext);
   const [isRinging, setIsRinging] = useState(true);
   const { pause } = useStopwatch({
     autoStart: false,
   });
 
   const formatPhoneNumber = useFormatPhoneNumber();
-  return (    
+
+  return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <audio id="ringtoneII" autoPlay hidden={true} src="ringtone.mp3" />
       <div className="flex flex-col items-center w-full max-w-72 p-6 bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
@@ -80,57 +89,63 @@ const InCallScreen = ({ setPhoneNumber,phoneNumber, session, speakerOff, setSpea
             </div>
           )}
         </div>
-        <button
-          className={`p-4 ${isRinging ? 'bg-blue-500' : 'bg-red-500' } text-white rounded-full hover:bg-red-600 focus:outline-none`}
-          
-          onClick={() => {
-            if(isRinging) {
-            console.log("call answer button clicked")
-            document.getElementById("ringtoneII").pause();
-            document.getElementById("ringtoneII").currentTime = 0;
-            session.answer();
-            setIsRinging(false);
-            session.connection.addEventListener("addstream", (event) => {
-              audioRefIn.current.srcObject = event.stream;
-            });
-            session.once("ended", (e) => {
-              console.log("Call ended local event");
-              setHistory((prev) => [
-                ...prev.slice(0, -1),
-                { ...prev[prev.length - 1], end: new Date().getTime() },
-              ]);  
-              pause();
-              setStatus("start");
-              setPhoneNumber("");
-              fetch(`https://samwad.iotcom.io/user/callended${username}`, {
-                method: 'POST',
-              }).then(()=>{
-                console.log("call ended API Called");
-                fetch(`https://samwad.iotcom.io/user/disposition${username}`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    //"Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
-                  },
-                  body: JSON.stringify({
-                    bridgeID: "web-phone-test",
-                    Disposition : "Webponecall"
-                }),
-                }).then(()=>{console.log("dispo req send to server")});
-              });
-            });
-          } else {
-            console.log("button clicked to end call")
-            session.terminate();
-            
-          }
-          
 
-            //session.terminate();
-          }}
-        >
-          <ImPhoneHangUp size={20} />
-        </button>
+        <div className="flex space-x-12">
+          <button
+            className={`p-4 ${
+              isRinging ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-500 hover:bg-gray-600'
+            } text-white rounded-full animate-ping focus:outline-none`}
+            onClick={() => {
+              if (isRinging) {
+                console.log('call answer button clicked');
+                document.getElementById('ringtoneII').pause();
+                document.getElementById('ringtoneII').currentTime = 0;
+                session.answer();
+                setIsRinging(false);
+                session.connection.addEventListener('addstream', (event) => {
+                  audioRefIn.current.srcObject = event.stream;
+                });
+                session.once('ended', (e) => {
+                  console.log('Call ended local event');
+                  setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
+                  pause();
+                  setStatus('start');
+                  setPhoneNumber('');
+                  fetch(`https://samwad.iotcom.io/user/callended${username}`, {
+                    method: 'POST',
+                  }).then(() => {
+                    console.log('call ended API Called');
+                    fetch(`https://samwad.iotcom.io/user/disposition${username}`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        //"Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+                      },
+                      body: JSON.stringify({
+                        bridgeID: 'web-phone-test',
+                        Disposition: 'Webponecall',
+                      }),
+                    }).then(() => {
+                      console.log('dispo req send to server');
+                    });
+                  });
+                });
+              }
+            }}
+          >
+            {isRinging && <ImPhoneHangUp size={20} />}
+          </button>
+
+          <button
+            className="p-4 bg-red-500 hover:bg-red-600 text-white rounded-full focus:outline-none"
+            onClick={() => {
+              console.log('button clicked to end call');
+              session.terminate();
+            }}
+          >
+            <BsX size={20} />
+          </button>
+        </div>
       </div>
       <audio ref={audioRefIn} autoPlay hidden={true} muted={speakerOff} />
     </div>

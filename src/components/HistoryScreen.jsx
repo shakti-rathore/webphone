@@ -4,7 +4,7 @@ import HistoryItem from './HistoryItem';
 import { IoMdArrowBack } from 'react-icons/io';
 import { BsTrash } from 'react-icons/bs';
 
-const HistoryScreen = ({ setSeeLogs }) => {
+const HistoryScreen = ({ setSeeLogs, setPhoneNumber, handleCall }) => {
   const { history, setHistory } = useContext(HistoryContext);
 
   return (
@@ -30,7 +30,6 @@ const HistoryScreen = ({ setSeeLogs }) => {
             <BsTrash className="text-xl" />
           </div>
         </div>
-
         <div className="overflow-x-auto lg:max-h-[60vh]">
           {history.length === 0 ? (
             <p className="text-gray-600">No recent calls</p>
@@ -46,6 +45,7 @@ const HistoryScreen = ({ setSeeLogs }) => {
                   end={item.end}
                   status={item.status}
                   index={index}
+                  type={item.type}
                 />
               ))
           )}

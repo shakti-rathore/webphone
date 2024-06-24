@@ -11,7 +11,7 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="w-full max-w-72 p-4 bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
+      <div className="w-full max-w-72 p-4 bg-white rounded-lg shadow-none md:shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className="flex justify-between items-center mb-4">
           <div className="text-xl font-bold text-blue-dark">WebPhone</div>
           <div
@@ -31,7 +31,7 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs }) => {
               setPhoneNumber(e.target.value);
             }}
             placeholder="Phone number"
-            className="w-full outline-none text-xl indent-1.5"
+            className="w-full outline-none text-2xl indent-1.5"
           />
           {phoneNumber && (
             <div
