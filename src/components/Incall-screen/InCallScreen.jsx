@@ -1,4 +1,4 @@
-import "./call-screen.scss";
+import "./Incall-screen.scss";
 import { BsPersonFill, BsMicMute } from "react-icons/bs";
 import { IoIosKeypad } from "react-icons/io";
 import {
@@ -7,28 +7,40 @@ import {
   IoVolumeMuteSharp,
 } from "react-icons/io5";
 import { ImPhoneHangUp } from "react-icons/im";
-import useFormatPhoneNumber from "./../../hooks/useFormatPhoneNumber";
-import { useState } from "react";
-import KeyPad from "./../key-pad/KeyPad";
+import useFormatPhoneNumber from "../../hooks/useFormatPhoneNumber";
+import { useState,useContext,useRef } from "react";
+import KeyPad from "../key-pad/KeyPad";
+import HistoryContext from "../../context/HistoryContext";
+import { useStopwatch } from "react-timer-hook";
 
-const CallScreen = ({
+
+const InCallScreen = ({
   phoneNumber,
+  setPhoneNumber,
   session,
   speakerOff,
   setSpeakerOff,
   seconds,
   minutes,
   isRunning,
+  setStatus
 }) => {
   const [currNum, setCurrNum] = useState("");
   const [isHovered, setIsHovered] = useState(false);
   const [showKeyPad, setShowKeyPad] = useState(false);
   const [muted, setMuted] = useState(false);
-  console.log("rendering call screen")
-
+  const { setHistory,username } = useContext(HistoryContext);
+  const audioRefIn = useRef();
+  const { pause } = useStopwatch({
+    autoStart: false,
+  });
   const formatPhoneNumber = useFormatPhoneNumber();
+  const [isRinging, setIsRinging] = useState(true);
+  //audioRefIn.current.srcObject = "ringtone.mp3";
+
   return (
     <div className="call-container">
+      <audio id="ringtoneII" autoPlay hidden={true} src="ringtone.mp3" />
       <div className="call-top">
         <div className="avatar">
           <BsPersonFill className="person-icon" />
@@ -89,17 +101,60 @@ const CallScreen = ({
           </div>
         )}
         <button
-          className="cancel"
+          className={isRinging ? 'call-btn' : 'cancel'}
           onClick={() => {
-            console.log("button clicked");
+            
+            if(isRinging) {
+            console.log("button clicked to answer call"); 
+            document.getElementById("ringtoneII").pause();
+            document.getElementById("ringtoneII").currentTime = 0;
+            session.answer();
+            setIsRinging(false);
+            session.connection.addEventListener("addstream", (event) => {
+              audioRefIn.current.srcObject = event.stream;
+            });
+            session.once("ended", (e) => {
+              console.log("Call ended local event");
+              setHistory((prev) => [
+                ...prev.slice(0, -1),
+                { ...prev[prev.length - 1], end: new Date().getTime() },
+              ]);  
+              pause();
+              setStatus("start");
+              setPhoneNumber("");
+              fetch(`https://samwad.iotcom.io/user/callended${username}`, {
+                method: 'POST',
+              }).then(()=>{
+                console.log("call ended API Called");
+                fetch(`https://samwad.iotcom.io/user/disposition${username}`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    //"Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+                  },
+                  body: JSON.stringify({
+                    bridgeID: "web-phone-test",
+                    Disposition : "Webponecall"
+                }),
+                }).then(()=>{console.log("dispo req send to server")});
+              });
+            });
+          } else {
+            console.log("button clicked to answer call")
             session.terminate();
+            
+          }
           }}
         >
           <ImPhoneHangUp className="cancle-icon" />
         </button>
       </div>
+
+      <audio ref={audioRefIn} autoPlay hidden={true} muted={speakerOff} />
+      {/* <audio id="ringtone" autoPlay hidden={true} src="ringtone.mp3" /> */}
+
     </div>
   );
 };
 
-export default CallScreen;
+export default InCallScreen;

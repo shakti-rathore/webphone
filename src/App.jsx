@@ -1,6 +1,7 @@
 import "./App.scss";
 import Home from "./components/home/Home";
 import CallScreen from "./components/call-screen/CallScreen";
+import InCallScreen from "./components/Incall-screen/InCallScreen";
 import HistoryScreen from "./components/history-screen/HistoryScreen";
 import useJssip from "./hooks/useJssip";
 import { useState } from "react";
@@ -18,6 +19,7 @@ function App() {
     setSpeakerOff,
     isRunning,
     audioRef,
+    setStatus,
   ] = useJssip();
   const [seeLogs, setSeeLogs] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
@@ -29,14 +31,14 @@ function App() {
     <div className="App">
       {seeLogs ? (
         <HistoryScreen setSeeLogs={setSeeLogs} />
-      ) : status !== "calling" ? (
+      ) : status !== "calling" && status !== "Incalling" ? (
         <Home
           phoneNumber={phoneNumber}
           setPhoneNumber={setPhoneNumber}
           handleCall={handleCall}
           setSeeLogs={setSeeLogs}
         />
-      ) : (
+      ) : status !== "Incalling" ? (
         <CallScreen
           phoneNumber={phoneNumber}
           session={session}
@@ -46,8 +48,21 @@ function App() {
           minutes={minuteTime}
           isRunning={isRunning}
         />
-      )}
+      ) : <InCallScreen
+      phoneNumber={phoneNumber}
+      session={session}
+      speakerOff={speakerOff}
+      setSpeakerOff={setSpeakerOff}
+      setPhoneNumber={setPhoneNumber}
+      seconds={secondTime}
+      minutes={minuteTime}
+      isRunning={isRunning}
+      setStatus={setStatus}
+      />
+      }
       <audio ref={audioRef} autoPlay hidden={true} muted={speakerOff} />
+      
+      
     </div>
   );
 }

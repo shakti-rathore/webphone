@@ -1,0 +1,170 @@
+.call-container {
+  width: 300px;
+  height: 542px;
+  background-color: #fbfbff;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  padding: 30px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+
+  .call-top {
+    .avatar {
+      border-radius: 50%;
+      background-color: #ddd;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: auto;
+
+      .person-icon {
+        font-size: 48px;
+        color: #888;
+      }
+    }
+
+    .phone-number {
+      font-size: 22px;
+      color: #555;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin: 8px 0 2px;
+    }
+
+    .status {
+      color: #999;
+      letter-spacing: 1px;
+      display: block;
+      text-align: center;
+    }
+  }
+
+  .keypad {
+    width: 180px;
+    position: relative;
+    .number-keyboard {
+      margin-top: 8px;
+      margin-bottom: 8px;
+      .item {
+        margin-bottom: 10px;
+        .number-item {
+          width: 46px;
+          height: 46px;
+        }
+      }
+    }
+    .phone-number {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      min-height: 28px;
+    }
+
+    .close-icon {
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 24px;
+      cursor: pointer;
+      color: darkred;
+    }
+  }
+
+  .call-bottom {
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+
+      .actions-item {
+        margin: 0 20px;
+        cursor: pointer;
+        transition: all ease-in-out 0.3s;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .actions-icon {
+          font-size: 24px;
+        }
+        &.active {
+          background-color: rgba(0, 0, 0, 0.05);
+          box-shadow: 0 0 4px 2px rgba($color: #000000, $alpha: 0.25);
+        }
+      }
+    }
+
+    .cancel {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      background-color: #ff5353;
+      color: #fbfbff;
+      font-size: 32px;
+      justify-self: flex-end;
+      margin: auto;
+      cursor: pointer;
+      box-shadow: 0 0 6px 8px rgba($color: #000000, $alpha: 0.05);
+      transition: all ease-in-out 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        transform: scale3d(1.05, 1.05, 1);
+      }
+    }
+
+    .call-btn {
+      animation: blink 1s linear infinite;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: none;
+      background-color: #5fdd5a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: auto;
+      margin-bottom: 20px;
+      cursor: pointer;
+      box-shadow: 0 0 6px 8px rgba($color: #000000, $alpha: 0.05);
+      transition: all ease-in-out 0.2s;
+  
+      &:hover {
+        transform: scale3d(1.1, 1.1, 1);
+      }
+  
+      .call-icon {
+        color: white;
+        font-size: 26px;
+      }
+
+      @keyframes blink {
+        25% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 0;
+        }
+        75% {
+          opacity: 0.5;
+        }
+      }
+      
+    }
+    
+  }
+}

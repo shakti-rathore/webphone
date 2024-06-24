@@ -7,6 +7,7 @@ export const HistoryProvider = ({ children }) => {
   const [history, setHistory] = useState(lst);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isDialing, setIsDialing] = useState(true);
 
 
   useEffect(() => {
@@ -14,7 +15,7 @@ export const HistoryProvider = ({ children }) => {
   }, [history]);
 
   return (
-    <HistoryContext.Provider value={{ history, setHistory,username,setUsername,password,setPassword }}>
+    <HistoryContext.Provider value={{ history, setHistory,username,setUsername,password,setPassword,isDialing, setIsDialing }}>
       {children}
     </HistoryContext.Provider>
   );

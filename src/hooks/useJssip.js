@@ -7,7 +7,7 @@ import JsSIP from "jssip";
 
 const useJssip = () => {
   const audioRef = useRef();
-  const { setHistory , username,password} = useContext(HistoryContext);
+  const { setHistory , username,password,isDialing, setIsDialing} = useContext(HistoryContext);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [ua, setUa] = useState(null);
   const [session, setSession] = useState(null);
@@ -77,7 +77,32 @@ const useJssip = () => {
         console.log(e.session.direction);
         if (e.session.direction === "incoming") {
           const incomingnumber = e.request.from._uri._user;
+          console.log(isDialing);
+          if(!isDialing) {
+            console.log("handle  fresh incoming call ");
+            setSession(e.session);
+            reset();
+            setStatus("Incalling");  
+            setHistory((prev) => {
+              setPhoneNumber(incomingnumber);
+              console.log("phoneNUmber", incomingnumber);
+              return [
+                ...prev,
+                {
+                  phoneNumber:incomingnumber,
+                  type: "incoming",
+                  status: "Success",
+                  start: new Date().getTime(),
+                  startTime: new Date(),
+                },
+              ];
+            });
+
+          } else {          
+          console.log("incoming call against dailout call");
           e.session.answer();
+          setSession(e.session);
+          reset();
           fetch(`https://samwad.iotcom.io/useroncall/${username}`, {
             method: 'POST',
             headers: {
@@ -91,7 +116,7 @@ const useJssip = () => {
             .then((data) => {
               if (data.message === 'Sucess answer the call') {
                 //answer the call and proceed
-                console.log(data.message);
+                //console.log(data.message);
                 
               } else { 
                 console.log('response error from server');         
@@ -101,9 +126,8 @@ const useJssip = () => {
               console.error('Error sending call answer request:', error);
             })
 
-          setSession(e.session);
-          reset();
-          setStatus("calling");
+          
+          //setStatus("calling");
 
           setHistory((prev) => {
             setPhoneNumber(incomingnumber);
@@ -131,6 +155,7 @@ const useJssip = () => {
             ]);
 
             pause();
+            setIsDialing(false);
             setStatus("start");
             setPhoneNumber("");
             fetch(`https://samwad.iotcom.io/user/callended${username}`, {
@@ -150,6 +175,10 @@ const useJssip = () => {
               }).then(()=>{console.log("dispo req send to server")});
             });
           });
+
+          }
+          
+          
         } else {
           setSession(e.session);
           e.session.connection.addEventListener("addstream", (event) => {
@@ -175,6 +204,9 @@ const useJssip = () => {
           phoneNumber,
         },
       ]);
+      setStatus("calling");
+      setIsDialing(true);
+      
       //ua.call(phoneNumber.replace(" ", ""), options);
 
       fetch(`https://samwad.iotcom.io/dialnumber`, {
@@ -184,8 +216,9 @@ const useJssip = () => {
         },
         body: JSON.stringify({ caller:username, receiver: phoneNumber})
       }).then(()=>{console.log("dail api called")} );
+      
 
-      setStatus("calling");
+      
     }
   };
 
@@ -201,6 +234,7 @@ const useJssip = () => {
     setSpeakerOff,
     isRunning,
     audioRef,
+    setStatus,
   ];
 };
 
