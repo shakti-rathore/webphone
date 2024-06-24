@@ -4,7 +4,7 @@ import App from './App';
 import { HistoryProvider } from './context/HistoryContext';
 import Login from './components/Login';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import './index.css';
+import { Toaster } from 'react-hot-toast';
 
 ReactDOM.render(
   <Router>
@@ -24,6 +24,7 @@ ReactDOM.render(
         element={
           <React.StrictMode>
             <HistoryProvider>
+              <Toaster position="top-right" reverseOrder={false} />
               <App />
             </HistoryProvider>
           </React.StrictMode>

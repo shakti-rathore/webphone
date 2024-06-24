@@ -14,14 +14,14 @@ const HistoryItem = ({ date, phone, status, start, end, index }) => {
   };
 
   return (
-    <div className=" bg-white rounded-lg shadow-md p-4 mb-4 flex items-center justify-between">
+    <div className="bg-white p-2 flex items-baseline border-b justify-between">
       <div>
         <div className="gap-x-4 flex mb-2">
           <span className="text-sm text-gray-600">{format(new Date(date), 'MM/dd/yyyy')}</span>
           <span className="text-sm text-gray-600">{format(new Date(date), 'hh:mm bbbb')}</span>
         </div>
         <div className="gap-x-4 flex md:mb-2 flex-wrap">
-          <span className="phone-numbe text-teal-dark font-semibold">{phone}</span>
+          <span className="phone-numbe text-blue-dark font-semibold">{phone}</span>
           <div>
             <span className="text-gray-600 mr-2">Status:</span>
             <em className={`font-medium ${status === 'Success' ? 'text-green-500' : 'text-red-600'}`}>
