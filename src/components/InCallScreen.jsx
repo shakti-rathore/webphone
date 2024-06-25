@@ -1,4 +1,4 @@
-import { BsPersonFill, BsMicMute, BsX } from 'react-icons/bs';
+import { BsPersonFill, BsMicMute, BsTelephoneFill } from 'react-icons/bs';
 import { IoIosKeypad } from 'react-icons/io';
 import { IoCloseCircleOutline, IoCloseCircle, IoVolumeMuteSharp } from 'react-icons/io5';
 import { ImPhoneHangUp } from 'react-icons/im';
@@ -31,7 +31,6 @@ const InCallScreen = ({
   });
 
   const formatPhoneNumber = useFormatPhoneNumber();
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <audio id="ringtoneII" autoPlay hidden={true} src="ringtone.mp3" />
@@ -89,12 +88,19 @@ const InCallScreen = ({
             </div>
           )}
         </div>
-
-        <div className="flex space-x-12">
+        <div className="flex items-center space-x-24">
           <button
-            className={`p-4 ${
-              isRinging ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-500 hover:bg-gray-600'
-            } text-white rounded-full animate-ping focus:outline-none`}
+            className="p-4 bg-red-500 hover:bg-red-600 text-white rounded-full focus:outline-none"
+            onClick={() => {
+              console.log('button clicked to end call');
+              session.terminate();
+            }}
+          >
+            <ImPhoneHangUp size={20} />
+          </button>
+
+          <button
+            className="p-4 bg-green-500 hover:bg-green-600 text-white rounded-full focus:outline-none"
             onClick={() => {
               if (isRinging) {
                 console.log('call answer button clicked');
@@ -133,17 +139,7 @@ const InCallScreen = ({
               }
             }}
           >
-            {isRinging && <ImPhoneHangUp size={20} />}
-          </button>
-
-          <button
-            className="p-4 bg-red-500 hover:bg-red-600 text-white rounded-full focus:outline-none"
-            onClick={() => {
-              console.log('button clicked to end call');
-              session.terminate();
-            }}
-          >
-            <BsX size={20} />
+            <BsTelephoneFill size={20} />
           </button>
         </div>
       </div>
