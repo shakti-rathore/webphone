@@ -59,6 +59,7 @@ function App() {
           minutes={minuteTime}
           isRunning={isRunning}
           setStatus={setStatus}
+          audioRef ={audioRef}
         />
       ) : (
         <div>Nothing</div>

@@ -18,12 +18,13 @@ const InCallScreen = ({
   minutes,
   isRunning,
   setStatus,
+  audioRef
 }) => {
   const [currNum, setCurrNum] = useState('');
   const [isHovered, setIsHovered] = useState(false);
   const [showKeyPad, setShowKeyPad] = useState(false);
   const [muted, setMuted] = useState(false);
-  const audioRefIn = useRef();
+  //const audioRefIn = useRef();
   const { setHistory, username } = useContext(HistoryContext);
   const [isRinging, setIsRinging] = useState(true);
   const { pause } = useStopwatch({
@@ -108,9 +109,32 @@ const InCallScreen = ({
                 document.getElementById('ringtoneII').currentTime = 0;
                 session.answer();
                 setIsRinging(false);
+                //setStatus('calling');
                 session.connection.addEventListener('addstream', (event) => {
-                  audioRefIn.current.srcObject = event.stream;
+                  audioRef.current.srcObject = event.stream;
                 });
+                fetch(`https://samwad.iotcom.io/useroncall/${username}`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    //"Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+                  },
+                })
+                  .then((response) => {
+                    return response.json();
+                  })
+                  .then((data) => {
+                    if (data.message === 'Sucess answer the call') {
+                      //answer the call and proceed
+                      //console.log(data.message);
+                      
+                    } else { 
+                      console.log('response error from server');         
+                    }
+                  })
+                  .catch((error) => {
+                    console.error('Error sending call answer request:', error);
+                  })
                 session.once('ended', (e) => {
                   console.log('Call ended local event');
                   setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
@@ -136,6 +160,7 @@ const InCallScreen = ({
                     });
                   });
                 });
+                setStatus('calling');
               }
             }}
           >
@@ -143,7 +168,7 @@ const InCallScreen = ({
           </button>
         </div>
       </div>
-      <audio ref={audioRefIn} autoPlay hidden={true} muted={speakerOff} />
+      {/* {<audio ref={audioRefIn} autoPlay hidden={true} muted={speakerOff} />} */}
     </div>
   );
 };
