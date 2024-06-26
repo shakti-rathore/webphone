@@ -81,6 +81,31 @@ const useJssip = () => {
             console.log("handle  fresh incoming call ");
             setStatus("Incalling");
             setSession(e.session);
+              e.session.once('failed', (e) => {
+                  console.log('Call failed local event');
+                  setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime(), status: "Fail", }]);
+                  pause();
+                  setStatus('start');
+                  setPhoneNumber('');
+                  fetch(`https://samwad.iotcom.io/user/callended${username}`, {
+                    method: 'POST',
+                  }).then(() => {
+                    console.log('call ended API Called');
+                    fetch(`https://samwad.iotcom.io/user/disposition${username}`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        //"Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+                      },
+                      body: JSON.stringify({
+                        bridgeID: 'web-phone-test',
+                        Disposition: 'Webponecall',
+                      }),
+                    }).then(() => {
+                      console.log('dispo req send to server');
+                    });
+                  });
+                });
             reset();
             setHistory((prev) => {
               setPhoneNumber(incomingnumber);
