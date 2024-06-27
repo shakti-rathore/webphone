@@ -5,6 +5,7 @@ import { HistoryProvider } from './context/HistoryContext';
 import Login from './components/Login';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <Router>
@@ -35,3 +36,6 @@ ReactDOM.render(
   </Router>,
   document.getElementById('root')
 );
+
+
+serviceWorker.register();
