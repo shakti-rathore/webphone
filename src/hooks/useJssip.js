@@ -11,6 +11,7 @@ const useJssip = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [ua, setUa] = useState(null);
   const [session, setSession] = useState(null);
+  const [bridgeID,setBridgeID]=useState("");
   const [speakerOff, setSpeakerOff] = useState(false);
   const [status, setStatus] = useState("start");
   const { seconds, minutes, isRunning, pause, reset } = useStopwatch({
@@ -61,12 +62,12 @@ const useJssip = () => {
   useEffect(() => {
     try {
       var socket = new JsSIP.WebSocketInterface(
-        "wss://samwad.iotcom.io:8089/ws"
+        "wss://awsdev.iotcom.io:8089/ws"
       );
       var configuration = {
         sockets: [socket],
         session_timers: false,
-        uri: `${(username).replace("@", "-")}@samwad.iotcom.io:8089`,
+        uri: `${(username).replace("@", "-")}@awsdev.iotcom.io:8089`,
         password: password,
       };
       var ua = new JsSIP.UA(configuration);
@@ -77,7 +78,11 @@ const useJssip = () => {
         console.log(e.session.direction);
         if (e.session.direction === "incoming") {
           const incomingnumber = e.request.from._uri._user;
-          if (true) {
+          const isdialing = localStorage.getItem("dialing");
+          console.log("isdialing",isdialing);
+          //console.log("condition",isdialing===null || isdialing === false);
+         // console.log("condition2",isdialing===null || isdialing === "false");
+          if (isdialing===null || isdialing === "false") {
             console.log("handle  fresh incoming call ");
             setStatus("Incalling");
             setSession(e.session);
@@ -87,11 +92,11 @@ const useJssip = () => {
                   pause();
                   setStatus('start');
                   setPhoneNumber('');
-                  fetch(`https://samwad.iotcom.io/user/callended${username}`, {
+                  fetch(`https://awsdev.iotcom.io/user/callended${username}`, {
                     method: 'POST',
                   }).then(() => {
                     console.log('call ended API Called');
-                    fetch(`https://samwad.iotcom.io/user/disposition${username}`, {
+                    fetch(`https://awsdev.iotcom.io/user/disposition${username}`, {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
@@ -126,6 +131,7 @@ const useJssip = () => {
             setSession(e.session);
             reset();
             setStatus("calling");
+            localStorage.setItem("dialing",false);
     
             setHistory((prev) => {
               setPhoneNumber(incomingnumber);
@@ -155,6 +161,7 @@ const useJssip = () => {
               pause();
               setStatus("start");
               setPhoneNumber("");
+              console.log("bridage id",bridgeID);
             });
           }
         } else {
@@ -184,8 +191,9 @@ const useJssip = () => {
         },
       ]);
       //ua.call(phoneNumber.replace(" ", ""), options);
+      localStorage.setItem("dialing",true);
 
-      fetch(`https://samwad.iotcom.io/dialnumber`, {
+      fetch(`https://awsdev.iotcom.io/dialnumber`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -193,7 +201,7 @@ const useJssip = () => {
         body: JSON.stringify({ caller: username, receiver: phoneNumber })
       }).then(() => { console.log("dail api called") });
 
-      setStatus("calling");
+      //setStatus("calling");
     }
   };
 
@@ -210,6 +218,7 @@ const useJssip = () => {
     isRunning,
     audioRef,
     setStatus,
+    setBridgeID
   ];
 };
 

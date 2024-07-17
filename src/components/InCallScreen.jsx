@@ -113,7 +113,7 @@ const InCallScreen = ({
                 session.connection.addEventListener('addstream', (event) => {
                   audioRef.current.srcObject = event.stream;
                 });
-                fetch(`https://samwad.iotcom.io/useroncall/${username}`, {
+                fetch(`https://awsdev.iotcom.io/useroncall/${username}`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -141,11 +141,11 @@ const InCallScreen = ({
                   pause();
                   setStatus('start');
                   setPhoneNumber('');
-                  fetch(`https://samwad.iotcom.io/user/callended${username}`, {
+                  fetch(`https://awsdev.iotcom.io/user/callended${username}`, {
                     method: 'POST',
                   }).then(() => {
                     console.log('call ended API Called');
-                    fetch(`https://samwad.iotcom.io/user/disposition${username}`, {
+                    fetch(`https://awsdev.iotcom.io/user/disposition${username}`, {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',

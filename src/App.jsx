@@ -20,6 +20,7 @@ function App() {
     isRunning,
     audioRef,
     setStatus,
+    setBridgeID
   ] = useJssip();
   const [seeLogs, setSeeLogs] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
@@ -47,6 +48,7 @@ function App() {
           seconds={secondTime}
           minutes={minuteTime}
           isRunning={isRunning}
+          setBridgeID={setBridgeID}
         />
       ) : status === 'Incalling' ? (
         <InCallScreen

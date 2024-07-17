@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://samwad.iotcom.io';
+const API_BASE_URL = 'https://awsdev.iotcom.io';
 
 export async function apiRequest(endpoint, method = 'GET', body = null) {
   const headers = {
@@ -22,7 +22,7 @@ export async function apiRequest(endpoint, method = 'GET', body = null) {
   } else {
     if(data.message !=="wrong login info"){
 
-      const url = `https://samwad.iotcom.io/userready/${body?.username}`;
+      const url = `https://awsdev.iotcom.io/userready/${body?.username}`;
       // Make a edit request to the server
       fetch(url, {
         method: 'POST',
@@ -44,7 +44,7 @@ export async function apiRequest(endpoint, method = 'GET', body = null) {
             //console.log(ua);
             //connectionTime = Date.now();
             const keeplive = setInterval(() => {
-              fetch('https://samwad.iotcom.io/userconnection', {
+              fetch('https://awsdev.iotcom.io/userconnection', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
