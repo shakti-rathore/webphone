@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://awsdev.iotcom.io';
+const API_BASE_URL = 'https://awsdev.iotcom.io'; // base url changed by shakti  
 
 export async function apiRequest(endpoint, method = 'GET', body = null) {
   const headers = {
