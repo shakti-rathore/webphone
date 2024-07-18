@@ -1,0 +1,6 @@
+{
+  "appId": "com.webphone.app",
+  "appName": "webphone",
+  "webDir": "build",
+  "bundledWebRuntime": false
+}
