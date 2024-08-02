@@ -1,17 +1,38 @@
 import { BsPersonFill, BsMicMute } from 'react-icons/bs';
 import { IoIosKeypad } from 'react-icons/io';
-import { IoCloseCircleOutline, IoCloseCircle, IoVolumeMuteSharp } from 'react-icons/io5';
+import { IoCloseCircleOutline, IoCloseCircle } from 'react-icons/io5';
 import { ImPhoneHangUp } from 'react-icons/im';
 import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 import { useState } from 'react';
 import KeyPad from './KeyPad';
 
-const CallScreen = ({ phoneNumber, session, speakerOff, setSpeakerOff, seconds, minutes, isRunning }) => {
+const CallScreen = ({
+  phoneNumber,
+  session,
+  seconds,
+  minutes,
+  isRunning,
+  devices,
+  selectedDeviceId,
+  changeAudioDevice,
+}) => {
   const [currNum, setCurrNum] = useState('');
   const [isHovered, setIsHovered] = useState(false);
   const [showKeyPad, setShowKeyPad] = useState(false);
   const [muted, setMuted] = useState(false);
-
+  const debugDevices = async () => {
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      console.log('All devices:', devices);
+      console.log(
+        'Audio input devices:',
+        devices.filter((device) => device.kind === 'audioinput')
+      );
+    } catch (error) {
+      console.error('Debug error:', error);
+    }
+  };
   const formatPhoneNumber = useFormatPhoneNumber();
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
@@ -32,12 +53,6 @@ const CallScreen = ({ phoneNumber, session, speakerOff, setSpeakerOff, seconds, 
         <div className="w-full">
           {!showKeyPad ? (
             <div className="flex justify-around mb-6">
-              <button
-                className={`p-4 rounded-full ${speakerOff ? 'bg-blue-dark text-white' : 'text-gray-600'}`}
-                onClick={() => setSpeakerOff(!speakerOff)}
-              >
-                <IoVolumeMuteSharp className="text-3xl" />
-              </button>
               <button
                 className={`p-4 rounded-full ${muted ? 'bg-blue-dark text-white' : 'text-gray-600'}`}
                 onClick={() => {
@@ -77,6 +92,23 @@ const CallScreen = ({ phoneNumber, session, speakerOff, setSpeakerOff, seconds, 
         >
           <ImPhoneHangUp size={20} />
         </button>
+        <div className="w-full mt-4">
+          <label htmlFor="audio-device" className="block text-sm font-medium text-gray-700 mb-1">
+            Audio Device:
+          </label>
+          <select
+            id="audio-device"
+            value={selectedDeviceId}
+            onChange={(e) => changeAudioDevice(e.target.value)}
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          >
+            {devices.map((device) => (
+              <option key={device.deviceId} value={device.deviceId}>
+                {device.label || `Audio device ${devices.indexOf(device) + 1}`}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   );
