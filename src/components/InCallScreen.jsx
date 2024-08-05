@@ -49,7 +49,7 @@ const InCallScreen = ({
             </span>
           )}
         </div>
-        <div className="w-full">
+        {/* <div className="w-full">
           {!showKeyPad ? (
             <div className="flex justify-around mb-6">
               <button
@@ -88,7 +88,7 @@ const InCallScreen = ({
               </div>
             </div>
           )}
-        </div>
+        </div> */}
         <div className="flex items-center space-x-24">
           <button
             className="p-4 bg-red-500 hover:bg-red-600 text-white rounded-full focus:outline-none"

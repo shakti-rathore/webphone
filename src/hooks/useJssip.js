@@ -11,7 +11,6 @@ const useJssip = () => {
   const [ua, setUa] = useState(null);
   const [session, setSession] = useState(null);
   const [bridgeID, setBridgeID] = useState('');
-  const [speakerOff, setSpeakerOff] = useState(false);
   const [status, setStatus] = useState('start');
   const [devices, setDevices] = useState([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState('');
@@ -59,7 +58,7 @@ const useJssip = () => {
     if (session) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          audio: { deviceId: { exact: deviceId } }
+          audio: { deviceId: { exact: deviceId } },
         });
         session.connection.getSenders()[0].replaceTrack(stream.getAudioTracks()[0]);
       } catch (error) {
@@ -186,11 +185,11 @@ const useJssip = () => {
       try {
         // Request permission for audio
         await navigator.mediaDevices.getUserMedia({ audio: true });
-        
+
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const audioDevices = devices.filter(device => device.kind === 'audioinput');
+        const audioDevices = devices.filter((device) => device.kind === 'audioinput');
         setDevices(audioDevices);
-        
+
         if (audioDevices.length > 0) {
           setSelectedDeviceId(audioDevices[0].deviceId);
         }
@@ -207,11 +206,9 @@ const useJssip = () => {
     return () => {
       navigator.mediaDevices.removeEventListener('devicechange', enumerateDevices);
     };
-
   }, []);
 
   const handleCall = () => {
-    setSpeakerOff(false);
     if (phoneNumber) {
       setHistory((prev) => [
         ...prev,
@@ -231,17 +228,6 @@ const useJssip = () => {
       }).then(() => {
         console.log('dial api called');
       });
-    }
-  };
-
-  const changeAudioOutput = (deviceId) => {
-    if (audioRef.current && typeof audioRef.current.setSinkId === 'function') {
-      audioRef.current
-        .setSinkId(deviceId)
-        .then(() => {
-          setSelectedDeviceId(deviceId);
-        })
-        .catch((error) => console.error('Error setting sinkId:', error));
     }
   };
 
