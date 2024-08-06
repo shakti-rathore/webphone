@@ -6,11 +6,6 @@
   "plugins": {
     "LocalNotifications": {
       "smallIcon": "ic_stat_icon"
-    },
-
-    "BackgroundRunner": {
-      "runOnBoot": true,
-      "enableAutoStart": true
     }
   }
 }
