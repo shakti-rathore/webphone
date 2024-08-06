@@ -5,6 +5,7 @@ import HistoryScreen from './components/HistoryScreen';
 import useJssip from './hooks/useJssip';
 import { useState, useEffect } from 'react';
 import InCallScreen from './components/InCallScreen';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 function App() {
   const [
@@ -28,6 +29,51 @@ function App() {
 
   const secondTime = seconds < 10 ? `0${seconds}` : `${seconds}`;
   const minuteTime = minutes < 10 ? `0${minutes}` : `${minutes}`;
+
+  useEffect(() => {
+    const requestPermissions = async () => {
+      const result = await LocalNotifications.requestPermissions();
+      if (result.receive === 'granted') {
+        console.log('Notification permissions granted.');
+      }
+    };
+
+    requestPermissions();
+  }, []);
+
+  useEffect(() => {
+    if (status === 'Incalling') {
+      const scheduleNotification = async () => {
+        await LocalNotifications.schedule({
+          notifications: [
+            {
+              title: 'Incoming Call',
+              body: 'You have an incoming call!',
+              id: 2,
+              sound: 'default',
+            },
+          ],
+        });
+      };
+
+      scheduleNotification();
+    }
+  }, [status]);
+
+  useEffect(() => {
+    const handleNotificationClick = (notification) => {
+      console.log('Notification clicked:', notification);
+    };
+
+    const notificationListener = LocalNotifications.addListener(
+      'localNotificationActionPerformed',
+      handleNotificationClick
+    );
+
+    return () => {
+      notificationListener.remove();
+    };
+  }, []);
 
   return (
     <div className="App">

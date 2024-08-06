@@ -2,5 +2,15 @@
   "appId": "com.webphone.app",
   "appName": "webphone",
   "webDir": "build",
-  "bundledWebRuntime": false
+  "bundledWebRuntime": false,
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon"
+    },
+
+    "BackgroundRunner": {
+      "runOnBoot": true,
+      "enableAutoStart": true
+    }
+  }
 }
