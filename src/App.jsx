@@ -23,6 +23,7 @@ function App() {
     devices,
     selectedDeviceId,
     changeAudioDevice,
+    scheduleNotification,
   ] = useJssip();
   const [seeLogs, setSeeLogs] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
@@ -39,40 +40,6 @@ function App() {
     };
 
     requestPermissions();
-  }, []);
-
-  useEffect(() => {
-    if (status === 'Incalling') {
-      const scheduleNotification = async () => {
-        await LocalNotifications.schedule({
-          notifications: [
-            {
-              title: 'Incoming Call',
-              body: 'You have an incoming call!',
-              id: 2,
-              sound: 'default',
-            },
-          ],
-        });
-      };
-
-      scheduleNotification();
-    }
-  }, [status]);
-
-  useEffect(() => {
-    const handleNotificationClick = (notification) => {
-      console.log('Notification clicked:', notification);
-    };
-
-    const notificationListener = LocalNotifications.addListener(
-      'localNotificationActionPerformed',
-      handleNotificationClick
-    );
-
-    return () => {
-      notificationListener.remove();
-    };
   }, []);
 
   return (

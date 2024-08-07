@@ -3,6 +3,7 @@ import HistoryContext from '../context/HistoryContext';
 import { useNavigate } from 'react-router-dom';
 import { useStopwatch } from 'react-timer-hook';
 import JsSIP from 'jssip';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 const useJssip = () => {
   const audioRef = useRef();
@@ -19,6 +20,18 @@ const useJssip = () => {
   });
   const navigate = useNavigate();
 
+  const showIncomingCallNotification = async (callDetails) => {
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          title: 'Incoming Call',
+          body: `Call from ${callDetails.caller}`,
+          id: 1,
+          sound: 'default',
+        },
+      ],
+    });
+  };
   var eventHandlers = {
     failed: function (e) {
       setStatus('fail');
@@ -89,6 +102,7 @@ const useJssip = () => {
           if (isdialing === null || isdialing === 'false') {
             console.log('handle fresh incoming call');
             setStatus('Incalling');
+            showIncomingCallNotification({ caller: incomingnumber });
             setSession(e.session);
             e.session.once('failed', (e) => {
               console.log('Call failed local event');
