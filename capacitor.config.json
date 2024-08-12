@@ -6,6 +6,9 @@
   "plugins": {
     "LocalNotifications": {
       "smallIcon": "ic_stat_icon"
+    },
+    "BackgroundRunner": {
+      "enabled": true
     }
   }
 }

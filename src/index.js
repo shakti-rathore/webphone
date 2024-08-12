@@ -9,7 +9,7 @@ import { Toaster } from 'react-hot-toast';
 ReactDOM.render(
   <Router>
     <Routes>
-      <Route
+      {/* <Route
         path="/login"
         element={
           <React.StrictMode>
@@ -18,7 +18,7 @@ ReactDOM.render(
             </HistoryProvider>
           </React.StrictMode>
         }
-      />
+      /> */}
       <Route
         path="/dashboard"
         element={
@@ -30,7 +30,7 @@ ReactDOM.render(
           </React.StrictMode>
         }
       />
-      <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="*" element={<Navigate to="/dashboard" />} />
     </Routes>
   </Router>,
   document.getElementById('root')

@@ -3,9 +3,10 @@ import Home from './components/Home';
 import CallScreen from './components/CallScreen';
 import HistoryScreen from './components/HistoryScreen';
 import useJssip from './hooks/useJssip';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import InCallScreen from './components/InCallScreen';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import HistoryContext from './context/HistoryContext';
 
 function App() {
   const [
@@ -25,6 +26,7 @@ function App() {
     changeAudioDevice,
     scheduleNotification,
   ] = useJssip();
+
   const [seeLogs, setSeeLogs] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
 
@@ -41,6 +43,41 @@ function App() {
 
     requestPermissions();
   }, []);
+
+  const keepAliveRef = useRef(null);
+  const { username } = useContext(HistoryContext);
+
+  useEffect(() => {
+    if (username) {
+      const url = `https://awsdev.iotcom.io/userready/${username}`;
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message === 'success') {
+            console.log('user ready to take call');
+            keepAliveRef.current = setInterval(() => {
+              fetch('https://awsdev.iotcom.io/userconnection', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user: username }),
+              }).then(() => {});
+            }, 2000);
+          }
+        })
+        .catch((error) => {
+          console.error('Error sending login request:', error);
+        });
+    }
+
+    return () => {
+      if (keepAliveRef.current) {
+        clearInterval(keepAliveRef.current);
+      }
+    };
+  }, [username]);
 
   return (
     <div className="App">
@@ -79,9 +116,9 @@ function App() {
           selectedDeviceId={selectedDeviceId}
         />
       ) : (
-        <div>Nothing</div>
+        <div>No content available</div> // Improved empty state handling
       )}
-      <audio ref={audioRef} autoPlay hidden={true} />
+      <audio ref={audioRef} autoPlay hidden />
     </div>
   );
 }
