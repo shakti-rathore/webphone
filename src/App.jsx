@@ -24,14 +24,59 @@ function App() {
     devices,
     selectedDeviceId,
     changeAudioDevice,
-    scheduleNotification,
   ] = useJssip();
 
   const [seeLogs, setSeeLogs] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
+  const [timeoutArray, setTimeoutArray] = useState([]);
+  const keepAliveRef = useRef(null);
+  const { username } = useContext(HistoryContext);
 
-  const secondTime = seconds < 10 ? `0${seconds}` : `${seconds}`;
-  const minuteTime = minutes < 10 ? `0${minutes}` : `${minutes}`;
+  const connectioncheck = async () => {
+    if (isLogin && username) {
+      try {
+        const response = await Promise.race([
+          fetch('https://awsdev.iotcom.io/userconnection', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user: username }),
+          }),
+          new Promise((_, reject) => {
+            setTimeout(() => {
+              reject(new Error('Timeout'));
+            }, 3000);
+          }),
+        ]);
+
+        if (response.status === 401) {
+          window.location.href = '/login';
+        } else {
+          const data = await response.json();
+          if (data.message === 'ok connection for user') {
+            setTimeoutArray([]);
+          } else if (data.message === 'poor connection problem ,please login again') {
+            setIsLogin(false);
+            clearInterval(keepAliveRef.current);
+          }
+        }
+      } catch (err) {
+        if (err.message === 'Timeout') {
+          const timeout = { timeout: true };
+          const newTimeoutArray = [...timeoutArray, timeout];
+          setTimeoutArray(newTimeoutArray);
+
+          if (newTimeoutArray.length > 2) {
+            setIsLogin(false);
+            clearInterval(keepAliveRef.current);
+          }
+        } else {
+          console.error('Error during connection check:', err);
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     const requestPermissions = async () => {
@@ -44,9 +89,6 @@ function App() {
     requestPermissions();
   }, []);
 
-  const keepAliveRef = useRef(null);
-  const { username } = useContext(HistoryContext);
-
   useEffect(() => {
     if (username) {
       const url = `https://awsdev.iotcom.io/userready/${username}`;
@@ -57,14 +99,10 @@ function App() {
         .then((response) => response.json())
         .then((data) => {
           if (data.message === 'success') {
-            console.log('user ready to take call');
+            setIsLogin(true);
             keepAliveRef.current = setInterval(() => {
-              fetch('https://awsdev.iotcom.io/userconnection', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user: username }),
-              }).then(() => {});
-            }, 2000);
+              connectioncheck();
+            }, 5000);
           }
         })
         .catch((error) => {
@@ -94,8 +132,8 @@ function App() {
         <CallScreen
           phoneNumber={phoneNumber}
           session={session}
-          seconds={secondTime}
-          minutes={minuteTime}
+          seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
+          minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
           isRunning={isRunning}
           setBridgeID={setBridgeID}
           devices={devices}
@@ -107,8 +145,8 @@ function App() {
           phoneNumber={phoneNumber}
           session={session}
           setPhoneNumber={setPhoneNumber}
-          seconds={secondTime}
-          minutes={minuteTime}
+          seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
+          minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
           isRunning={isRunning}
           setStatus={setStatus}
           audioRef={audioRef}
@@ -116,7 +154,7 @@ function App() {
           selectedDeviceId={selectedDeviceId}
         />
       ) : (
-        <div>No content available</div> // Improved empty state handling
+        <div>No content available</div>
       )}
       <audio ref={audioRef} autoPlay hidden />
     </div>
