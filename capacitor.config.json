@@ -6,6 +6,17 @@
   "plugins": {
     "LocalNotifications": {
       "smallIcon": "ic_stat_icon"
+    },
+    "BackgroundRunner": {
+      "label": "com.capacitor.background.check",
+      "src": "runners/runner.js",
+      "event": "checkIn",
+      "repeat": true,
+      "interval": 1,
+      "autoStart": true
     }
   }
 }
+
+
+
