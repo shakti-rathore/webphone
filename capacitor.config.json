@@ -10,7 +10,7 @@
     "BackgroundRunner": {
       "label": "com.capacitor.background.check",
       "src": "runners/runner.js",
-      "event": "checkIn",
+      "event": "checkConnection",
       "repeat": true,
       "interval": 1,
       "autoStart": true

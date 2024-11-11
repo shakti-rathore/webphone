@@ -82,11 +82,11 @@ const useJssip = () => {
 
   useEffect(() => {
     try {
-      var socket = new JsSIP.WebSocketInterface('wss://awsdev.iotcom.io:8089/ws');
+      var socket = new JsSIP.WebSocketInterface('wss://callapp.iotcom.io:8089/ws');
       var configuration = {
         sockets: [socket],
         session_timers: false,
-        uri: `${username.replace('@', '-')}@awsdev.iotcom.io:8089`,
+        uri: `${username.replace('@', '-')}@callapp.iotcom.io:8089`,
         password: password,
       };
       var ua = new JsSIP.UA(configuration);
@@ -113,11 +113,11 @@ const useJssip = () => {
               pause();
               setStatus('start');
               setPhoneNumber('');
-              fetch(`https://awsdev.iotcom.io/user/callended${username}`, {
+              fetch(`https://callapp.iotcom.io/user/callended${username}`, {
                 method: 'POST',
               }).then(() => {
                 console.log('call ended API Called');
-                fetch(`https://awsdev.iotcom.io/user/disposition${username}`, {
+                fetch(`https://callapp.iotcom.io/user/disposition${username}`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -233,7 +233,7 @@ const useJssip = () => {
       ]);
       localStorage.setItem('dialing', true);
 
-      fetch(`https://awsdev.iotcom.io/dialnumber`, {
+      fetch(`https://callapp.iotcom.io/dialnumber`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
