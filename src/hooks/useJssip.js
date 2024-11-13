@@ -36,31 +36,26 @@ const useJssip = () => {
     });
   };
 
-
-
   // Function to start recording
-  const startRecording = async () => {
-    if (!session || isRecording) return;
+  const startRecording = async (currentSession) => {
+    if (!currentSession || isRecording) return;
 
     try {
-      // Get the audio streams from the session
       const audioStream = new MediaStream();
-      
+
       // Add both local and remote audio tracks to the stream
-      session.connection.getReceivers().forEach(receiver => {
+      currentSession.connection.getReceivers().forEach((receiver) => {
         if (receiver.track.kind === 'audio') {
           audioStream.addTrack(receiver.track);
         }
       });
-      
-      // Add local audio track if available
-      session.connection.getSenders().forEach(sender => {
+
+      currentSession.connection.getSenders().forEach((sender) => {
         if (sender.track && sender.track.kind === 'audio') {
           audioStream.addTrack(sender.track);
         }
       });
 
-      // Create MediaRecorder instance
       const recorder = new MediaRecorder(audioStream, {
         mimeType: 'audio/webm',
       });
@@ -75,13 +70,17 @@ const useJssip = () => {
         const blob = new Blob(chunks.current, { type: 'audio/webm' });
         chunks.current = [];
 
+        // Generate filename with timestamp and call direction
+        const timestamp = new Date().toISOString();
+        const direction = currentSession.direction || 'unknown';
+        const phoneNum = phoneNumber || 'unknown';
+
         // Convert to WAV format
-        convertToWav(blob).then(wavBlob => {
-          // Create download link
+        convertToWav(blob).then((wavBlob) => {
           const url = URL.createObjectURL(wavBlob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `call-recording-${new Date().toISOString()}.wav`;
+          a.download = `call-${direction}-${phoneNum}-${timestamp}.wav`;
           a.click();
           URL.revokeObjectURL(url);
         });
@@ -100,50 +99,48 @@ const useJssip = () => {
     if (mediaRecorder && isRecording) {
       mediaRecorder.stop();
       setIsRecording(false);
+      setMediaRecorder(null);
     }
   };
 
-  // Function to convert audio blob to WAV format
+  // Keep the existing convertToWav and encodeWAV functions...
   const convertToWav = async (blob) => {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const arrayBuffer = await blob.arrayBuffer();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    
+
     const numberOfChannels = audioBuffer.numberOfChannels;
     const length = audioBuffer.length;
     const sampleRate = audioBuffer.sampleRate;
     const wavBuffer = audioContext.createBuffer(numberOfChannels, length, sampleRate);
 
-    // Copy the audio data to the new buffer
     for (let channel = 0; channel < numberOfChannels; channel++) {
       const channelData = audioBuffer.getChannelData(channel);
       wavBuffer.copyToChannel(channelData, channel);
     }
 
-    // Convert to WAV format
     const wavData = encodeWAV(wavBuffer);
     return new Blob([wavData], { type: 'audio/wav' });
   };
-
   // Function to encode audio buffer to WAV format
   const encodeWAV = (audioBuffer) => {
     const numChannels = audioBuffer.numberOfChannels;
     const sampleRate = audioBuffer.sampleRate;
     const format = 1; // PCM
     const bitDepth = 16;
-    
+
     const bytesPerSample = bitDepth / 8;
     const blockAlign = numChannels * bytesPerSample;
-    
+
     const buffer = audioBuffer.getChannelData(0);
     const samples = buffer.length;
     const dataSize = samples * blockAlign;
     const headerSize = 44;
     const totalSize = headerSize + dataSize;
-    
+
     const arrayBuffer = new ArrayBuffer(totalSize);
     const dataView = new DataView(arrayBuffer);
-    
+
     // Write WAV header
     writeString(dataView, 0, 'RIFF');
     dataView.setUint32(4, totalSize - 8, true);
@@ -158,18 +155,18 @@ const useJssip = () => {
     dataView.setUint16(34, bitDepth, true);
     writeString(dataView, 36, 'data');
     dataView.setUint32(40, dataSize, true);
-    
+
     // Write audio data
     let offset = 44;
     for (let i = 0; i < samples; i++) {
       for (let channel = 0; channel < numChannels; channel++) {
         const sample = audioBuffer.getChannelData(channel)[i];
         const value = Math.max(-1, Math.min(1, sample));
-        dataView.setInt16(offset, value * 0x7FFF, true);
+        dataView.setInt16(offset, value * 0x7fff, true);
         offset += bytesPerSample;
       }
     }
-    
+
     return arrayBuffer;
   };
 
@@ -180,9 +177,9 @@ const useJssip = () => {
     }
   };
 
-
   var eventHandlers = {
     failed: function (e) {
+      stopRecording();
       setStatus('fail');
       setPhoneNumber('');
       setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], status: 'Fail', start: 0, end: 0 }]);
@@ -190,7 +187,7 @@ const useJssip = () => {
 
     confirmed: function (e) {
       reset();
-      startRecording(); // Start recording when call is confirmed
+      startRecording(session); // Start recording when call is confirmed
       setHistory((prev) => [
         ...prev.slice(0, -1),
         {
@@ -200,8 +197,9 @@ const useJssip = () => {
         },
       ]);
     },
+
     ended: function (e) {
-      stopRecording(); // Stop recording when call ends
+      stopRecording();
       console.log('call ended');
       setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
       pause();
@@ -209,6 +207,23 @@ const useJssip = () => {
       setPhoneNumber('');
     },
   };
+
+  // Modified session handling for incoming calls
+  useEffect(() => {
+    if (session) {
+      session.on('confirmed', () => {
+        startRecording(session);
+      });
+
+      session.on('ended', () => {
+        stopRecording();
+      });
+
+      session.on('failed', () => {
+        stopRecording();
+      });
+    }
+  }, [session]);
 
   var options = {
     eventHandlers: eventHandlers,
@@ -321,9 +336,9 @@ const useJssip = () => {
               audioRef.current.srcObject = event.stream;
             });
             e.session.once('ended', (e) => {
+              stopRecording();
               console.log('Call ended local event');
               setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
-
               pause();
               setStatus('start');
               setPhoneNumber('');
@@ -410,8 +425,6 @@ const useJssip = () => {
     selectedDeviceId,
     changeAudioDevice,
     isRecording,
-    startRecording,
-    stopRecording,
   ];
 };
 

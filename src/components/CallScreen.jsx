@@ -38,9 +38,12 @@ const CallScreen = ({
           {!isRunning ? (
             <span className="text-gray-500">Calling...</span>
           ) : (
-            <span className="text-gray-500">
-              {minutes} : {seconds}
-            </span>
+            <div className="flex items-center">
+              <span className="text-gray-500">
+                {minutes} : {seconds}
+              </span>
+              {!isRecording && <span className="ml-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>}
+            </div>
           )}
         </div>
 
@@ -56,7 +59,7 @@ const CallScreen = ({
               >
                 <BsMicMute className="text-3xl" />
               </button>
-              <div className="flex space-x-4">
+              {/* <div className="flex space-x-4">
                 {!isRecording ? (
                   <button
                     onClick={startRecording}
@@ -76,7 +79,7 @@ const CallScreen = ({
                     <span className="ml-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
                   </button>
                 )}
-              </div>
+              </div> */}
 
               <button className="p-4 text-gray-600 rounded-full" onClick={() => setShowKeyPad(true)}>
                 <IoIosKeypad className="text-3xl" />
