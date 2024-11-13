@@ -2,6 +2,7 @@ import { BsPersonFill, BsMicMute } from 'react-icons/bs';
 import { IoIosKeypad } from 'react-icons/io';
 import { IoCloseCircleOutline, IoCloseCircle } from 'react-icons/io5';
 import { ImPhoneHangUp } from 'react-icons/im';
+import { FaStopCircle } from 'react-icons/fa';
 import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 import { useState } from 'react';
 import KeyPad from './KeyPad';
@@ -15,6 +16,9 @@ const CallScreen = ({
   devices,
   selectedDeviceId,
   changeAudioDevice,
+  isRecording,
+  startRecording,
+  stopRecording,
 }) => {
   const [currNum, setCurrNum] = useState('');
   const [isHovered, setIsHovered] = useState(false);
@@ -22,6 +26,7 @@ const CallScreen = ({
   const [muted, setMuted] = useState(false);
 
   const formatPhoneNumber = useFormatPhoneNumber();
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <div className="flex flex-col items-center w-full max-w-72 p-6 bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
@@ -38,6 +43,7 @@ const CallScreen = ({
             </span>
           )}
         </div>
+
         <div className="w-full">
           {!showKeyPad ? (
             <div className="flex justify-around mb-6">
@@ -50,6 +56,28 @@ const CallScreen = ({
               >
                 <BsMicMute className="text-3xl" />
               </button>
+              <div className="flex space-x-4">
+                {!isRecording ? (
+                  <button
+                    onClick={startRecording}
+                    disabled={!session}
+                    className={`flex items-center space-x-2 px-4 py-2 text-gray-600 rounded-lg transition-opacity focus:outline-none ${
+                      !session ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <FaStopCircle className="text-3xl text-green-500" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={stopRecording}
+                    className="flex items-center space-x-2 px-4 py-2 text-gray-600 rounded-lg transition-opacity focus:outline-none"
+                  >
+                    <FaStopCircle className="text-3xl text-red-500" />
+                    <span className="ml-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
+                  </button>
+                )}
+              </div>
+
               <button className="p-4 text-gray-600 rounded-full" onClick={() => setShowKeyPad(true)}>
                 <IoIosKeypad className="text-3xl" />
               </button>
@@ -72,6 +100,7 @@ const CallScreen = ({
             </div>
           )}
         </div>
+
         <button
           className="p-4 bg-red-500 text-white rounded-full hover:bg-red-600 focus:outline-none"
           onClick={() => {
@@ -80,12 +109,13 @@ const CallScreen = ({
         >
           <ImPhoneHangUp size={20} />
         </button>
+
         <div className="mt-5">
           <select
             id="audio-device"
             value={selectedDeviceId}
             onChange={(e) => changeAudioDevice(e.target.value)}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 outline-none"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 outline-none"
           >
             {devices.map((device) => (
               <option key={device.deviceId} value={device.deviceId}>

@@ -141,12 +141,6 @@ function App() {
 
   return (
     <div className="App">
-      <button onClick={startRecording} disabled={!session || isRecording}>
-        Start Recording
-      </button>
-      <button onClick={stopRecording} disabled={!isRecording}>
-        Stop Recording
-      </button>
       {seeLogs ? (
         <HistoryScreen setSeeLogs={setSeeLogs} />
       ) : status === 'start' ? (
@@ -158,6 +152,9 @@ function App() {
         />
       ) : status === 'calling' ? (
         <CallScreen
+          isRecording={isRecording}
+          startRecording={startRecording}
+          stopRecording={stopRecording}
           phoneNumber={phoneNumber}
           session={session}
           seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
@@ -170,6 +167,9 @@ function App() {
         />
       ) : status === 'Incalling' ? (
         <InCallScreen
+          isRecording={isRecording}
+          startRecording={startRecording}
+          stopRecording={stopRecording}
           phoneNumber={phoneNumber}
           session={session}
           setPhoneNumber={setPhoneNumber}

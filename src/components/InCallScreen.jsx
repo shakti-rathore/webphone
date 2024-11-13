@@ -18,7 +18,10 @@ const InCallScreen = ({
   minutes,
   isRunning,
   setStatus,
-  audioRef
+  audioRef,
+  isRecording,
+  startRecording,
+  stopRecording,
 }) => {
   const [currNum, setCurrNum] = useState('');
   const [isHovered, setIsHovered] = useState(false);
@@ -127,14 +130,13 @@ const InCallScreen = ({
                     if (data.message === 'Sucess answer the call') {
                       //answer the call and proceed
                       //console.log(data.message);
-                      
-                    } else { 
-                      console.log('response error from server');         
+                    } else {
+                      console.log('response error from server');
                     }
                   })
                   .catch((error) => {
                     console.error('Error sending call answer request:', error);
-                  })
+                  });
                 session.once('ended', (e) => {
                   console.log('Call ended local event');
                   setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
