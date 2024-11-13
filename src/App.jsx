@@ -25,6 +25,9 @@ function App() {
     devices,
     selectedDeviceId,
     changeAudioDevice,
+    isRecording,
+    startRecording,
+    stopRecording,
   ] = useJssip();
 
   const [seeLogs, setSeeLogs] = useState(false);
@@ -138,6 +141,12 @@ function App() {
 
   return (
     <div className="App">
+      <button onClick={startRecording} disabled={!session || isRecording}>
+        Start Recording
+      </button>
+      <button onClick={stopRecording} disabled={!isRecording}>
+        Stop Recording
+      </button>
       {seeLogs ? (
         <HistoryScreen setSeeLogs={setSeeLogs} />
       ) : status === 'start' ? (
