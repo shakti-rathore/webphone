@@ -26,8 +26,6 @@ function App() {
     selectedDeviceId,
     changeAudioDevice,
     isRecording,
-    startRecording,
-    stopRecording,
   ] = useJssip();
 
   const [seeLogs, setSeeLogs] = useState(false);
@@ -153,8 +151,6 @@ function App() {
       ) : status === 'calling' ? (
         <CallScreen
           isRecording={isRecording}
-          startRecording={startRecording}
-          stopRecording={stopRecording}
           phoneNumber={phoneNumber}
           session={session}
           seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
@@ -168,8 +164,6 @@ function App() {
       ) : status === 'Incalling' ? (
         <InCallScreen
           isRecording={isRecording}
-          startRecording={startRecording}
-          stopRecording={stopRecording}
           phoneNumber={phoneNumber}
           session={session}
           setPhoneNumber={setPhoneNumber}

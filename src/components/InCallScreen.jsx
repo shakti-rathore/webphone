@@ -19,9 +19,6 @@ const InCallScreen = ({
   isRunning,
   setStatus,
   audioRef,
-  isRecording,
-  startRecording,
-  stopRecording,
 }) => {
   const [currNum, setCurrNum] = useState('');
   const [isHovered, setIsHovered] = useState(false);

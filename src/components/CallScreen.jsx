@@ -16,9 +16,6 @@ const CallScreen = ({
   devices,
   selectedDeviceId,
   changeAudioDevice,
-  isRecording,
-  startRecording,
-  stopRecording,
 }) => {
   const [currNum, setCurrNum] = useState('');
   const [isHovered, setIsHovered] = useState(false);
@@ -42,7 +39,6 @@ const CallScreen = ({
               <span className="text-gray-500">
                 {minutes} : {seconds}
               </span>
-              {!isRecording && <span className="ml-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>}
             </div>
           )}
         </div>
@@ -59,27 +55,6 @@ const CallScreen = ({
               >
                 <BsMicMute className="text-3xl" />
               </button>
-              {/* <div className="flex space-x-4">
-                {!isRecording ? (
-                  <button
-                    onClick={startRecording}
-                    disabled={!session}
-                    className={`flex items-center space-x-2 px-4 py-2 text-gray-600 rounded-lg transition-opacity focus:outline-none ${
-                      !session ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    <FaStopCircle className="text-3xl text-green-500" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={stopRecording}
-                    className="flex items-center space-x-2 px-4 py-2 text-gray-600 rounded-lg transition-opacity focus:outline-none"
-                  >
-                    <FaStopCircle className="text-3xl text-red-500" />
-                    <span className="ml-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
-                  </button>
-                )}
-              </div> */}
 
               <button className="p-4 text-gray-600 rounded-full" onClick={() => setShowKeyPad(true)}>
                 <IoIosKeypad className="text-3xl" />
