@@ -142,7 +142,7 @@ function App() {
 
   return (
     <div className="App">
-      {/* <SpeechRecognitionComponent /> */}
+      <SpeechRecognitionComponent />
       {seeLogs ? (
         <HistoryScreen setSeeLogs={setSeeLogs} />
       ) : status === 'start' ? (
