@@ -10,31 +10,40 @@ function SpeechRecognitionComponent() {
 
   // Function to start the WebRTC stream and loop it to the virtual microphone
   const startStream = async () => {
-    // Assume you have a WebRTC stream, replace with your stream source
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false }); 
-    audioStreamRef.current = stream;
+    try {
+      // Assume you have a WebRTC stream, replace with your stream source
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false }); 
+      audioStreamRef.current = stream;
 
-    // Create AudioContext and MediaStreamDestination
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    audioContextRef.current = audioContext;
-    const streamDestination = audioContext.createMediaStreamDestination();
+      // Create AudioContext and MediaStreamDestination
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      audioContextRef.current = audioContext;
+      const streamDestination = audioContext.createMediaStreamDestination();
 
-    // Connect stream to destination
-    const source = audioContext.createMediaStreamSource(stream);
-    source.connect(streamDestination);
+      // Connect stream to destination
+      const source = audioContext.createMediaStreamSource(stream);
+      source.connect(streamDestination);
 
-    // Optional: Play audio locally
-    const audioElement = new Audio();
-    audioElement.srcObject = stream;
-    audioElement.play();
+      // Optional: Play audio locally
+      const audioElement = new Audio();
+      audioElement.srcObject = stream;
+      audioElement.play();
 
-    // Use the destination stream as a new microphone input (assumes virtual microphone is set as default)
-    startSpeechRecognition(streamDestination.stream);
+      // Use the destination stream as a new microphone input (assumes virtual microphone is set as default)
+      startSpeechRecognition(streamDestination.stream);
+    } catch (error) {
+      console.error('Error starting stream:', error);
+    }
   };
 
   // Initialize SpeechRecognition and start listening
   const startSpeechRecognition = (audioStream) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Speech recognition is not supported in this browser.');
+      return;
+    }
+
     const recognition = new SpeechRecognition();
     recognitionRef.current = recognition;
     recognition.lang = 'en-US';
@@ -42,11 +51,14 @@ function SpeechRecognitionComponent() {
     recognition.interimResults = true;
 
     recognition.onresult = (event) => {
+      let interimTranscript = '';
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
           finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
         }
       }
       setTranscript((prev) => prev + ' ' + finalTranscript);
@@ -69,6 +81,7 @@ function SpeechRecognitionComponent() {
   // Start button handler
   const handleStart = () => {
     setIsListening(true);
+    setTranscript(''); // Clear previous transcript
     startStream();
   };
 
