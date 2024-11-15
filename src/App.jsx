@@ -8,6 +8,7 @@ import InCallScreen from './components/InCallScreen';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import HistoryContext from './context/HistoryContext';
 import { BackgroundRunner } from '@capacitor/background-runner';
+import SpeechRecognitionComponent from './components/SpeechRecognitionComponent';
 
 function App() {
   const [
@@ -141,6 +142,7 @@ function App() {
 
   return (
     <div className="App">
+      {/* <SpeechRecognitionComponent /> */}
       {seeLogs ? (
         <HistoryScreen setSeeLogs={setSeeLogs} />
       ) : status === 'start' ? (
