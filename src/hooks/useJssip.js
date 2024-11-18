@@ -17,7 +17,9 @@ const useJssip = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [remoteTranscript, setRemoteTranscript] = useState('');
   const recognition = useRef(null);
+  const remoteRecognition = useRef(null);
   const chunks = useRef([]);
   const audioRef = useRef();
   const { seconds, minutes, isRunning, pause, reset } = useStopwatch({
@@ -38,32 +40,41 @@ const useJssip = () => {
     });
   };
 
-  const startTranscribing = (audioStream) => {
+  const startTranscribing = (audioStream, isRemote = false) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       console.error('Speech recognition not supported');
       return;
     }
 
-    recognition.current = new SpeechRecognition();
-    recognition.current.continuous = true;
-    recognition.current.interimResults = true;
-    recognition.current.lang = 'en-US';
+    const currentRecognition = new SpeechRecognition();
+    currentRecognition.continuous = true;
+    currentRecognition.interimResults = true;
+    currentRecognition.lang = 'en-IN';
 
-    recognition.current.onresult = (event) => {
+    currentRecognition.onresult = (event) => {
       let fullTranscript = '';
       for (let i = 0; i < event.results.length; i++) {
         fullTranscript += event.results[i][0].transcript + ' ';
       }
-      setTranscript(fullTranscript);
+      if (isRemote) {
+        setRemoteTranscript(fullTranscript);
+        remoteRecognition.current = currentRecognition;
+      } else {
+        setTranscript(fullTranscript);
+        recognition.current = currentRecognition;
+      }
     };
 
-    recognition.current.start();
+    currentRecognition.start();
   };
 
   const stopTranscribing = () => {
     if (recognition.current) {
       recognition.current.stop();
+    }
+    if (remoteRecognition.current) {
+      remoteRecognition.current.stop();
     }
   };
 
@@ -80,9 +91,17 @@ Duration: ${duration}
 Call Direction: ${direction}
 Device Used: ${deviceInfo}
 
-Conversation Transcript
---------------------
-${transcript || 'No transcript available'}
+Local Participant Transcript
+------------------------
+${transcript || 'No local transcript available'}
+
+Remote Participant Transcript
+-------------------------
+${remoteTranscript || 'No remote transcript available'}
+
+Complete Conversation
+------------------
+${formatConversation(transcript, remoteTranscript)}
     `;
 
     const textBlob = new Blob([textContent], { type: 'text/plain' });
@@ -92,6 +111,96 @@ ${transcript || 'No transcript available'}
     textLink.download = `call-details-${new Date().toISOString()}.txt`;
     textLink.click();
     URL.revokeObjectURL(textUrl);
+  };
+
+  // Helper function to format the conversation in chronological order
+  const formatConversation = (localTranscript, remoteTranscript) => {
+    const local = localTranscript.split('. ').filter(Boolean);
+    const remote = remoteTranscript.split('. ').filter(Boolean);
+
+    let conversation = '';
+    const maxLength = Math.max(local.length, remote.length);
+
+    for (let i = 0; i < maxLength; i++) {
+      if (local[i]) {
+        conversation += `Local: ${local[i]}.\n`;
+      }
+      if (remote[i]) {
+        conversation += `Remote: ${remote[i]}.\n`;
+      }
+    }
+
+    return conversation;
+  };
+
+  const startRecording = async () => {
+    if (!session || isRecording) return;
+
+    try {
+      // Create a combined audio stream with both local and remote audio
+      const combinedStream = new MediaStream();
+
+      // Get local microphone stream
+      const micStream = await navigator.mediaDevices.getUserMedia({
+        audio: selectedDeviceId ? { deviceId: { exact: selectedDeviceId } } : true,
+      });
+
+      // Add local microphone tracks
+      micStream.getAudioTracks().forEach((track) => {
+        combinedStream.addTrack(track);
+      });
+
+      // Get remote audio tracks from the WebRTC session
+      const remoteReceivers = session.connection.getReceivers() || [];
+      const remoteTracks = remoteReceivers
+        .filter((receiver) => receiver.track?.kind === 'audio')
+        .map((receiver) => receiver.track)
+        .filter(Boolean);
+
+      // Add remote tracks to combined stream
+      remoteTracks.forEach((track) => {
+        combinedStream.addTrack(track);
+      });
+
+      // Create audio context for mixing streams
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const destination = audioContext.createMediaStreamDestination();
+
+      // Connect local microphone source
+      const localSource = audioContext.createMediaStreamSource(micStream);
+      localSource.connect(destination);
+
+      // Connect remote audio source if available
+      if (remoteTracks.length > 0) {
+        const remoteStream = new MediaStream(remoteTracks);
+        const remoteSource = audioContext.createMediaStreamSource(remoteStream);
+        remoteSource.connect(destination);
+      }
+
+      // Setup recorder with combined stream
+      const recorder = new MediaRecorder(destination.stream, {
+        mimeType: 'audio/webm',
+      });
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.current.push(event.data);
+        }
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+
+      // Start transcription for both streams
+      startTranscribing(micStream);
+      if (remoteTracks.length > 0) {
+        startTranscribing(new MediaStream(remoteTracks), true);
+      }
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      setIsRecording(false);
+    }
   };
 
   // Modified stopRecording function
@@ -131,67 +240,6 @@ ${transcript || 'No transcript available'}
     }
   };
 
-  const startRecording = async () => {
-    if (!session || isRecording) return;
-
-    try {
-      // Create a new MediaStream to hold all audio tracks
-      const combinedStream = new MediaStream();
-
-      // Get local microphone stream
-      const micStream = await navigator.mediaDevices.getUserMedia({
-        audio: selectedDeviceId ? { deviceId: { exact: selectedDeviceId } } : true,
-      });
-
-      // Add local microphone track to combined stream
-      micStream.getAudioTracks().forEach((track) => {
-        combinedStream.addTrack(track);
-      });
-
-      // Add remote audio tracks from the session
-      session.connection.getReceivers().forEach((receiver) => {
-        if (receiver.track.kind === 'audio') {
-          combinedStream.addTrack(receiver.track);
-        }
-      });
-
-      // Add local audio tracks from the session
-      session.connection.getSenders().forEach((sender) => {
-        if (sender.track && sender.track.kind === 'audio') {
-          combinedStream.addTrack(sender.track);
-        }
-      });
-
-      // Create audio context for mixing streams
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const destination = audioContext.createMediaStreamDestination();
-
-      combinedStream.getAudioTracks().forEach((track) => {
-        const source = audioContext.createMediaStreamSource(new MediaStream([track]));
-        source.connect(destination);
-      });
-
-      const recorder = new MediaRecorder(destination.stream, {
-        mimeType: 'audio/webm',
-      });
-
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunks.current.push(event.data);
-        }
-      };
-
-      recorder.start();
-      setMediaRecorder(recorder);
-      setIsRecording(true);
-      startTranscribing(destination.stream);
-
-      console.log('Recording and transcription started successfully with local microphone');
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      setIsRecording(false);
-    }
-  };
   // Event handlers now include recording management
   const eventHandlers = {
     failed: function (e) {
@@ -307,7 +355,17 @@ ${transcript || 'No transcript available'}
 
   var options = {
     eventHandlers: eventHandlers,
-    mediaConstraints: { audio: true },
+    mediaConstraints: {
+      audio: {
+        mandatory: {
+          echoCancellation: true,
+          googEchoCancellation: true,
+          googAutoGainControl: true,
+          googNoiseSuppression: true,
+          googHighpassFilter: true,
+        },
+      },
+    },
   };
 
   const changeAudioDevice = async (deviceId) => {

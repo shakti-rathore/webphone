@@ -1,4 +1,3 @@
-
 import { BsPersonFill, BsMicMute } from 'react-icons/bs';
 import { IoIosKeypad } from 'react-icons/io';
 import { IoCloseCircleOutline, IoCloseCircle } from 'react-icons/io5';
@@ -106,6 +105,7 @@ const CallScreen = ({
           className="p-4 bg-red-500 text-white rounded-full hover:bg-red-600 focus:outline-none"
           onClick={() => {
             session.terminate();
+            stopRecording();
           }}
         >
           <ImPhoneHangUp size={20} />
