@@ -94,83 +94,104 @@ ${transcript || 'No transcript available'}
     URL.revokeObjectURL(textUrl);
   };
 
-// Modified stopRecording function
-const stopRecording = () => {
-  if (mediaRecorder && isRecording) {
-    mediaRecorder.stop();
-    stopTranscribing(); // Stop transcription when recording stops
-    setIsRecording(false);
+  // Modified stopRecording function
+  const stopRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      stopTranscribing(); // Stop transcription when recording stops
+      setIsRecording(false);
 
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks.current, { type: 'audio/webm' });
-      chunks.current = [];
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks.current, { type: 'audio/webm' });
+        chunks.current = [];
 
-      convertToWav(blob).then((wavBlob) => {
-        const audioUrl = URL.createObjectURL(wavBlob);
-        const audioLink = document.createElement('a');
-        audioLink.href = audioUrl;
-        audioLink.download = `call-recording-${new Date().toISOString()}.wav`;
-        audioLink.click();
-        URL.revokeObjectURL(audioUrl);
+        convertToWav(blob).then((wavBlob) => {
+          const audioUrl = URL.createObjectURL(wavBlob);
+          const audioLink = document.createElement('a');
+          audioLink.href = audioUrl;
+          audioLink.download = `call-recording-${new Date().toISOString()}.wav`;
+          audioLink.click();
+          URL.revokeObjectURL(audioUrl);
 
-        const durationMinutes = minutes;
-        const durationSeconds = seconds;
-        const durationString = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
+          const durationMinutes = minutes;
+          const durationSeconds = seconds;
+          const durationString = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
 
-        const callDetails = {
-          phoneNumber: phoneNumber,
-          startTime: new Date(),
-          duration: durationString,
-          direction: session?.direction || 'outgoing',
-          deviceInfo: devices.find((d) => d.deviceId === selectedDeviceId)?.label || 'Default Device'
-        };
+          const callDetails = {
+            phoneNumber: phoneNumber,
+            startTime: new Date(),
+            duration: durationString,
+            direction: session?.direction || 'outgoing',
+            deviceInfo: devices.find((d) => d.deviceId === selectedDeviceId)?.label || 'Default Device',
+          };
 
-        saveTextFile(callDetails);
+          saveTextFile(callDetails);
+        });
+      };
+    }
+  };
+
+  const startRecording = async () => {
+    if (!session || isRecording) return;
+
+    try {
+      // Create a new MediaStream to hold all audio tracks
+      const combinedStream = new MediaStream();
+
+      // Get local microphone stream
+      const micStream = await navigator.mediaDevices.getUserMedia({
+        audio: selectedDeviceId ? { deviceId: { exact: selectedDeviceId } } : true,
       });
-    };
-  }
-};
 
-// Modified startRecording function
-const startRecording = async () => {
-  if (!session || isRecording) return;
+      // Add local microphone track to combined stream
+      micStream.getAudioTracks().forEach((track) => {
+        combinedStream.addTrack(track);
+      });
 
-  try {
-    const audioStream = new MediaStream();
+      // Add remote audio tracks from the session
+      session.connection.getReceivers().forEach((receiver) => {
+        if (receiver.track.kind === 'audio') {
+          combinedStream.addTrack(receiver.track);
+        }
+      });
 
-    session.connection.getReceivers().forEach((receiver) => {
-      if (receiver.track.kind === 'audio') {
-        audioStream.addTrack(receiver.track);
-      }
-    });
+      // Add local audio tracks from the session
+      session.connection.getSenders().forEach((sender) => {
+        if (sender.track && sender.track.kind === 'audio') {
+          combinedStream.addTrack(sender.track);
+        }
+      });
 
-    session.connection.getSenders().forEach((sender) => {
-      if (sender.track && sender.track.kind === 'audio') {
-        audioStream.addTrack(sender.track);
-      }
-    });
+      // Create audio context for mixing streams
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const destination = audioContext.createMediaStreamDestination();
 
-    const recorder = new MediaRecorder(audioStream, {
-      mimeType: 'audio/webm'
-    });
+      combinedStream.getAudioTracks().forEach((track) => {
+        const source = audioContext.createMediaStreamSource(new MediaStream([track]));
+        source.connect(destination);
+      });
 
-    recorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        chunks.current.push(event.data);
-      }
-    };
+      const recorder = new MediaRecorder(destination.stream, {
+        mimeType: 'audio/webm',
+      });
 
-    recorder.start();
-    setMediaRecorder(recorder);
-    setIsRecording(true);
-    startTranscribing(audioStream); // Start transcription when recording starts
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.current.push(event.data);
+        }
+      };
 
-    console.log('Recording and transcription started successfully');
-  } catch (error) {
-    console.error('Error starting recording:', error);
-    setIsRecording(false);
-  }
-};
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      startTranscribing(destination.stream);
+
+      console.log('Recording and transcription started successfully with local microphone');
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      setIsRecording(false);
+    }
+  };
   // Event handlers now include recording management
   const eventHandlers = {
     failed: function (e) {
