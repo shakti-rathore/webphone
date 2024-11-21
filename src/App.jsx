@@ -5,9 +5,7 @@ import HistoryScreen from './components/HistoryScreen';
 import useJssip from './hooks/useJssip';
 import { useState, useEffect, useRef, useContext } from 'react';
 import InCallScreen from './components/InCallScreen';
-import { LocalNotifications } from '@capacitor/local-notifications';
 import HistoryContext from './context/HistoryContext';
-import { BackgroundRunner } from '@capacitor/background-runner';
 
 function App() {
   const [
@@ -119,24 +117,6 @@ function App() {
         clearInterval(keepAliveRef.current);
       }
     };
-  }, [username]);
-
-  useEffect(() => {
-    if (username) {
-      const startBackgroundTask = async () => {
-        try {
-          await BackgroundRunner.dispatchEvent({
-            label: 'com.capacitor.background.check',
-            event: 'checkConnection',
-            details: { username },
-          });
-        } catch (err) {
-          console.error('Failed to start background task:', err);
-        }
-      };
-
-      startBackgroundTask();
-    }
   }, [username]);
 
   return (

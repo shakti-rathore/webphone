@@ -3,7 +3,6 @@ import HistoryContext from '../context/HistoryContext';
 import { useNavigate } from 'react-router-dom';
 import { useStopwatch } from 'react-timer-hook';
 import JsSIP from 'jssip';
-import { LocalNotifications } from '@capacitor/local-notifications';
 
 const useJssip = () => {
   const { setHistory, username, password } = useContext(HistoryContext);
@@ -29,19 +28,6 @@ const useJssip = () => {
     autoStart: false,
   });
   const navigate = useNavigate();
-
-  const showIncomingCallNotification = async (callDetails) => {
-    await LocalNotifications.schedule({
-      notifications: [
-        {
-          title: 'Incoming Call',
-          body: `Call from ${callDetails.caller}`,
-          id: 1,
-          sound: 'default',
-        },
-      ],
-    });
-  };
 
   const initializeWebSocketTranscription = () => {
     const createWebSocket = (isAgent = true) => {
