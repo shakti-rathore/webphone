@@ -16,12 +16,15 @@ const useJssip = () => {
   const [selectedDeviceId, setSelectedDeviceId] = useState('');
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const [remoteTranscript, setRemoteTranscript] = useState('');
-  const recognition = useRef(null);
-  const remoteRecognition = useRef(null);
-  const chunks = useRef([]);
+  const [agentText, setAgentText] = useState('');
+  const [customerText, setCustomerText] = useState('');
+  const agentSocketRef = useRef(null);
+  const customerSocketRef = useRef(null);
+  const agentMediaRecorderRef = useRef(null);
+  const customerMediaRecorderRef = useRef(null);
   const audioRef = useRef();
+  const chunks = useRef([]);
+
   const { seconds, minutes, isRunning, pause, reset } = useStopwatch({
     autoStart: false,
   });
@@ -40,114 +43,126 @@ const useJssip = () => {
     });
   };
 
-  const startTranscribing = (audioStream, isRemote = false) => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      console.error('Speech recognition not supported');
+  const initializeWebSocketTranscription = () => {
+    const createWebSocket = (isAgent = true) => {
+      const socketRef = isAgent ? agentSocketRef : customerSocketRef;
+      const setTextFunction = isAgent ? setAgentText : setCustomerText;
+
+      const socket = new WebSocket('wss://callapp.iotcom.io/socket');
+      socketRef.current = socket;
+
+      socket.onopen = () => {
+        console.log(`${isAgent ? 'Agent' : 'Customer'} WebSocket Connected`);
+      };
+
+      socket.onerror = (error) => {
+        console.error(`${isAgent ? 'Agent' : 'Customer'} WebSocket Error:`, error);
+      };
+
+      socket.onclose = () => {
+        console.log(`${isAgent ? 'Agent' : 'Customer'} WebSocket Closed`);
+        // Attempt to reconnect after a short delay
+        setTimeout(() => {
+          createWebSocket(isAgent);
+        }, 3000);
+      };
+
+      socket.onmessage = (msg) => {
+        try {
+          const text = JSON.parse(msg.data);
+          if (text.isFixed === 'true' || text.isFixed === true) {
+            setTextFunction((prev) => prev + text.data);
+          } else {
+            setTextFunction((prev) => prev + text.data);
+          }
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
+      };
+
+      return socket;
+    };
+
+    // Create both agent and customer WebSockets
+    createWebSocket(true); // Agent WebSocket
+    createWebSocket(false); // Customer WebSocket
+  };
+
+  const startSpeechToText = (stream, isAgent = true) => {
+    const websocket = isAgent ? agentSocketRef.current : customerSocketRef.current;
+    const mediaRecorderRef = isAgent ? agentMediaRecorderRef : customerMediaRecorderRef;
+
+    // Check WebSocket state with more robust connection checking
+    if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+      console.log(`${isAgent ? 'Agent' : 'Customer'} WebSocket not ready. Current state: ${websocket?.readyState}`);
+
+      // If the socket is closing or closed, attempt to reinitialize
+      if (websocket?.readyState === WebSocket.CLOSING || websocket?.readyState === WebSocket.CLOSED) {
+        initializeWebSocketTranscription();
+      }
+
       return;
     }
 
-    const currentRecognition = new SpeechRecognition();
-    currentRecognition.continuous = true;
-    currentRecognition.interimResults = true;
-    currentRecognition.lang = 'en-IN';
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType: 'audio/webm;codecs=opus',
+    });
 
-    currentRecognition.onresult = (event) => {
-      let fullTranscript = '';
-      for (let i = 0; i < event.results.length; i++) {
-        fullTranscript += event.results[i][0].transcript + ' ';
-      }
-      if (isRemote) {
-        setRemoteTranscript(fullTranscript);
-        remoteRecognition.current = currentRecognition;
-      } else {
-        setTranscript(fullTranscript);
-        recognition.current = currentRecognition;
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0 && websocket.readyState === WebSocket.OPEN) {
+        websocket.send(event.data);
       }
     };
 
-    currentRecognition.start();
-  };
+    mediaRecorder.onstop = async () => {
+      const tracks = stream.getAudioTracks();
+      tracks.forEach((track) => track.stop());
 
-  const stopTranscribing = () => {
-    if (recognition.current) {
-      recognition.current.stop();
-    }
-    if (remoteRecognition.current) {
-      remoteRecognition.current.stop();
-    }
-  };
-
-  const saveTextFile = (callDetails) => {
-    const { phoneNumber, startTime, duration, direction, deviceInfo } = callDetails;
-
-    const textContent = `
-Call Details
------------
-Phone Number: ${phoneNumber}
-Date: ${startTime.toLocaleDateString()}
-Time: ${startTime.toLocaleTimeString()}
-Duration: ${duration}
-Call Direction: ${direction}
-Device Used: ${deviceInfo}
-
-Local Participant Transcript
-------------------------
-${transcript || 'No local transcript available'}
-
-Remote Participant Transcript
--------------------------
-${remoteTranscript || 'No remote transcript available'}
-
-Complete Conversation
-------------------
-${formatConversation(transcript, remoteTranscript)}
-    `;
-
-    const textBlob = new Blob([textContent], { type: 'text/plain' });
-    const textUrl = URL.createObjectURL(textBlob);
-    const textLink = document.createElement('a');
-    textLink.href = textUrl;
-    textLink.download = `call-details-${new Date().toISOString()}.txt`;
-    textLink.click();
-    URL.revokeObjectURL(textUrl);
-  };
-
-  // Helper function to format the conversation in chronological order
-  const formatConversation = (localTranscript, remoteTranscript) => {
-    const local = localTranscript.split('. ').filter(Boolean);
-    const remote = remoteTranscript.split('. ').filter(Boolean);
-
-    let conversation = '';
-    const maxLength = Math.max(local.length, remote.length);
-
-    for (let i = 0; i < maxLength; i++) {
-      if (local[i]) {
-        conversation += `Local: ${local[i]}.\n`;
+      if (websocket.readyState === WebSocket.OPEN) {
+        websocket.send(JSON.stringify('streamClose'));
       }
-      if (remote[i]) {
-        conversation += `Remote: ${remote[i]}.\n`;
-      }
+    };
+
+    mediaRecorder.start(1000);
+    mediaRecorderRef.current = mediaRecorder;
+  };
+
+  const stopSpeechToText = (isAgent = true) => {
+    const mediaRecorderRef = isAgent ? agentMediaRecorderRef : customerMediaRecorderRef;
+    const websocket = isAgent ? agentSocketRef.current : customerSocketRef.current;
+
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
     }
 
-    return conversation;
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+      websocket.send(JSON.stringify('streamClose'));
+    }
   };
+
+  useEffect(() => {
+    initializeWebSocketTranscription();
+
+    return () => {
+      // Properly close WebSockets on component unmount
+      if (agentSocketRef.current) {
+        agentSocketRef.current.close();
+      }
+      if (customerSocketRef.current) {
+        customerSocketRef.current.close();
+      }
+    };
+  }, []);
 
   const startRecording = async () => {
     if (!session || isRecording) return;
 
     try {
-      // Create a combined audio stream with both local and remote audio
       const combinedStream = new MediaStream();
 
       // Get local microphone stream
       const micStream = await navigator.mediaDevices.getUserMedia({
         audio: selectedDeviceId ? { deviceId: { exact: selectedDeviceId } } : true,
-      });
-
-      // Add local microphone tracks
-      micStream.getAudioTracks().forEach((track) => {
-        combinedStream.addTrack(track);
       });
 
       // Get remote audio tracks from the WebRTC session
@@ -156,6 +171,13 @@ ${formatConversation(transcript, remoteTranscript)}
         .filter((receiver) => receiver.track?.kind === 'audio')
         .map((receiver) => receiver.track)
         .filter(Boolean);
+
+      // Start WebSocket transcription for both streams
+      startSpeechToText(micStream, true); // Agent stream
+      if (remoteTracks.length > 0) {
+        const remoteStream = new MediaStream(remoteTracks);
+        startSpeechToText(remoteStream, false); // Customer stream
+      }
 
       // Add remote tracks to combined stream
       remoteTracks.forEach((track) => {
@@ -191,12 +213,6 @@ ${formatConversation(transcript, remoteTranscript)}
       recorder.start();
       setMediaRecorder(recorder);
       setIsRecording(true);
-
-      // Start transcription for both streams
-      startTranscribing(micStream);
-      if (remoteTracks.length > 0) {
-        startTranscribing(new MediaStream(remoteTracks), true);
-      }
     } catch (error) {
       console.error('Error starting recording:', error);
       setIsRecording(false);
@@ -205,9 +221,10 @@ ${formatConversation(transcript, remoteTranscript)}
 
   // Modified stopRecording function
   const stopRecording = () => {
+    stopSpeechToText(true);
+    stopSpeechToText(false);
     if (mediaRecorder && isRecording) {
       mediaRecorder.stop();
-      stopTranscribing(); // Stop transcription when recording stops
       setIsRecording(false);
 
       mediaRecorder.onstop = () => {
@@ -221,20 +238,6 @@ ${formatConversation(transcript, remoteTranscript)}
           audioLink.download = `call-recording-${new Date().toISOString()}.wav`;
           audioLink.click();
           URL.revokeObjectURL(audioUrl);
-
-          const durationMinutes = minutes;
-          const durationSeconds = seconds;
-          const durationString = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
-
-          const callDetails = {
-            phoneNumber: phoneNumber,
-            startTime: new Date(),
-            duration: durationString,
-            direction: session?.direction || 'outgoing',
-            deviceInfo: devices.find((d) => d.deviceId === selectedDeviceId)?.label || 'Default Device',
-          };
-
-          saveTextFile(callDetails);
         });
       };
     }
