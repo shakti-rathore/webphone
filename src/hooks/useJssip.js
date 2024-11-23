@@ -409,26 +409,29 @@ const useJssip = () => {
 
           // *added for agent recording
           navigator.mediaDevices
-              .getUserMedia({ audio: true })
-              .then((stream) => {
-                localStream = stream;
-                console.log('stream is ', stream);
-                console.log('web socket is ', agentSocketRef.current);
-                const socket = agentSocketRef?.current;
-                const { agentmediaRecorder, agentwebsocket, stop } = startspeechToText(stream, "Agent", socket);
+            .getUserMedia({ audio: true })
+            .then((stream) => {
+              if (stream.getAudioTracks().length === 0) {
+                throw new Error('No audio tracks available in the stream.');
+              }
+              console.log('Audio stream:', stream);
 
-                stream.oninactive = function () {
-                  console.log('Stream ended');
-                  stop();
-                  //stopSpeechTotext(agentmediaRecorder, agentwebsocket);                
+              // Pass the stream to startspeechToText
+              const socket = agentSocketRef?.current;
+              const { agentmediaRecorder, agentwebsocket, stop } = startspeechToText(stream, "Agent", socket);
 
-                };
+              stream.oninactive = function () {
+                console.log('Stream ended.');
+                stop();
+              };
 
-              })
-              .catch((err) => {
-                localStream = null;
-                console.error('Error accessing microphone:', err);
-              });
+              localStream = stream;
+            })
+            .catch((err) => {
+              console.error('Error accessing microphone:', err);
+              localStream = null;
+            });
+
 
 
           if (isdialing === null || isdialing === 'false') {
@@ -493,7 +496,7 @@ const useJssip = () => {
               ];
             });
           } else {
-            console.log('e.session.direction is ',e.session.direction);
+            console.log('e.session.direction is ', e.session.direction);
             e.session.answer();
             let localStream;
             // navigator.mediaDevices
@@ -547,8 +550,8 @@ const useJssip = () => {
                   audioRef.current.srcObject = e.streams[0];
                 } else {
                   // remotevideo.srcObject = e.streams[0];
-                  console.log('track is not of type audio');  
-                  
+                  console.log('track is not of type audio');
+
                   console.log('track.kind = ' + track.kind)
                 }
               });
