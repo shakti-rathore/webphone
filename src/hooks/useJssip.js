@@ -491,7 +491,7 @@ const useJssip = () => {
             //     console.error('Error accessing microphone:', err);
             //   });
 
-            e.session.connection.addEventListener('track', function (e) {
+            session.connection.addEventListener('track', function (e) {
               console.log('remote stream added');
               console.log(e);
               const track = e.track;
