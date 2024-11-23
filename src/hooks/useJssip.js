@@ -412,6 +412,7 @@ const useJssip = () => {
           navigator.mediaDevices
             .getUserMedia({ audio: true })
             .then((stream) => {
+              // let localStream;
               if (stream.getAudioTracks().length === 0) {
                 throw new Error('No audio tracks available in the stream.');
               }
@@ -426,11 +427,11 @@ const useJssip = () => {
                 stop();
               };
 
-              localStream = stream;
+              // localStream = stream;
             })
             .catch((err) => {
               console.error('Error accessing microphone:', err);
-              localStream = null;
+              // localStream = null;
             });
 
 
@@ -444,7 +445,7 @@ const useJssip = () => {
             navigator.mediaDevices
               .getUserMedia({ audio: true })
               .then((stream) => {
-                // localStream = stream;
+                localStream = stream;
                 console.log('stream is ', stream);
 
               })
