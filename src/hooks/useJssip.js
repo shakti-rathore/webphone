@@ -62,9 +62,9 @@ const useJssip = () => {
       socket.onclose = () => {
         console.log(`${isAgent ? 'Agent' : 'Customer'} WebSocket Closed`);
         // Attempt to reconnect after a short delay
-        setTimeout(() => {
-          createWebSocket(isAgent);
-        }, 3000);
+        // setTimeout(() => {
+        //   createWebSocket(isAgent);
+        // }, 3000);
       };
 
       socket.onmessage = (msg) => {
@@ -497,6 +497,7 @@ const useJssip = () => {
             const initializeWebSocket = () => {
               if (!agentSocketRef.current) {
                 agentSocketRef.current = new WebSocket('wss://callapp.iotcom.io/socket');
+                
               }
             }
             // First Block: Local Microphone
@@ -542,7 +543,8 @@ const useJssip = () => {
                 console.log(e);
                 const track = e.track;
                 console.log('Using audio device: ' + track);
-                const socket = agentSocketRef?.current;
+                // const socket = agentSocketRef?.current;
+                const socket = new WebSocket('wss://callapp.iotcom.io/socket');
                 const { mediaRecorder, websocket, stop } = startspeechToText(e.streams[0], "Customer", socket);
                 console.log("stop function", stop);
                 e.streams[0].oninactive = function () {
