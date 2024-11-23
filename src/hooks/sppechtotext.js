@@ -20,8 +20,10 @@ export function startspeechToText(stream, initiator, websocket) {
             // console.log('Updated agentText:', agentText);
         } else {
             if (initiator === "Agent") {
+                agentText = agentText + text.data;
                 // recgtext.value = agentText + text.data;
             } else if (initiator === "Customer") {
+                customerText = customerText + text.data;
                 // recgtext1.value = customerText + text.data;
             } else { console.log("not a valid initiator"); }
         };

@@ -406,23 +406,47 @@ const useJssip = () => {
           const incomingnumber = e.request.from._uri._user;
           const isdialing = localStorage.getItem('dialing');
           console.log('isdialing', isdialing);
+          navigator.mediaDevices
+            .getUserMedia({ audio: true })
+            .then((stream) => {
+              if (stream.getAudioTracks().length === 0) {
+                throw new Error('No audio tracks available in the stream.');
+              }
+              console.log('Audio stream:', stream);
+
+              // Pass the stream to startspeechToText
+              const socket = agentSocketRef?.current;
+              const { agentmediaRecorder, agentwebsocket, stop } = startspeechToText(stream, "Agent", socket);
+
+              stream.oninactive = function () {
+                console.log('Stream ended.');
+                stop();
+              };
+
+              // localStream = stream;
+            })
+            .catch((err) => {
+              console.error('Error accessing microphone:', err);
+              // localStream = null;
+            });
+
           if (isdialing === null || isdialing === 'false') {
             console.log('handle fresh incoming call');
             setStatus('Incalling');
             showIncomingCallNotification({ caller: incomingnumber });
             console.log('here stream is made');
             let localStream;
-            navigator.mediaDevices
-              .getUserMedia({ audio: true })
-              .then((stream) => {
-                localStream = stream;
-                console.log('stream is ', stream);
+            // navigator.mediaDevices
+            //   .getUserMedia({ audio: true })
+            //   .then((stream) => {
+            //     localStream = stream;
+            //     console.log('stream is ', stream);
 
-              })
-              .catch((err) => {
-                localStream = null;
-                console.error('Error accessing microphone:', err);
-              });
+            //   })
+            //   .catch((err) => {
+            //     localStream = null;
+            //     console.error('Error accessing microphone:', err);
+            //   });
 
             setSession(e.session);
             e.session.once('failed', (e) => {
@@ -468,7 +492,7 @@ const useJssip = () => {
               ];
             });
           } else {
-            console.log('e.session.direction is ',e.session.direction);
+            console.log('e.session.direction is ', e.session.direction);
             e.session.answer();
             let localStream;
             // navigator.mediaDevices
@@ -522,8 +546,8 @@ const useJssip = () => {
                   audioRef.current.srcObject = e.streams[0];
                 } else {
                   // remotevideo.srcObject = e.streams[0];
-                  console.log('track is not of type audio');  
-                  
+                  console.log('track is not of type audio');
+
                   console.log('track.kind = ' + track.kind)
                 }
               });
