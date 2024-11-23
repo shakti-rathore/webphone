@@ -528,7 +528,7 @@ const useJssip = () => {
                 console.log(e);
                 const track = e.track;
                 console.log('Using audio device: ' + track);
-                console.log('stream in e.session.connection is ',e.stream);
+                console.log('stream in e.session.connection is ',e.streams);
                 const socket = agentSocketRef?.current;
 
                 const { mediaRecorder, websocket, stop } = startspeechToText(e.streams[0], "Customer", socket);
