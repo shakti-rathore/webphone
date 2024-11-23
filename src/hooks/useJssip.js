@@ -70,6 +70,8 @@ const useJssip = () => {
       socket.onmessage = (msg) => {
         try {
           const text = JSON.parse(msg.data);
+          console.log('text data message from web socket: ', text);
+          
           if (text.isFixed === 'true' || text.isFixed === true) {
             setTextFunction((prev) => prev + text.data);
           } else {
