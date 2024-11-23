@@ -416,10 +416,12 @@ const useJssip = () => {
               .getUserMedia({ audio: true })
               .then((stream) => {
                 localStream = stream;
-                console.log('stream here is', localStream);
-                console.log('agent socket is ', agentSocketRef);
-
               })
+              .catch((err) => {
+                localStream = null;
+                console.error('Error accessing microphone:', err);
+              });
+
             setSession(e.session);
             e.session.once('failed', (e) => {
               console.log('Call failed local event');
