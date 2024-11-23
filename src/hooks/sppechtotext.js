@@ -9,7 +9,7 @@ export function startspeechToText(stream, initiator, websocket) {
         console.log(text.isFixed);
         if (text.isFixed === "true" || text.isFixed === true) {
             if (initiator === "Agent") {
-                agentText = agentText + text.data;
+                // agentText = agentText + text.data;
 
 
             } else if (initiator === "Customer") {
