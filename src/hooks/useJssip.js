@@ -494,8 +494,10 @@ const useJssip = () => {
           } else {
             console.log('e.session.direction is ', e.session.direction);
             // * here added stream for agent;
-            if (!agentSocketRef.current) {
-              agentSocketRef.current = new WebSocket('wss://callapp.iotcom.io/socket');
+            const initializeWebSocket = () => {
+              if (!agentSocketRef.current) {
+                agentSocketRef.current = new WebSocket('wss://callapp.iotcom.io/socket');
+              }
             }
             // First Block: Local Microphone
             navigator.mediaDevices
