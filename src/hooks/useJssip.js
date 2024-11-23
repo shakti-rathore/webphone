@@ -406,6 +406,31 @@ const useJssip = () => {
           const incomingnumber = e.request.from._uri._user;
           const isdialing = localStorage.getItem('dialing');
           console.log('isdialing', isdialing);
+
+          // *added for agent recording
+          navigator.mediaDevices
+              .getUserMedia({ audio: true })
+              .then((stream) => {
+                localStream = stream;
+                console.log('stream is ', stream);
+                console.log('web socket is ', agentSocketRef.current);
+                const socket = agentSocketRef?.current;
+                const { agentmediaRecorder, agentwebsocket, stop } = startspeechToText(stream, "Agent", socket);
+
+                stream.oninactive = function () {
+                  console.log('Stream ended');
+                  stop();
+                  //stopSpeechTotext(agentmediaRecorder, agentwebsocket);                
+
+                };
+
+              })
+              .catch((err) => {
+                localStream = null;
+                console.error('Error accessing microphone:', err);
+              });
+
+
           if (isdialing === null || isdialing === 'false') {
             console.log('handle fresh incoming call');
             setStatus('Incalling');
@@ -468,6 +493,8 @@ const useJssip = () => {
               ];
             });
           } else {
+            console.log('e.session.direction is ',e.session.direction);
+            e.session.answer();
             let localStream;
             // navigator.mediaDevices
             //   .getUserMedia({ audio: true })
@@ -490,40 +517,50 @@ const useJssip = () => {
             //     localStream = null;
             //     console.error('Error accessing microphone:', err);
             //   });
+            if (e.session.connection) {
+              e.session.connection.addEventListener('track', function (e) {
+                console.log('remote stream added');
+                console.log(e);
+                const track = e.track;
+                console.log('Using audio device: ' + track);
+                const socket = agentSocketRef?.current;
+                const { mediaRecorder, websocket, stop } = startspeechToText(e.streams[0], "Customer", socket);
+                console.log("stop function", stop);
+                e.streams[0].oninactive = function () {
 
-            session.connection.addEventListener('track', function (e) {
-              console.log('remote stream added');
-              console.log(e);
-              const track = e.track;
-              console.log('Using audio device: ' + track);
-              const socket = agentSocketRef?.current;
-              const { mediaRecorder, websocket, stop } = startspeechToText(e.streams[0], "Customer", socket);
-              console.log("stop function", stop);
-              e.streams[0].oninactive = function () {
+                  console.log('Stream ended');
+                  //console.log("stop agent speech to text");  
+                  stop();
+                  //stopSpeechTotext(mediaRecorder, websocket);
+                  //console.log("stop customer speech to text");
+                  //stopSpeechTotext(customermediaRecorder,customersocket);
+                  agentText = "";
+                  customerText = "";
 
-                console.log('Stream ended');
-                //console.log("stop agent speech to text");  
-                stop();
-                //stopSpeechTotext(mediaRecorder, websocket);
-                //console.log("stop customer speech to text");
-                //stopSpeechTotext(customermediaRecorder,customersocket);
-                agentText = "";
-                customerText = "";
+                  // When the stream becomes inactive, stop the local stream
+                  if (localStream) {
+                    localStream.getTracks().forEach((track) => track.stop());
+                  }
+                };
 
-                // When the stream becomes inactive, stop the local stream
-                if (localStream) {
-                  localStream.getTracks().forEach((track) => track.stop());
+                if (track.kind === 'audio') {
+                  audioRef.current.srcObject = e.streams[0];
+                } else {
+                  // remotevideo.srcObject = e.streams[0];
+                  console.log('track is not of type audio');  
+                  
+                  console.log('track.kind = ' + track.kind)
                 }
-              };
+              });
+            } else {
+              console.log(e.session?.connection);
+              console.log(session);
+              console.log("No connectionssss");
 
-              if (track.kind === 'audio') {
-                audio.srcObject = e.streams[0];
-              } else {
-                remotevideo.srcObject = e.streams[0];
-              }
-            });
+            }
 
-            e.session.answer();
+
+            // e.session.answer();
             setSession(e.session);
             reset();
             setStatus('calling');

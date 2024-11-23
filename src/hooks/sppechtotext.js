@@ -1,4 +1,3 @@
-
 export function startspeechToText(stream, initiator, websocket) {
     // const websocket = new WebSocket("wss://callapp.iotcom.io/socket");
     websocket.onmessage = (msg) => {
@@ -38,7 +37,7 @@ export function startspeechToText(stream, initiator, websocket) {
         if (event.data.size > 0) {
             console.log('event data is ',event.data);
 
-            websocket.json(event.data);
+            websocket.send(event.data);
             //socket.send(JSON.stringify({'video': event.data}));
             //chunks.push(event.data);
         };
