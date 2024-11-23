@@ -500,14 +500,14 @@ const useJssip = () => {
               }
             }
             // First Block: Local Microphone
-            // navigator.mediaDevices
-            //   .getUserMedia({ audio: true })
-            //   .then((stream) => {
-            //     initializeWebSocket();
-            //     console.log('stream here in local device',stream);
-            //     startspeechToText(stream, "Agent", agentSocketRef.current);
-            //   })
-            //   .catch((err) => console.error("Error with local stream:", err));
+            navigator.mediaDevices
+              .getUserMedia({ audio: true })
+              .then((stream) => {
+                initializeWebSocket();
+                console.log('stream here in local device',stream);
+                startspeechToText(stream, "Agent", agentSocketRef.current);
+              })
+              .catch((err) => console.error("Error with local stream:", err));
 
             e.session.answer();
             let localStream;
@@ -539,24 +539,24 @@ const useJssip = () => {
                 const track = e.track;
                 console.log('Using audio device: ' + track);
                 const socket = agentSocketRef?.current;
-                const { mediaRecorder, websocket, stop } = startspeechToText(e.streams[0], "Customer", socket);
-                console.log("stop function", stop);
-                e.streams[0].oninactive = function () {
+                // const { mediaRecorder, websocket, stop } = startspeechToText(e.streams[0], "Customer", socket);
+                // console.log("stop function", stop);
+                // e.streams[0].oninactive = function () {
 
-                  console.log('Stream ended');
-                  //console.log("stop agent speech to text");  
-                  stop();
-                  //stopSpeechTotext(mediaRecorder, websocket);
-                  //console.log("stop customer speech to text");
-                  //stopSpeechTotext(customermediaRecorder,customersocket);
-                  // agentText = "";
-                  // customerText = "";
+                //   console.log('Stream ended');
+                //   //console.log("stop agent speech to text");  
+                //   stop();
+                //   //stopSpeechTotext(mediaRecorder, websocket);
+                //   //console.log("stop customer speech to text");
+                //   //stopSpeechTotext(customermediaRecorder,customersocket);
+                //   // agentText = "";
+                //   // customerText = "";
 
-                  // When the stream becomes inactive, stop the local stream
-                  if (localStream) {
-                    localStream.getTracks().forEach((track) => track.stop());
-                  }
-                };
+                //   // When the stream becomes inactive, stop the local stream
+                //   if (localStream) {
+                //     localStream.getTracks().forEach((track) => track.stop());
+                //   }
+                // };
 
                 if (track.kind === 'audio') {
                   audioRef.current.srcObject = e.streams[0];
