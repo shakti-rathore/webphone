@@ -8,11 +8,11 @@ export function startspeechToText(stream, initiator, websocket) {
         //recgtext.value = agentText + text.data;
         // console.log(text.isFixed);
         if (text.isFixed === "true" || text.isFixed === true) {
-            if (initiator === "agent") {
+            if (initiator === "Agent") {
                 agentText = agentText + text.data;
                 recgtext.value = agentText;
 
-            } else if (initiator === "customer") {
+            } else if (initiator === "Customer") {
                 customerText = customerText + text.data;
                 recgtext1.value = customerText;
             } else { console.log("not a valid initiator"); }
@@ -20,9 +20,9 @@ export function startspeechToText(stream, initiator, websocket) {
             // console.log("new final Data", text.data);
             // console.log('Updated agentText:', agentText);
         } else {
-            if (initiator === "agent") {
+            if (initiator === "Agent") {
                 recgtext.value = agentText + text.data;
-            } else if (initiator === "customer") {
+            } else if (initiator === "Customer") {
                 recgtext1.value = customerText + text.data;
             } else { console.log("not a valid initiator"); }
         };

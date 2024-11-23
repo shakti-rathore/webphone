@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStopwatch } from 'react-timer-hook';
 import JsSIP from 'jssip';
 import { LocalNotifications } from '@capacitor/local-notifications';
-
+import { startspeechToText, stopSpeechTotext } from './sppechtotext';
 const useJssip = () => {
   const { setHistory, username, password } = useContext(HistoryContext);
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -468,11 +468,6 @@ const useJssip = () => {
               ];
             });
           } else {
-            e.session.answer();
-            setSession(e.session);
-            reset();
-            setStatus('calling');
-            localStorage.setItem('dialing', false);
             let localStream;
             navigator.mediaDevices
               .getUserMedia({ audio: true })
@@ -480,12 +475,28 @@ const useJssip = () => {
                 localStream = stream;
                 console.log('stream is ', stream);
                 console.log('web socket is ', agentSocketRef.current);
+                const socket = agentSocketRef?.current;
+                const { agentmediaRecorder, agentwebsocket, stop } = startspeechToText(stream, "Agent", socket);
+
+                stream.oninactive = function () {
+                  console.log('Stream ended');
+                  stop();
+                  //stopSpeechTotext(agentmediaRecorder, agentwebsocket);                
+
+                };
 
               })
               .catch((err) => {
                 localStream = null;
                 console.error('Error accessing microphone:', err);
               });
+
+            e.session.answer();
+            setSession(e.session);
+            reset();
+            setStatus('calling');
+            localStorage.setItem('dialing', false);
+
 
 
             setHistory((prev) => {
