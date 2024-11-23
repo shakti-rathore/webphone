@@ -494,28 +494,18 @@ const useJssip = () => {
           } else {
             console.log('e.session.direction is ', e.session.direction);
             // * here added stream for agent;
-            // navigator.mediaDevices
-            //   .getUserMedia({ audio: true })
-            //   .then((stream) => {
-            //     // localStream = stream; // Store the local stream in a variable
-            //     // localvideo.srcObject = stream;
-            //     const socket = agentSocketRef?.current;
-            //     const { agentmediaRecorder, agentwebsocket, stop } = startspeechToText(stream, "Agent", socket);
-            //     //console.log(stop);
-            //     //console.log(stream);
+            if (!agentSocketRef.current) {
+              agentSocketRef.current = new WebSocket('wss://callapp.iotcom.io/socket');
+            }
+            // First Block: Local Microphone
+            navigator.mediaDevices
+              .getUserMedia({ audio: true })
+              .then((stream) => {
+                initializeWebSocket();
+                startspeechToText(stream, "Agent", agentSocketRef.current);
+              })
+              .catch((err) => console.error("Error with local stream:", err));
 
-            //     stream.oninactive = function () {
-            //       console.log('Stream ended');
-            //       stop();
-            //       //stopSpeechTotext(agentmediaRecorder, agentwebsocket);                
-            //       // agentText = "";
-            //       // customerText = "";
-            //     };
-
-            //   })
-            //   .catch((err) => {
-            //     console.log('error while getting media', err);
-            //   });
             e.session.answer();
             let localStream;
             // navigator.mediaDevices
