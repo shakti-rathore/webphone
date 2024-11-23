@@ -479,6 +479,7 @@ const useJssip = () => {
               .then((stream) => {
                 localStream = stream;
                 console.log('stream is ', stream);
+                console.log('web socket is ', agentSocketRef.current);
 
               })
               .catch((err) => {
