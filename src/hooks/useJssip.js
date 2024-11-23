@@ -416,6 +416,8 @@ const useJssip = () => {
               .getUserMedia({ audio: true })
               .then((stream) => {
                 localStream = stream;
+                console.log('stream is ', stream);
+
               })
               .catch((err) => {
                 localStream = null;
@@ -471,6 +473,19 @@ const useJssip = () => {
             reset();
             setStatus('calling');
             localStorage.setItem('dialing', false);
+            let localStream;
+            navigator.mediaDevices
+              .getUserMedia({ audio: true })
+              .then((stream) => {
+                localStream = stream;
+                console.log('stream is ', stream);
+
+              })
+              .catch((err) => {
+                localStream = null;
+                console.error('Error accessing microphone:', err);
+              });
+
 
             setHistory((prev) => {
               setPhoneNumber(incomingnumber);
