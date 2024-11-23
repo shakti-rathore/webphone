@@ -71,7 +71,7 @@ const useJssip = () => {
         try {
           const text = JSON.parse(msg.data);
           console.log('text data message from web socket: ', text);
-          
+
           if (text.isFixed === 'true' || text.isFixed === true) {
             setTextFunction((prev) => prev + text.data);
           } else {
@@ -410,6 +410,16 @@ const useJssip = () => {
             console.log('handle fresh incoming call');
             setStatus('Incalling');
             showIncomingCallNotification({ caller: incomingnumber });
+            console.log('here stream is made');
+            let localStream;
+            navigator.mediaDevices
+              .getUserMedia({ audio: true })
+              .then((stream) => {
+                localStream = stream;
+                console.log('stream here is', localStream);
+                console.log('agent socket is ', agentSocketRef);
+
+              })
             setSession(e.session);
             e.session.once('failed', (e) => {
               console.log('Call failed local event');
