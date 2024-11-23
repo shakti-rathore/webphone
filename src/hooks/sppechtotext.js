@@ -4,26 +4,26 @@ export function startspeechToText(stream, initiator, websocket) {
     websocket.onmessage = (msg) => {
         //console.log(JSON.parse(msg.data));
         const text = JSON.parse(msg.data);
+        console.log('text is in func stt',text);
         //console.log("fixed text",agentText);
         //recgtext.value = agentText + text.data;
-        // console.log(text.isFixed);
+        console.log(text.isFixed);
         if (text.isFixed === "true" || text.isFixed === true) {
             if (initiator === "Agent") {
                 agentText = agentText + text.data;
-                recgtext.value = agentText;
+
 
             } else if (initiator === "Customer") {
                 customerText = customerText + text.data;
-                recgtext1.value = customerText;
             } else { console.log("not a valid initiator"); }
 
             // console.log("new final Data", text.data);
             // console.log('Updated agentText:', agentText);
         } else {
             if (initiator === "Agent") {
-                recgtext.value = agentText + text.data;
+                // recgtext.value = agentText + text.data;
             } else if (initiator === "Customer") {
-                recgtext1.value = customerText + text.data;
+                // recgtext1.value = customerText + text.data;
             } else { console.log("not a valid initiator"); }
         };
     };
@@ -36,7 +36,8 @@ export function startspeechToText(stream, initiator, websocket) {
     mediaRecorder.ondataavailable = (event) => {
         //console.log(event);
         if (event.data.size > 0) {
-            // console.log(event.data);
+            console.log('event data is ',event.data);
+
             websocket.send(event.data);
             //socket.send(JSON.stringify({'video': event.data}));
             //chunks.push(event.data);
