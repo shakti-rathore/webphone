@@ -493,28 +493,29 @@ const useJssip = () => {
             });
           } else {
             console.log('e.session.direction is ', e.session.direction);
-            navigator.mediaDevices
-              .getUserMedia({ audio: true })
-              .then((stream) => {
-                // localStream = stream; // Store the local stream in a variable
-                // localvideo.srcObject = stream;
-                const socket = agentSocketRef?.current;
-                const { agentmediaRecorder, agentwebsocket, stop } = startspeechToText(stream, "Agent", socket);
-                //console.log(stop);
-                //console.log(stream);
+            // * here added stream for agent;
+            // navigator.mediaDevices
+            //   .getUserMedia({ audio: true })
+            //   .then((stream) => {
+            //     // localStream = stream; // Store the local stream in a variable
+            //     // localvideo.srcObject = stream;
+            //     const socket = agentSocketRef?.current;
+            //     const { agentmediaRecorder, agentwebsocket, stop } = startspeechToText(stream, "Agent", socket);
+            //     //console.log(stop);
+            //     //console.log(stream);
 
-                stream.oninactive = function () {
-                  console.log('Stream ended');
-                  stop();
-                  //stopSpeechTotext(agentmediaRecorder, agentwebsocket);                
-                  // agentText = "";
-                  // customerText = "";
-                };
+            //     stream.oninactive = function () {
+            //       console.log('Stream ended');
+            //       stop();
+            //       //stopSpeechTotext(agentmediaRecorder, agentwebsocket);                
+            //       // agentText = "";
+            //       // customerText = "";
+            //     };
 
-              })
-              .catch((err) => {
-                console.log('error while getting media', err);
-              });
+            //   })
+            //   .catch((err) => {
+            //     console.log('error while getting media', err);
+            //   });
             e.session.answer();
             let localStream;
             // navigator.mediaDevices
