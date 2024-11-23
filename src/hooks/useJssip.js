@@ -504,8 +504,12 @@ const useJssip = () => {
               .getUserMedia({ audio: true })
               .then((stream) => {
                 initializeWebSocket();
-                console.log('stream here in local device',stream);
-                startspeechToText(stream, "Agent", agentSocketRef.current);
+                console.log('stream here in local device', stream);
+                const { stop } = startspeechToText(stream, "Agent", agentSocketRef.current);
+                stream.oninactive = function () {
+                  console.log('Stream ended in local device', stream);
+                  stop();
+                }
               })
               .catch((err) => console.error("Error with local stream:", err));
 
