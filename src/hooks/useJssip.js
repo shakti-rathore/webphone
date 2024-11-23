@@ -548,8 +548,8 @@ const useJssip = () => {
                   //stopSpeechTotext(mediaRecorder, websocket);
                   //console.log("stop customer speech to text");
                   //stopSpeechTotext(customermediaRecorder,customersocket);
-                  agentText = "";
-                  customerText = "";
+                  // agentText = "";
+                  // customerText = "";
 
                   // When the stream becomes inactive, stop the local stream
                   if (localStream) {
