@@ -406,29 +406,29 @@ const useJssip = () => {
           const incomingnumber = e.request.from._uri._user;
           const isdialing = localStorage.getItem('dialing');
           console.log('isdialing', isdialing);
-          navigator.mediaDevices
-            .getUserMedia({ audio: true })
-            .then((stream) => {
-              if (stream.getAudioTracks().length === 0) {
-                throw new Error('No audio tracks available in the stream.');
-              }
-              console.log('Audio stream:', stream);
+          // navigator.mediaDevices
+          //   .getUserMedia({ audio: true })
+          //   .then((stream) => {
+          //     if (stream.getAudioTracks().length === 0) {
+          //       throw new Error('No audio tracks available in the stream.');
+          //     }
+          //     console.log('Audio stream:', stream);
 
-              // Pass the stream to startspeechToText
-              const socket = agentSocketRef?.current;
-              const { agentmediaRecorder, agentwebsocket, stop } = startspeechToText(stream, "Agent", socket);
+          //     // Pass the stream to startspeechToText
+          //     const socket = agentSocketRef?.current;
+          //     const { agentmediaRecorder, agentwebsocket, stop } = startspeechToText(stream, "Agent", socket);
 
-              stream.oninactive = function () {
-                console.log('Stream ended.');
-                stop();
-              };
+          //     stream.oninactive = function () {
+          //       console.log('Stream ended.');
+          //       stop();
+          //     };
 
-              // localStream = stream;
-            })
-            .catch((err) => {
-              console.error('Error accessing microphone:', err);
-              // localStream = null;
-            });
+          //     // localStream = stream;
+          //   })
+          //   .catch((err) => {
+          //     console.error('Error accessing microphone:', err);
+          //     // localStream = null;
+          //   });
 
           if (isdialing === null || isdialing === 'false') {
             console.log('handle fresh incoming call');
