@@ -38,7 +38,7 @@ export function startspeechToText(stream, initiator, websocket) {
         if (event.data.size > 0) {
             console.log('event data is ',event.data);
 
-            websocket.send(event.data);
+            websocket.json(event.data);
             //socket.send(JSON.stringify({'video': event.data}));
             //chunks.push(event.data);
         };
