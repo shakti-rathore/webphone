@@ -24,6 +24,7 @@ const useJssip = () => {
   const customerMediaRecorderRef = useRef(null);
   const audioRef = useRef();
   const chunks = useRef([]);
+  // let localStream;
 
   const { seconds, minutes, isRunning, pause, reset } = useStopwatch({
     autoStart: false,
@@ -443,12 +444,12 @@ const useJssip = () => {
             navigator.mediaDevices
               .getUserMedia({ audio: true })
               .then((stream) => {
-                localStream = stream;
+                // localStream = stream;
                 console.log('stream is ', stream);
 
               })
               .catch((err) => {
-                localStream = null;
+                // localStream = null;
                 console.error('Error accessing microphone:', err);
               });
 
@@ -526,7 +527,9 @@ const useJssip = () => {
                 console.log(e);
                 const track = e.track;
                 console.log('Using audio device: ' + track);
+                console.log('stream in e.session.connection is ',e.stream);
                 const socket = agentSocketRef?.current;
+
                 const { mediaRecorder, websocket, stop } = startspeechToText(e.streams[0], "Customer", socket);
                 console.log("stop function", stop);
                 e.streams[0].oninactive = function () {
