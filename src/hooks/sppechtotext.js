@@ -3,7 +3,7 @@ export function startspeechToText(stream, initiator, websocket) {
     websocket.onmessage = (msg) => {
         //console.log(JSON.parse(msg.data));
         const text = JSON.parse(msg.data);
-        console.log('text is in func stt',text);
+        console.log('text is in func stt', text);
         //console.log("fixed text",agentText);
         //recgtext.value = agentText + text.data;
         console.log(text.isFixed);
@@ -35,11 +35,14 @@ export function startspeechToText(stream, initiator, websocket) {
     mediaRecorder.ondataavailable = (event) => {
         //console.log(event);
         if (event.data.size > 0) {
-            console.log('event data is ',event.data);
+            console.log('event data is ', event.data);
 
             websocket.send(event.data);
             //socket.send(JSON.stringify({'video': event.data}));
             //chunks.push(event.data);
+        } else {
+            console.log("event in event data is else block ", event);
+            console.log("event.data", event.data);
         };
     };
 
