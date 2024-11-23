@@ -13,7 +13,7 @@ export function startspeechToText(stream, initiator, websocket) {
 
 
             } else if (initiator === "Customer") {
-                customerText = customerText + text.data;
+                // customerText = customerText + text.data;
             } else { console.log("not a valid initiator"); }
 
             // console.log("new final Data", text.data);
