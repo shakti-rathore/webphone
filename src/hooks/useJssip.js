@@ -7,6 +7,7 @@ import JsSIP from 'jssip';
 const useJssip = () => {
   const { setHistory, username, password } = useContext(HistoryContext);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [conferenceNumber, setConferenceNumber] = useState('');
   const [ua, setUa] = useState(null);
   const [session, setSession] = useState(null);
   const [bridgeID, setBridgeID] = useState('');
@@ -17,6 +18,8 @@ const useJssip = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [agentText, setAgentText] = useState('');
   const [customerText, setCustomerText] = useState('');
+  const [isHeld, setIsHeld] = useState(false);
+  const [conferenceStatus, setConferenceStatus] = useState(false);
   const agentSocketRef = useRef(null);
   const customerSocketRef = useRef(null);
   const agentMediaRecorderRef = useRef(null);
@@ -28,6 +31,40 @@ const useJssip = () => {
     autoStart: false,
   });
   const navigate = useNavigate();
+
+  const createConferenceCall = async () => {
+    try {
+      const response = await fetch(`https://callapp.iotcom.io/reqConf/${username}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          confNumber: conferenceNumber,
+        }).replace(/\s+/g, ''),
+      });
+
+      const data = await response.json();
+
+      if (data.message === 'conferance call dialed') {
+        if (data.result) {
+          setBridgeID(data.result);
+        }
+        setConferenceStatus(true);
+        setStatus('conference');
+      } else if (data.message === 'error dialing conferance call') {
+        console.error('Conference call dialing failed');
+
+        setStatus('calling');
+      } else {
+        console.log('Unexpected response:', data.message);
+      }
+    } catch (error) {
+      console.error('Error creating conference call:', error);
+
+      setStatus('calling');
+    }
+  };
 
   const initializeWebSocketTranscription = () => {
     const createWebSocket = (isAgent = true) => {
@@ -139,6 +176,80 @@ const useJssip = () => {
       }
     };
   }, []);
+
+  const reqUnHold = async () => {
+    if (!session) return;
+
+    try {
+      const response = await fetch(`https://callapp.iotcom.io/reqUnHold/${username}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bridgeID: session.bridgeID,
+        }),
+      });
+
+      if (response.ok) {
+        if (audioRef.current) {
+          audioRef.current.play();
+        }
+        setConferenceStatus(false);
+        console.log('Call unhold successful');
+      } else {
+        console.error('Failed to unhold call');
+      }
+    } catch (error) {
+      console.error('Error unholding call:', error);
+    }
+  };
+
+  const toggleHold = async () => {
+    if (!session) return;
+
+    try {
+      if (!isHeld) {
+        // Put call on hold
+        await fetch(`https://callapp.iotcom.io/reqHold/${username}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            bridgeID: session.bridgeID,
+          }),
+        });
+
+        // Attempt to pause audio
+        if (audioRef.current) {
+          audioRef.current.pause();
+        }
+
+        setIsHeld(true);
+      } else {
+        // Unhold call
+        await fetch(`https://callapp.iotcom.io/reqUnHold/${username}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            bridgeID: session.bridgeID,
+          }),
+        });
+
+        // Resume audio
+        if (audioRef.current) {
+          audioRef.current.play();
+        }
+
+        setIsHeld(false);
+      }
+    } catch (error) {
+      console.error('Error toggling hold:', error);
+    }
+  };
 
   const startRecording = async () => {
     if (!session || isRecording) return;
@@ -537,6 +648,13 @@ const useJssip = () => {
   };
 
   return [
+    conferenceStatus,
+    reqUnHold,
+    conferenceNumber,
+    setConferenceNumber,
+    createConferenceCall,
+    toggleHold,
+    isHeld,
     seconds,
     minutes,
     status,

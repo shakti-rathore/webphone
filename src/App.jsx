@@ -6,9 +6,17 @@ import useJssip from './hooks/useJssip';
 import { useState, useEffect, useRef, useContext } from 'react';
 import InCallScreen from './components/InCallScreen';
 import HistoryContext from './context/HistoryContext';
+import CallConference from './components/CallConference';
 
 function App() {
   const [
+    conferenceStatus,
+    reqUnHold,
+    conferenceNumber,
+    setConferenceNumber,
+    createConferenceCall,
+    toggleHold,
+    isHeld,
     seconds,
     minutes,
     status,
@@ -27,9 +35,9 @@ function App() {
     startRecording,
     stopRecording,
   ] = useJssip();
-
   const [seeLogs, setSeeLogs] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
+  const [callConference, setCallConference] = useState(false);
   const [timeoutArray, setTimeoutArray] = useState([]);
   const keepAliveRef = useRef(null);
   const { username } = useContext(HistoryContext);
@@ -81,17 +89,6 @@ function App() {
   };
 
   useEffect(() => {
-    const requestPermissions = async () => {
-      const result = await LocalNotifications.requestPermissions();
-      if (result.receive === 'granted') {
-        console.log('Notification permissions granted.');
-      }
-    };
-
-    requestPermissions();
-  }, []);
-
-  useEffect(() => {
     if (username) {
       const url = `https://callapp.iotcom.io/userready/${username}`;
       fetch(url, {
@@ -119,6 +116,12 @@ function App() {
     };
   }, [username]);
 
+  function handleCalls() {
+    createConferenceCall();
+    setCallConference(false);
+    setConferenceNumber('');
+  }
+
   return (
     <div className="App">
       {seeLogs ? (
@@ -130,21 +133,39 @@ function App() {
           handleCall={handleCall}
           setSeeLogs={setSeeLogs}
         />
-      ) : status === 'calling' ? (
-        <CallScreen
-          isRecording={isRecording}
-          startRecording={startRecording}
-          stopRecording={stopRecording}
-          phoneNumber={phoneNumber}
-          session={session}
-          seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
-          minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
-          isRunning={isRunning}
-          setBridgeID={setBridgeID}
-          devices={devices}
-          selectedDeviceId={selectedDeviceId}
-          changeAudioDevice={changeAudioDevice}
-        />
+      ) : status === 'calling' || status === 'conference' ? (
+        <>
+          {(callConference && (
+            <CallConference
+              conferenceNumber={conferenceNumber}
+              setCallConference={setCallConference}
+              setConferenceNumber={setConferenceNumber}
+              handleCall={handleCalls}
+              setSeeLogs={setSeeLogs}
+              phoneNumber={phoneNumber}
+            />
+          )) || (
+            <CallScreen
+              reqUnHold={reqUnHold}
+              setCallConference={setCallConference}
+              toggleHold={toggleHold}
+              isHeld={isHeld}
+              isRecording={isRecording}
+              startRecording={startRecording}
+              stopRecording={stopRecording}
+              phoneNumber={phoneNumber}
+              session={session}
+              seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
+              minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
+              isRunning={isRunning}
+              setBridgeID={setBridgeID}
+              devices={devices}
+              selectedDeviceId={selectedDeviceId}
+              changeAudioDevice={changeAudioDevice}
+              conferenceStatus={conferenceStatus}
+            />
+          )}
+        </>
       ) : status === 'Incalling' ? (
         <InCallScreen
           isRecording={isRecording}

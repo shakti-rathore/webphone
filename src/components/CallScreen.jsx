@@ -1,4 +1,4 @@
-import { BsPersonFill, BsMicMute } from 'react-icons/bs';
+import { BsPersonFill, BsMicMute, BsPause, BsCameraVideo, BsPersonPlus } from 'react-icons/bs';
 import { IoIosKeypad } from 'react-icons/io';
 import { IoCloseCircleOutline, IoCloseCircle } from 'react-icons/io5';
 import { ImPhoneHangUp } from 'react-icons/im';
@@ -6,8 +6,12 @@ import { FaStopCircle } from 'react-icons/fa';
 import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 import { useState } from 'react';
 import KeyPad from './KeyPad';
+import { MdCallMerge } from 'react-icons/md';
 
 const CallScreen = ({
+  reqUnHold,
+  toggleHold,
+  isHeld,
   phoneNumber,
   session,
   seconds,
@@ -19,12 +23,13 @@ const CallScreen = ({
   isRecording,
   startRecording,
   stopRecording,
+  setCallConference,
+  conferenceStatus,
 }) => {
   const [currNum, setCurrNum] = useState('');
   const [isHovered, setIsHovered] = useState(false);
   const [showKeyPad, setShowKeyPad] = useState(false);
   const [muted, setMuted] = useState(false);
-
   const formatPhoneNumber = useFormatPhoneNumber();
 
   return (
@@ -46,17 +51,38 @@ const CallScreen = ({
 
         <div className="w-full">
           {!showKeyPad ? (
-            <div className="flex justify-around mb-6">
-              <button
-                className={`p-4 rounded-full ${muted ? 'bg-blue-dark text-white' : 'text-gray-600'}`}
-                onClick={() => {
-                  muted ? session.unmute() : session.mute();
-                  setMuted(!muted);
-                }}
-              >
-                <BsMicMute className="text-3xl" />
-              </button>
-              <div className="flex space-x-4">
+            <div className="mb-6">
+              <div className="flex justify-around items-center">
+                <button
+                  onClick={toggleHold}
+                  disabled={!session}
+                  className={`p-4 rounded-full ${isHeld ? 'bg-blue-dark text-white' : 'text-gray-600'}`}
+                >
+                  <BsPause className="text-3xl" />
+                </button>
+                <button disabled className="p-4 rounded-full text-gray-600">
+                  <BsCameraVideo className="text-3xl" />
+                </button>
+
+                <button className="p-4 text-gray-600 rounded-full" onClick={() => setShowKeyPad(true)}>
+                  <IoIosKeypad className="text-3xl" />
+                </button>
+              </div>
+              <div className="flex justify-around items-center">
+                {(conferenceStatus && (
+                  <button className="p-4 rounded-full text-gray-600" disabled={!session} onClick={reqUnHold}>
+                    <MdCallMerge className="text-3xl" />
+                  </button>
+                )) || (
+                  <button
+                    className="p-4 rounded-full text-gray-600"
+                    disabled={!session}
+                    onClick={() => setCallConference(true)}
+                  >
+                    <BsPersonPlus className="text-3xl" />
+                  </button>
+                )}
+
                 {!isRecording ? (
                   <button
                     onClick={startRecording}
@@ -76,11 +102,16 @@ const CallScreen = ({
                     <span className="ml-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
                   </button>
                 )}
+                <button
+                  className={`p-4 rounded-full ${muted ? 'bg-blue-dark text-white' : 'text-gray-600'}`}
+                  onClick={() => {
+                    muted ? session.unmute() : session.mute();
+                    setMuted(!muted);
+                  }}
+                >
+                  <BsMicMute className="text-3xl" />
+                </button>
               </div>
-
-              <button className="p-4 text-gray-600 rounded-full" onClick={() => setShowKeyPad(true)}>
-                <IoIosKeypad className="text-3xl" />
-              </button>
             </div>
           ) : (
             <div className="flex flex-col items-center mb-4 relative">
