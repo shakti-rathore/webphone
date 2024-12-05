@@ -255,56 +255,39 @@ const useJssip = () => {
     if (!session || isRecording) return;
 
     try {
-      const combinedStream = new MediaStream();
-
       // Get local microphone stream
-      const micStream = await navigator.mediaDevices.getUserMedia({
-        audio: selectedDeviceId ? { deviceId: { exact: selectedDeviceId } } : true,
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
       });
 
-      // Get remote audio tracks from the WebRTC session
-      const remoteReceivers = session.connection.getReceivers() || [];
-      const remoteTracks = remoteReceivers
-        .filter((receiver) => receiver.track?.kind === 'audio')
-        .map((receiver) => receiver.track)
-        .filter(Boolean);
-
-      // Start WebSocket transcription for both streams
-      startSpeechToText(micStream, true); // Agent stream
-      if (remoteTracks.length > 0) {
-        const remoteStream = new MediaStream(remoteTracks);
-        startSpeechToText(remoteStream, false); // Customer stream
-      }
-
-      // Add remote tracks to combined stream
-      remoteTracks.forEach((track) => {
-        combinedStream.addTrack(track);
-      });
-
-      // Create audio context for mixing streams
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const destination = audioContext.createMediaStreamDestination();
-
-      // Connect local microphone source
-      const localSource = audioContext.createMediaStreamSource(micStream);
-      localSource.connect(destination);
-
-      // Connect remote audio source if available
-      if (remoteTracks.length > 0) {
-        const remoteStream = new MediaStream(remoteTracks);
-        const remoteSource = audioContext.createMediaStreamSource(remoteStream);
-        remoteSource.connect(destination);
-      }
-
-      // Setup recorder with combined stream
-      const recorder = new MediaRecorder(destination.stream, {
-        mimeType: 'audio/webm',
-      });
+      const recorder = new MediaRecorder(stream);
 
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunks.current.push(event.data);
         }
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks.current, { type: 'audio/webm' });
+        chunks.current = [];
+
+        convertToWav(blob).then((wavBlob) => {
+          const audioUrl = URL.createObjectURL(wavBlob);
+          const audioLink = document.createElement('a');
+          audioLink.href = audioUrl;
+          audioLink.download = `call-recording-${new Date().toISOString()}.wav`;
+          audioLink.click();
+          URL.revokeObjectURL(audioUrl);
+        });
+
+        // Stop all tracks
+        stream.getTracks().forEach((track) => track.stop());
       };
 
       recorder.start();
@@ -316,7 +299,6 @@ const useJssip = () => {
     }
   };
 
-  // Modified stopRecording function
   const stopRecording = () => {
     stopSpeechToText(true);
     stopSpeechToText(false);
@@ -366,7 +348,7 @@ const useJssip = () => {
 
     ended: function (e) {
       if (isRecording) {
-        stopRecording(); // Stop recording and generate files when call ends
+        stopRecording();
       }
       console.log('call ended');
       setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
@@ -576,7 +558,8 @@ const useJssip = () => {
             e.session.once('ended', (e) => {
               console.log('Call ended local event');
               setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
-
+              setIsRecording(false);
+              stopRecording();
               pause();
               setStatus('start');
               setPhoneNumber('');
