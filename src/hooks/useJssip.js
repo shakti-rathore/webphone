@@ -84,7 +84,6 @@ const useJssip = () => {
 
       socket.onclose = () => {
         console.log(`${isAgent ? 'Agent' : 'Customer'} WebSocket Closed`);
-        // Attempt to reconnect after a short delay
         setTimeout(() => {
           createWebSocket(isAgent);
         }, 3000);
@@ -106,20 +105,15 @@ const useJssip = () => {
       return socket;
     };
 
-    // Create both agent and customer WebSockets
-    createWebSocket(true); // Agent WebSocket
-    createWebSocket(false); // Customer WebSocket
+    createWebSocket(true); 
+    createWebSocket(false); 
   };
 
   const startSpeechToText = (stream, isAgent = true) => {
     const websocket = isAgent ? agentSocketRef.current : customerSocketRef.current;
     const mediaRecorderRef = isAgent ? agentMediaRecorderRef : customerMediaRecorderRef;
 
-    // Check WebSocket state with more robust connection checking
     if (!websocket || websocket.readyState !== WebSocket.OPEN) {
-      console.log(`${isAgent ? 'Agent' : 'Customer'} WebSocket not ready. Current state: ${websocket?.readyState}`);
-
-      // If the socket is closing or closed, attempt to reinitialize
       if (websocket?.readyState === WebSocket.CLOSING || websocket?.readyState === WebSocket.CLOSED) {
         initializeWebSocketTranscription();
       }
@@ -167,7 +161,6 @@ const useJssip = () => {
     initializeWebSocketTranscription();
 
     return () => {
-      // Properly close WebSockets on component unmount
       if (agentSocketRef.current) {
         agentSocketRef.current.close();
       }
@@ -210,7 +203,6 @@ const useJssip = () => {
 
     try {
       if (!isHeld) {
-        // Put call on hold
         await fetch(`https://callapp.iotcom.io/reqHold/${username}`, {
           method: 'POST',
           headers: {
@@ -221,14 +213,12 @@ const useJssip = () => {
           }),
         });
 
-        // Attempt to pause audio
         if (audioRef.current) {
           audioRef.current.pause();
         }
 
         setIsHeld(true);
       } else {
-        // Unhold call
         await fetch(`https://callapp.iotcom.io/reqUnHold/${username}`, {
           method: 'POST',
           headers: {
@@ -239,7 +229,6 @@ const useJssip = () => {
           }),
         });
 
-        // Resume audio
         if (audioRef.current) {
           audioRef.current.play();
         }
@@ -255,39 +244,48 @@ const useJssip = () => {
     if (!session || isRecording) return;
 
     try {
-      // Get local microphone stream
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
+      const combinedStream = new MediaStream();
+
+      const micStream = await navigator.mediaDevices.getUserMedia({
+        audio: selectedDeviceId ? { deviceId: { exact: selectedDeviceId } } : true,
       });
 
-      const recorder = new MediaRecorder(stream);
+      const remoteReceivers = session.connection.getReceivers() || [];
+      const remoteTracks = remoteReceivers
+        .filter((receiver) => receiver.track?.kind === 'audio')
+        .map((receiver) => receiver.track)
+        .filter(Boolean);
+
+      startSpeechToText(micStream, true); 
+      if (remoteTracks.length > 0) {
+        const remoteStream = new MediaStream(remoteTracks);
+        startSpeechToText(remoteStream, false); 
+      }
+
+      remoteTracks.forEach((track) => {
+        combinedStream.addTrack(track);
+      });
+
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const destination = audioContext.createMediaStreamDestination();
+
+      const localSource = audioContext.createMediaStreamSource(micStream);
+      localSource.connect(destination);
+
+      if (remoteTracks.length > 0) {
+        const remoteStream = new MediaStream(remoteTracks);
+        const remoteSource = audioContext.createMediaStreamSource(remoteStream);
+        remoteSource.connect(destination);
+      }
+
+      const recorder = new MediaRecorder(destination.stream, {
+        mimeType: 'audio/webm',
+      });
 
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunks.current.push(event.data);
         }
-      };
-
-      recorder.onstop = () => {
-        const blob = new Blob(chunks.current, { type: 'audio/webm' });
-        chunks.current = [];
-
-        convertToWav(blob).then((wavBlob) => {
-          const audioUrl = URL.createObjectURL(wavBlob);
-          const audioLink = document.createElement('a');
-          audioLink.href = audioUrl;
-          audioLink.download = `call-recording-${new Date().toISOString()}.wav`;
-          audioLink.click();
-          URL.revokeObjectURL(audioUrl);
-        });
-
-        // Stop all tracks
-        stream.getTracks().forEach((track) => track.stop());
       };
 
       recorder.start();
@@ -302,7 +300,6 @@ const useJssip = () => {
   const stopRecording = () => {
     stopSpeechToText(true);
     stopSpeechToText(false);
-    console.log(mediaRecorder, 'mediaRecorder');
     if (mediaRecorder && isRecording) {
       mediaRecorder.stop();
       setIsRecording(false);
@@ -323,7 +320,6 @@ const useJssip = () => {
     }
   };
 
-  // Event handlers now include recording management
   const eventHandlers = {
     failed: function (e) {
       setStatus('fail');
@@ -336,7 +332,7 @@ const useJssip = () => {
 
     confirmed: function (e) {
       reset();
-      startRecording(); // Start recording when call is confirmed
+      startRecording();
       setHistory((prev) => [
         ...prev.slice(0, -1),
         {
@@ -359,7 +355,6 @@ const useJssip = () => {
     },
   };
 
-  // Function to convert audio blob to WAV format
   const convertToWav = async (blob) => {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const arrayBuffer = await blob.arrayBuffer();
@@ -370,22 +365,19 @@ const useJssip = () => {
     const sampleRate = audioBuffer.sampleRate;
     const wavBuffer = audioContext.createBuffer(numberOfChannels, length, sampleRate);
 
-    // Copy the audio data to the new buffer
     for (let channel = 0; channel < numberOfChannels; channel++) {
       const channelData = audioBuffer.getChannelData(channel);
       wavBuffer.copyToChannel(channelData, channel);
     }
 
-    // Convert to WAV format
     const wavData = encodeWAV(wavBuffer);
     return new Blob([wavData], { type: 'audio/wav' });
   };
 
-  // Function to encode audio buffer to WAV format
   const encodeWAV = (audioBuffer) => {
     const numChannels = audioBuffer.numberOfChannels;
     const sampleRate = audioBuffer.sampleRate;
-    const format = 1; // PCM
+    const format = 1;
     const bitDepth = 16;
 
     const bytesPerSample = bitDepth / 8;
@@ -400,7 +392,6 @@ const useJssip = () => {
     const arrayBuffer = new ArrayBuffer(totalSize);
     const dataView = new DataView(arrayBuffer);
 
-    // Write WAV header
     writeString(dataView, 0, 'RIFF');
     dataView.setUint32(4, totalSize - 8, true);
     writeString(dataView, 8, 'WAVE');
@@ -415,7 +406,6 @@ const useJssip = () => {
     writeString(dataView, 36, 'data');
     dataView.setUint32(40, dataSize, true);
 
-    // Write audio data
     let offset = 44;
     for (let i = 0; i < samples; i++) {
       for (let channel = 0; channel < numChannels; channel++) {
@@ -429,7 +419,6 @@ const useJssip = () => {
     return arrayBuffer;
   };
 
-  // Helper function to write strings to DataView
   const writeString = (dataView, offset, string) => {
     for (let i = 0; i < string.length; i++) {
       dataView.setUint8(offset + i, string.charCodeAt(i));
@@ -581,7 +570,6 @@ const useJssip = () => {
 
     const enumerateDevices = async () => {
       try {
-        // Request permission for audio
         await navigator.mediaDevices.getUserMedia({ audio: true });
 
         const devices = await navigator.mediaDevices.enumerateDevices();
@@ -598,7 +586,6 @@ const useJssip = () => {
 
     enumerateDevices();
 
-    // Re-enumerate devices when they change
     navigator.mediaDevices.addEventListener('devicechange', enumerateDevices);
 
     return () => {

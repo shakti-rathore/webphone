@@ -7,6 +7,7 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import InCallScreen from './components/InCallScreen';
 import HistoryContext from './context/HistoryContext';
 import CallConference from './components/CallConference';
+import Layout from './components/Layouts/Layout';
 
 function App() {
   const [
@@ -129,70 +130,72 @@ function App() {
   }
 
   return (
-    <div className="App">
-      {seeLogs ? (
-        <HistoryScreen setSeeLogs={setSeeLogs} />
-      ) : status === 'start' ? (
-        <Home
-          phoneNumber={phoneNumber}
-          setPhoneNumber={setPhoneNumber}
-          handleCall={handleCall}
-          setSeeLogs={setSeeLogs}
-        />
-      ) : status === 'calling' || status === 'conference' ? (
-        <>
-          {(callConference && (
-            <CallConference
-              conferenceNumber={conferenceNumber}
-              setCallConference={setCallConference}
-              setConferenceNumber={setConferenceNumber}
-              handleCall={handleCalls}
-              setSeeLogs={setSeeLogs}
-              phoneNumber={phoneNumber}
-            />
-          )) || (
-            <CallScreen
-              reqUnHold={reqUnHold}
-              setCallConference={setCallConference}
-              toggleHold={toggleHold}
-              isHeld={isHeld}
-              isRecording={isRecording}
-              startRecording={startRecording}
-              stopRecording={stopRecording}
-              phoneNumber={phoneNumber}
-              session={session}
-              seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
-              minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
-              isRunning={isRunning}
-              setBridgeID={setBridgeID}
-              devices={devices}
-              selectedDeviceId={selectedDeviceId}
-              changeAudioDevice={changeAudioDevice}
-              conferenceStatus={conferenceStatus}
-            />
-          )}
-        </>
-      ) : status === 'Incalling' ? (
-        <InCallScreen
-          isRecording={isRecording}
-          startRecording={startRecording}
-          stopRecording={stopRecording}
-          phoneNumber={phoneNumber}
-          session={session}
-          setPhoneNumber={setPhoneNumber}
-          seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
-          minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
-          isRunning={isRunning}
-          setStatus={setStatus}
-          audioRef={audioRef}
-          devices={devices}
-          selectedDeviceId={selectedDeviceId}
-        />
-      ) : (
-        <div>No content available</div>
-      )}
-      <audio ref={audioRef} autoPlay hidden />
-    </div>
+    <Layout>
+      <div className="App">
+        {seeLogs ? (
+          <HistoryScreen setSeeLogs={setSeeLogs} />
+        ) : status === 'start' ? (
+          <Home
+            phoneNumber={phoneNumber}
+            setPhoneNumber={setPhoneNumber}
+            handleCall={handleCall}
+            setSeeLogs={setSeeLogs}
+          />
+        ) : status === 'calling' || status === 'conference' ? (
+          <>
+            {(callConference && (
+              <CallConference
+                conferenceNumber={conferenceNumber}
+                setCallConference={setCallConference}
+                setConferenceNumber={setConferenceNumber}
+                handleCall={handleCalls}
+                setSeeLogs={setSeeLogs}
+                phoneNumber={phoneNumber}
+              />
+            )) || (
+              <CallScreen
+                reqUnHold={reqUnHold}
+                setCallConference={setCallConference}
+                toggleHold={toggleHold}
+                isHeld={isHeld}
+                isRecording={isRecording}
+                startRecording={startRecording}
+                stopRecording={stopRecording}
+                phoneNumber={phoneNumber}
+                session={session}
+                seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
+                minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
+                isRunning={isRunning}
+                setBridgeID={setBridgeID}
+                devices={devices}
+                selectedDeviceId={selectedDeviceId}
+                changeAudioDevice={changeAudioDevice}
+                conferenceStatus={conferenceStatus}
+              />
+            )}
+          </>
+        ) : status === 'Incalling' ? (
+          <InCallScreen
+            isRecording={isRecording}
+            startRecording={startRecording}
+            stopRecording={stopRecording}
+            phoneNumber={phoneNumber}
+            session={session}
+            setPhoneNumber={setPhoneNumber}
+            seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
+            minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
+            isRunning={isRunning}
+            setStatus={setStatus}
+            audioRef={audioRef}
+            devices={devices}
+            selectedDeviceId={selectedDeviceId}
+          />
+        ) : (
+          <div>No content available</div>
+        )}
+        <audio ref={audioRef} autoPlay hidden />
+      </div>
+    </Layout>
   );
 }
 
