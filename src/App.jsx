@@ -42,6 +42,12 @@ function App() {
   const keepAliveRef = useRef(null);
   const { username } = useContext(HistoryContext);
 
+  useEffect(() => {
+    if (status == 'start') {
+      stopRecording();
+    }
+  }, [status]);
+
   const connectioncheck = async () => {
     if (isLogin && username) {
       try {

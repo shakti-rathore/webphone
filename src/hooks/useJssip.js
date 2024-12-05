@@ -302,6 +302,7 @@ const useJssip = () => {
   const stopRecording = () => {
     stopSpeechToText(true);
     stopSpeechToText(false);
+    console.log(mediaRecorder, 'mediaRecorder');
     if (mediaRecorder && isRecording) {
       mediaRecorder.stop();
       setIsRecording(false);
@@ -558,8 +559,6 @@ const useJssip = () => {
             e.session.once('ended', (e) => {
               console.log('Call ended local event');
               setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
-              setIsRecording(false);
-              stopRecording();
               pause();
               setStatus('start');
               setPhoneNumber('');
