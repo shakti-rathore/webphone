@@ -37,3 +37,32 @@ select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
   -webkit-text-fill-color: #333 !important;
 }
+
+.dark .form-wrap.form-builder .frmb li.form-field {
+  background-color: #333 !important;
+}
+
+.dark .form-builder-container textarea,
+.dark .form-builder-container input,
+.dark .form-builder-container select {
+  background-color: #333 !important;
+  color: #ffffff !important;
+  border-color: #9999 !important;
+}
+
+.dark .form-wrap.form-builder .frmb .field-label,
+.dark .form-wrap.form-builder .frmb .legend {
+  color: #ebebeb !important;
+}
+
+.dark .form-builder-container button {
+  color: #ffffff !important;
+}
+
+.dark .form-wrap.form-builder .frmb-control li:hover {
+  background-color: #1a1a1a;
+}
+.dark .form-wrap.form-builder .frmb-control li {
+  background-color: #333;
+  color: #ffffff;
+}

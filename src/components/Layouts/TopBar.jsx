@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { RiMoonLine, RiSunLine } from 'react-icons/ri';
 
 const TopBarPage = () => {
   const toggleTheme = useTheme();
+  const location = useLocation();
+  const isActive = (path) => location.pathname === path;
 
   return (
     <>
@@ -15,10 +17,18 @@ const TopBarPage = () => {
           </Link>
         </div>
         <ul className="flex gap-x-6">
-          <li className="text-black dark:text-white hover:text-blue transition-colors dark:hover:text-[#00498e]">
+          <li
+            className={` hover:text-blue transition-colors dark:hover:text-[#00498e] ${
+              isActive('/dashboard') ? 'text-blue dark:text-[#00498e]' : 'text-black dark:text-white'
+            }`}
+          >
             <Link to={'/dashboard'}>Dashboard</Link>
           </li>
-          <li className="text-black dark:text-white hover:text-blue transition-colors dark:hover:text-[#00498e]">
+          <li
+            className={` hover:text-blue transition-colors dark:hover:text-[#00498e] ${
+              isActive('/campaign') ? 'text-blue dark:text-[#00498e]' : 'text-black dark:text-white'
+            }`}
+          >
             <Link to={'/campaign'}>Campaign</Link>
           </li>
         </ul>

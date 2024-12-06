@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom'; // Use ReactDOM.render for React < 18
+import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { HistoryProvider } from './context/HistoryContext';
