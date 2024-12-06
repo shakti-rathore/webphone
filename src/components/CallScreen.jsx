@@ -34,7 +34,7 @@ const CallScreen = ({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="flex flex-col items-center w-full max-w-72 p-6 bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
+      <div className="flex flex-col items-center w-full max-w-72 p-6 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className={`flex flex-col items-center ${showKeyPad ? '' : 'mb-24'}`}>
           <div className="w-12 h-12 rounded-full bg-blue-dark flex items-center justify-center mb-4">
             <BsPersonFill className="text-white text-2xl" />
@@ -56,26 +56,26 @@ const CallScreen = ({
                 <button
                   onClick={toggleHold}
                   disabled={!session}
-                  className={`p-4 rounded-full ${isHeld ? 'bg-blue-dark text-white' : 'text-gray-600'}`}
+                  className={`p-4 rounded-full ${isHeld ? 'bg-blue-dark text-white' : 'text-gray-600 dark:text-white'}`}
                 >
                   <BsPause className="text-3xl" />
                 </button>
-                <button disabled className="p-4 rounded-full text-gray-600">
+                <button disabled className="p-4 rounded-full text-gray-600 dark:text-white">
                   <BsCameraVideo className="text-3xl" />
                 </button>
 
-                <button className="p-4 text-gray-600 rounded-full" onClick={() => setShowKeyPad(true)}>
+                <button className="p-4 text-gray-600 dark:text-white rounded-full" onClick={() => setShowKeyPad(true)}>
                   <IoIosKeypad className="text-3xl" />
                 </button>
               </div>
               <div className="flex justify-around items-center">
                 {(conferenceStatus && (
-                  <button className="p-4 rounded-full text-gray-600" disabled={!session} onClick={reqUnHold}>
+                  <button className="p-4 rounded-full text-gray-600 dark:text-white" disabled={!session} onClick={reqUnHold}>
                     <MdCallMerge className="text-3xl" />
                   </button>
                 )) || (
                   <button
-                    className="p-4 rounded-full text-gray-600"
+                    className="p-4 rounded-full text-gray-600 dark:text-white"
                     disabled={!session}
                     onClick={() => setCallConference(true)}
                   >
@@ -87,7 +87,7 @@ const CallScreen = ({
                   <button
                     onClick={startRecording}
                     disabled={!session}
-                    className={`flex items-center space-x-2 px-4 py-2 text-gray-600 rounded-lg transition-opacity focus:outline-none ${
+                    className={`flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-white rounded-lg transition-opacity focus:outline-none ${
                       !session ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                   >
@@ -96,14 +96,14 @@ const CallScreen = ({
                 ) : (
                   <button
                     onClick={stopRecording}
-                    className="flex items-center space-x-2 px-4 py-2 text-gray-600 rounded-lg transition-opacity focus:outline-none"
+                    className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-white rounded-lg transition-opacity focus:outline-none"
                   >
                     <FaStopCircle className="text-3xl text-red-500" />
                     <span className="ml-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
                   </button>
                 )}
                 <button
-                  className={`p-4 rounded-full ${muted ? 'bg-blue-dark text-white' : 'text-gray-600'}`}
+                  className={`p-4 rounded-full ${muted ? 'bg-blue-dark text-white' : 'text-gray-600 dark:text-white'}`}
                   onClick={() => {
                     muted ? session.unmute() : session.mute();
                     setMuted(!muted);
@@ -147,7 +147,7 @@ const CallScreen = ({
             id="audio-device"
             value={selectedDeviceId}
             onChange={(e) => changeAudioDevice(e.target.value)}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 outline-none"
+            className="bg-gray-50 border dark:text-white dark:bg-[#3333] dark:border-[#333] border-[#ddd] text-gray-900 text-sm rounded-lg block w-full p-2.5 outline-none"
           >
             {devices.map((device) => (
               <option key={device.deviceId} value={device.deviceId}>

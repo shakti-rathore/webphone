@@ -130,8 +130,8 @@ function App() {
   }
 
   return (
-    <Layout>
-      <div className="App">
+    <div className="bg-[#ecf3f9] antialiased scroll-smooth dark:bg-[#121212]">
+      <Layout>
         {seeLogs ? (
           <HistoryScreen setSeeLogs={setSeeLogs} />
         ) : status === 'start' ? (
@@ -194,8 +194,8 @@ function App() {
           <div>No content available</div>
         )}
         <audio ref={audioRef} autoPlay hidden />
-      </div>
-    </Layout>
+      </Layout>
+    </div>
   );
 }
 

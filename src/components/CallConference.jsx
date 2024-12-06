@@ -10,7 +10,7 @@ const CallConference = ({ conferenceNumber, handleCall, setCallConference, phone
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="w-full max-w-72 p-4 bg-white rounded-lg shadow-none md:shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
+      <div className="w-full max-w-72 p-4 bg-white dark:bg-[#3333] rounded-lg shadow-none md:shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className="text-xl font-bold text-blue-dark mb-2">WebPhone</div>
         <marquee
           className="text-sm text-white p-1 cursor-pointer bg-blue-dark mb-4"
@@ -26,7 +26,7 @@ const CallConference = ({ conferenceNumber, handleCall, setCallConference, phone
               setConferenceNumber(e.target.value);
             }}
             placeholder="Phone number"
-            className="w-full outline-none text-2xl indent-1.5"
+            className="w-full outline-none text-2xl indent-1.5 bg-white dark:bg-[#1a1a1a]/20 dark:text-white text-[#070707]"
           />
           {phoneNumber && (
             <div
