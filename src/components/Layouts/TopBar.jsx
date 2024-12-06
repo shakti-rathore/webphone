@@ -12,8 +12,16 @@ const TopBarPage = () => {
         <div className="flex gap-x-12 items-center">
           <Link to={'/dashboard'}>
             <img src="/images/logo.png" alt="Logo" width={48} height={48} />
-          </Link>{' '}
+          </Link>
         </div>
+        <ul className="flex gap-x-6">
+          <li className="text-black dark:text-white hover:text-blue transition-colors dark:hover:text-[#00498e]">
+            <Link to={'/dashboard'}>Dashboard</Link>
+          </li>
+          <li className="text-black dark:text-white hover:text-blue transition-colors dark:hover:text-[#00498e]">
+            <Link to={'/campaign'}>Campaign</Link>
+          </li>
+        </ul>
         <div className="flex items-center md:gap-x-6 gap-x-3">
           <DarkModeToggle toggleTheme={toggleTheme} />
         </div>

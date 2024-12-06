@@ -1,37 +1,61 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import { HistoryProvider } from './context/HistoryContext';
-import Login from './components/Login';
+import ReactDOM from 'react-dom'; // Use ReactDOM.render for React < 18
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { HistoryProvider } from './context/HistoryContext';
+import App from './App';
+import Campaign from './components/Campaign';
+import Login from './components/Login';
+import Layout from './components/Layouts/Layout';
 
-ReactDOM.render(
-  <Router>
-    <Routes>
-      {/* <Route
-        path="/login"
-        element={
-          <React.StrictMode>
+const AppRoutes = () => {
+  const CommonLayout = ({ children }) => (
+    <div className="bg-[#ecf3f9] antialiased scroll-smooth dark:bg-[#121212]">
+      <Layout>{children}</Layout>
+    </div>
+  );
+
+  return (
+    <Router>
+      <Toaster position="top-right" reverseOrder={false} />
+      <Routes>
+        <Route
+          path="/login"
+          element={
             <HistoryProvider>
               <Login />
             </HistoryProvider>
-          </React.StrictMode>
-        }
-      /> */}
-      <Route
-        path="/dashboard"
-        element={
-          <React.StrictMode>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
             <HistoryProvider>
-              <Toaster position="top-right" reverseOrder={false} />
-              <App />
+              <CommonLayout>
+                <App />
+              </CommonLayout>
             </HistoryProvider>
-          </React.StrictMode>
-        }
-      />
-      <Route path="*" element={<Navigate to="/dashboard" />} />
-    </Routes>
-  </Router>,
+          }
+        />
+        <Route
+          path="/campaign"
+          element={
+            <HistoryProvider>
+              <CommonLayout>
+                <Campaign />
+              </CommonLayout>
+            </HistoryProvider>
+          }
+        />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </Router>
+  );
+};
+
+ReactDOM.render(
+  <React.StrictMode>
+    <AppRoutes />
+  </React.StrictMode>,
   document.getElementById('root')
 );
