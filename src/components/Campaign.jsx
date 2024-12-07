@@ -13,77 +13,77 @@ class CampaignFormBuilder extends Component {
     super(props);
 
     // Initial form data with campaign-specific fields
-    this.initialFormData = [
-      {
-        type: 'header',
-        subtype: 'h1',
-        label: 'Campaign Form Builder',
-        className:'dark:text-white dark:bg-[#3333] bg-white text-gray-900'
-      },
-      {
-        type: 'text',
-        label: 'Campaign Name',
-        name: 'campaign_name',
-        required: true,
-        placeholder: 'Enter campaign name',
-        className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md outline-none bg-white',
-      },
-      {
-        type: 'select',
-        label: 'Campaign Type',
-        name: 'campaign_type',
-        values: [
-          { label: 'Email Marketing', value: 'email' },
-          { label: 'Social Media', value: 'social' },
-          { label: 'PPC', value: 'ppc' },
-          { label: 'Content Marketing', value: 'content' },
-        ],
-        className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md outline-none bg-white',
-      },
-      {
-        type: 'date',
-        label: 'Start Date',
-        name: 'start_date',
-        required: true,
-        className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md bg-white',
+    // this.initialFormData = [
+    //   {
+    //     type: 'header',
+    //     subtype: 'h1',
+    //     label: 'Campaign Form Builder',
+    //     className:'dark:text-white dark:bg-[#3333] bg-white text-gray-900'
+    //   },
+    //   {
+    //     type: 'text',
+    //     label: 'Campaign Name',
+    //     name: 'campaign_name',
+    //     required: true,
+    //     placeholder: 'Enter campaign name',
+    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md outline-none bg-white',
+    //   },
+    //   {
+    //     type: 'select',
+    //     label: 'Campaign Type',
+    //     name: 'campaign_type',
+    //     values: [
+    //       { label: 'Email Marketing', value: 'email' },
+    //       { label: 'Social Media', value: 'social' },
+    //       { label: 'PPC', value: 'ppc' },
+    //       { label: 'Content Marketing', value: 'content' },
+    //     ],
+    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md outline-none bg-white',
+    //   },
+    //   {
+    //     type: 'date',
+    //     label: 'Start Date',
+    //     name: 'start_date',
+    //     required: true,
+    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md bg-white',
 
-      },
-      {
-        type: 'date',
-        label: 'End Date',
-        name: 'end_date',
-        className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md bg-white',
+    //   },
+    //   {
+    //     type: 'date',
+    //     label: 'End Date',
+    //     name: 'end_date',
+    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md bg-white',
 
-      },
-      {
-        type: 'select',
-        label: 'Campaign Status',
-        name: 'campaign_status',
-        values: [
-          { label: 'Draft', value: 'draft' },
-          { label: 'Active', value: 'active' },
-          { label: 'Paused', value: 'paused' },
-          { label: 'Completed', value: 'completed' },
-        ],
-        className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md bg-white',
+    //   },
+    //   {
+    //     type: 'select',
+    //     label: 'Campaign Status',
+    //     name: 'campaign_status',
+    //     values: [
+    //       { label: 'Draft', value: 'draft' },
+    //       { label: 'Active', value: 'active' },
+    //       { label: 'Paused', value: 'paused' },
+    //       { label: 'Completed', value: 'completed' },
+    //     ],
+    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md bg-white',
 
-      },
-      {
-        type: 'number',
-        label: 'Budget',
-        name: 'campaign_budget',
-        step: '0.01',
-        className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md outline-none bg-white',
+    //   },
+    //   {
+    //     type: 'number',
+    //     label: 'Budget',
+    //     name: 'campaign_budget',
+    //     step: '0.01',
+    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md outline-none bg-white',
 
-      },
-      {
-        type: 'textarea',
-        label: 'Campaign Description',
-        name: 'campaign_description',
-        className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md outline-none bg-white',
+    //   },
+    //   {
+    //     type: 'textarea',
+    //     label: 'Campaign Description',
+    //     name: 'campaign_description',
+    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md outline-none bg-white',
 
-      },
-    ];
+    //   },
+    // ];
 
     // Reference for form builder
     this.fb = createRef();
