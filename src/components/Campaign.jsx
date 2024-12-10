@@ -1,178 +1,445 @@
-import $ from 'jquery';
-import React, { Component, createRef } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { Toaster, toast } from 'react-hot-toast';
+import { FaPlus, FaTrash, FaEye, FaFilter, FaSpinner } from 'react-icons/fa';
 
-window.jQuery = $;
-window.$ = $;
+const Campaign = () => {
+  const [fields, setFields] = useState([]);
+  const [formData, setFormData] = useState({
+    campaignName: '',
+  });
+  const [preview, setPreview] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-require('jquery-ui-sortable');
-require('formBuilder');
+  const addField = () => {
+    setFields([
+      ...fields,
+      {
+        id: Date.now(),
+        label: '',
+        type: 'text',
+        options: [],
+        condition: {
+          dependentField: null,
+          operator: 'equals',
+          value: '',
+        },
+        visible: true,
+      },
+    ]);
+  };
 
-class CampaignFormBuilder extends Component {
-  constructor(props) {
-    super(props);
+  const removeField = (id) => {
+    setFields(fields.filter((field) => field.id !== id));
+    const updatedData = { ...formData };
+    delete updatedData[id];
+    setFormData(updatedData);
+  };
 
-    // Initial form data with campaign-specific fields
-    // this.initialFormData = [
-    //   {
-    //     type: 'header',
-    //     subtype: 'h1',
-    //     label: 'Campaign Form Builder',
-    //     className:'dark:text-white dark:bg-[#3333] bg-white text-gray-900'
-    //   },
-    //   {
-    //     type: 'text',
-    //     label: 'Campaign Name',
-    //     name: 'campaign_name',
-    //     required: true,
-    //     placeholder: 'Enter campaign name',
-    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md outline-none bg-white',
-    //   },
-    //   {
-    //     type: 'select',
-    //     label: 'Campaign Type',
-    //     name: 'campaign_type',
-    //     values: [
-    //       { label: 'Email Marketing', value: 'email' },
-    //       { label: 'Social Media', value: 'social' },
-    //       { label: 'PPC', value: 'ppc' },
-    //       { label: 'Content Marketing', value: 'content' },
-    //     ],
-    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md outline-none bg-white',
-    //   },
-    //   {
-    //     type: 'date',
-    //     label: 'Start Date',
-    //     name: 'start_date',
-    //     required: true,
-    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md bg-white',
+  const handleFieldChange = (id, key, value) => {
+    setFields(fields.map((field) => (field.id === id ? { ...field, [key]: value } : field)));
+  };
 
-    //   },
-    //   {
-    //     type: 'date',
-    //     label: 'End Date',
-    //     name: 'end_date',
-    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md bg-white',
+  const updateCondition = (id, conditionKey, value) => {
+    setFields(
+      fields.map((field) =>
+        field.id === id
+          ? {
+              ...field,
+              condition: { ...field.condition, [conditionKey]: value },
+            }
+          : field
+      )
+    );
+  };
+  const resetForm = () => {
+    setFields([]);
+    setFormData({ campaignName: '' });
+    setPreview(false);
+  };
 
-    //   },
-    //   {
-    //     type: 'select',
-    //     label: 'Campaign Status',
-    //     name: 'campaign_status',
-    //     values: [
-    //       { label: 'Draft', value: 'draft' },
-    //       { label: 'Active', value: 'active' },
-    //       { label: 'Paused', value: 'paused' },
-    //       { label: 'Completed', value: 'completed' },
-    //     ],
-    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md bg-white',
+  const handleInputChange = (id, value) => {
+    const updatedFormData = { ...formData, [id]: value };
+    setFormData(updatedFormData);
 
-    //   },
-    //   {
-    //     type: 'number',
-    //     label: 'Budget',
-    //     name: 'campaign_budget',
-    //     step: '0.01',
-    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md outline-none bg-white',
+    const updatedFields = fields.map((field) => {
+      if (field.condition.dependentField) {
+        const dependentValue = updatedFormData[field.condition.dependentField];
 
-    //   },
-    //   {
-    //     type: 'textarea',
-    //     label: 'Campaign Description',
-    //     name: 'campaign_description',
-    //     className: 'w-full px-3 py-2 border dark:text-white dark:bg-[#3333] dark:border-[#999] border-[#ddd] rounded-md outline-none bg-white',
-
-    //   },
-    // ];
-
-    // Reference for form builder
-    this.fb = createRef();
-
-    // State to track form builder instance
-    this.state = {
-      formBuilderInstance: null,
-    };
-  }
-
-  componentDidMount() {
-    // Initialize form builder with predefined fields
-    const formBuilderInstance = $(this.fb.current).formBuilder({
-      formData: this.initialFormData,
-      disabledActionButtons: ['data'],
-      onSave: this.handleFormSave.bind(this),
+        switch (field.condition.operator) {
+          case 'equals':
+            field.visible = dependentValue === field.condition.value;
+            break;
+          case 'not equals':
+            field.visible = dependentValue !== field.condition.value;
+            break;
+          default:
+            field.visible = true;
+        }
+      }
+      return field;
     });
 
-    // Store form builder instance in state
-    this.setState({ formBuilderInstance });
-  }
+    setFields(updatedFields);
+  };
 
-  // Handle form save action
-  handleFormSave(evt) {
-    try {
-      // Get the form data
-      const formData = this.state.formBuilderInstance.actions.getData('json');
-      const parsedData = JSON.parse(formData);
+  const addOption = (id) => {
+    setFields(fields.map((field) => (field.id === id ? { ...field, options: [...(field.options || []), ''] } : field)));
+  };
 
-      // Log or process the campaign form data
-      console.log('Campaign Form Data:', parsedData);
-
-      // Optional: Send data to backend or perform further processing
-      this.saveCampaignData(parsedData);
-    } catch (error) {
-      console.error('Error parsing form data:', error);
-    }
-  }
-
-  // Method to save campaign data (mock implementation)
-  saveCampaignData(data) {
-    // In a real application, this would typically involve an API call
-    fetch('/api/campaigns', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        console.log('Campaign saved successfully:', result);
-        // Optionally show success message or redirect
-      })
-      .catch((error) => {
-        console.error('Error saving campaign:', error);
-        // Handle error (show error message, etc.)
-      });
-  }
-
-  render() {
-    return (
-      <>
-        <div className="mx-auto">
-          {/* Form Builder Container */}
-          <div className="bg-white dark:bg-[#333] shadow-lg rounded-xl p-6 border dark:border-[#1a1a1a] border-[#ddd] mb-6">
-            <div className="flex items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Campaign Details</h2>
-            </div>
-
-            <div id="fb-editor" ref={this.fb} className="form-builder-container space-y-4 dark:bg-[#333] bg-white" />
-          </div>
-
-          {/* Save Button */}
-          <div className="flex justify-end">
-            <button
-              onClick={() => this.state.formBuilderInstance?.actions.save()}
-              className="flex items-center px-6 py-3 bg-blue-dark text-white rounded-lg hover:bg-blue transition-colors"
-            >
-              Save Campaign
-            </button>
-          </div>
-        </div>
-      </>
+  const updateOption = (id, index, value) => {
+    setFields(
+      fields.map((field) =>
+        field.id === id
+          ? {
+              ...field,
+              options: field.options.map((opt, i) => (i === index ? value : opt)),
+            }
+          : field
+      )
     );
-  }
-}
+  };
 
-// Render the component
-ReactDOM.render(<CampaignFormBuilder />, document.getElementById('root'));
+  const removeOption = (id, index) => {
+    setFields(
+      fields.map((field) =>
+        field.id === id
+          ? {
+              ...field,
+              options: field.options.filter((_, i) => i !== index),
+            }
+          : field
+      )
+    );
+  };
 
-export default CampaignFormBuilder;
+  const renderFormField = (field) => {
+    if (!field.visible) return null;
+
+    switch (field.type) {
+      case 'text':
+      case 'number':
+      case 'email':
+      case 'date':
+        return (
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2 capitalize">{field.label}</label>
+            <input
+              type={field.type}
+              placeholder={`Enter ${field.label}`}
+              className="w-full px-3 py-2 border rounded outline-none"
+              value={formData[field.id] || ''}
+              onChange={(e) => handleInputChange(field.id, e.target.value)}
+            />
+          </div>
+        );
+
+      case 'textarea':
+        return (
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">{field.label}</label>
+            <textarea
+              placeholder={`Enter ${field.label}`}
+              className="w-full px-3 py-2 border rounded outline-none"
+              value={formData[field.id] || ''}
+              onChange={(e) => handleInputChange(field.id, e.target.value)}
+            />
+          </div>
+        );
+
+      case 'checkbox':
+        return (
+          <div className="mb-4 flex items-center">
+            <input
+              type="checkbox"
+              id={`checkbox-${field.id}`}
+              checked={formData[field.id] || false}
+              onChange={(e) => handleInputChange(field.id, e.target.checked)}
+              className="mr-2"
+            />
+            <label htmlFor={`checkbox-${field.id}`} className="text-gray-700">
+              {field.label}
+            </label>
+          </div>
+        );
+
+      case 'radio':
+        return (
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">{field.label}</label>
+            <div className="space-y-2">
+              {field.options.map((option, index) => (
+                <div key={index} className="flex items-center">
+                  <input
+                    type="radio"
+                    id={`radio-${field.id}-${index}`}
+                    name={`radio-${field.id}`}
+                    value={option}
+                    checked={formData[field.id] === option}
+                    onChange={(e) => handleInputChange(field.id, e.target.value)}
+                    className="mr-2"
+                  />
+                  <label htmlFor={`radio-${field.id}-${index}`} className="text-gray-700">
+                    {option}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'select':
+        return (
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">{field.label}</label>
+            <select
+              className="w-full px-3 py-2 border rounded outline-none"
+              value={formData[field.id] || ''}
+              onChange={(e) => handleInputChange(field.id, e.target.value)}
+            >
+              <option value="">Select {field.label}</option>
+              {field.options.map((option, index) => (
+                <option key={index} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    if (!formData.campaignName) {
+      toast.error('Campaign Name is required');
+      setIsLoading(false);
+      return;
+    }
+
+    const requiredFieldsMissing = fields.some(
+      (field) => field.visible && (!formData[field.id] || formData[field.id] === '')
+    );
+
+    if (requiredFieldsMissing) {
+      toast.error('Please fill out all required fields');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/campaign',
+        {
+          campaignFields: {
+            campaignName: formData.campaignName,
+            fields: fields,
+            formData: formData,
+          },
+          metadata: {
+            timestamp: new Date().toISOString(),
+            source: 'dynamic-form-builder',
+          },
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      toast.success('Form submitted successfully!');
+      resetForm();
+      setIsLoading(false);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to submit form');
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="p-6 mx-auto bg-white rounded-lg shadow">
+      <Toaster position="top-right" reverseOrder={false} />
+
+      <h1 className="text-2xl font-bold mb-4">Campaign Form</h1>
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">Campaign Name</label>
+        <input
+          type="text"
+          placeholder="Enter Campaign Name"
+          className="w-full px-3 py-2 border rounded outline-none"
+          value={formData.campaignName}
+          onChange={(e) => setFormData({ ...formData, campaignName: e.target.value })}
+          required
+        />
+      </div>
+
+      <div className="mb-6">
+        <button
+          onClick={addField}
+          className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 flex items-center gap-2"
+        >
+          <FaPlus /> Add Field
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        {fields.map(
+          (field) =>
+            field.visible && (
+              <div key={field.id} className="p-4 bg-white border rounded-lg shadow-sm">
+                <div className="flex items-center gap-4">
+                  <input
+                    type="text"
+                    placeholder="Field Label"
+                    className="flex-1 px-3 py-2 border rounded outline-none"
+                    value={field.label}
+                    onChange={(e) => handleFieldChange(field.id, 'label', e.target.value)}
+                  />
+                  <select
+                    className="px-3 py-2 border rounded outline-none"
+                    value={field.type}
+                    onChange={(e) => handleFieldChange(field.id, 'type', e.target.value)}
+                  >
+                    <option value="text">Text</option>
+                    <option value="number">Number</option>
+                    <option value="email">Email</option>
+                    <option value="date">Date</option>
+                    <option value="textarea">Textarea</option>
+                    <option value="checkbox">Checkbox</option>
+                    <option value="radio">Radio Button</option>
+                    <option value="select">Select Box</option>
+                  </select>
+                  <button onClick={() => removeField(field.id)} className="text-red-500 hover:text-red-600">
+                    <FaTrash />
+                  </button>
+                </div>
+
+                <div className="mt-4 bg-gray-50 p-3 rounded border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FaFilter className="text-gray-500" />
+                    <span className="font-semibold text-sm">Conditional Logic</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <select
+                      value={field.condition.dependentField || ''}
+                      onChange={(e) => updateCondition(field.id, 'dependentField', e.target.value)}
+                      className="px-2 py-1 border rounded"
+                    >
+                      <option value="">Select Dependent Field</option>
+                      {fields
+                        .filter((f) => f.id !== field.id)
+                        .map((f) => (
+                          <option key={f.id} value={f.id.toString()}>
+                            {f.label || `Field ${f.id}`}
+                          </option>
+                        ))}
+                    </select>
+
+                    <select
+                      value={field.condition.operator}
+                      onChange={(e) => updateCondition(field.id, 'operator', e.target.value)}
+                      className="px-2 py-1 border rounded"
+                    >
+                      <option value="equals">Equals</option>
+                      <option value="not equals">Not Equals</option>
+                    </select>
+
+                    <input
+                      type="text"
+                      placeholder="Condition Value"
+                      value={field.condition.value}
+                      onChange={(e) => updateCondition(field.id, 'value', e.target.value)}
+                      className="px-2 py-1 border rounded outline-none"
+                    />
+                  </div>
+                </div>
+
+                {['select', 'radio'].includes(field.type) && (
+                  <div className="mt-4 space-y-2">
+                    {field.options.map((option, index) => (
+                      <div key={index} className="flex items-center gap-4">
+                        <input
+                          type="text"
+                          placeholder={`Option ${index + 1}`}
+                          className="flex-1 px-3 py-2 border rounded outline-none"
+                          value={option}
+                          onChange={(e) => updateOption(field.id, index, e.target.value)}
+                        />
+                        <button
+                          onClick={() => removeOption(field.id, index)}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => addOption(field.id)}
+                      className="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600"
+                    >
+                      Add Option
+                    </button>
+                  </div>
+                )}
+              </div>
+            )
+        )}
+      </div>
+
+      <div className="mt-6 flex justify-between items-center">
+        <button
+          onClick={() => setPreview(!preview)}
+          className="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600 flex items-center gap-2"
+        >
+          <FaEye /> {preview ? 'Hide Preview' : 'Show Preview'}
+        </button>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          onClick={handleSubmit}
+          className={`px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-600 ${
+            isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white'
+          }`}
+        >
+          {isLoading ? (
+            <>
+              <FaSpinner className="animate-spin" /> Submitting...
+            </>
+          ) : (
+            'Submit'
+          )}
+        </button>
+      </div>
+
+      {preview && (
+        <div className="mt-6 bg-white p-6 border rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">Form Preview</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">Campaign Name</label>
+              <input
+                type="text"
+                placeholder="Enter Campaign Name"
+                className="w-full px-3 py-2 border rounded outline-none"
+                value={formData.campaignName}
+                onChange={(e) => setFormData({ ...formData, campaignName: e.target.value })}
+                required
+              />
+            </div>
+            {fields.map((field) => renderFormField(field))}
+          </form>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Campaign;

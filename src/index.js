@@ -7,6 +7,7 @@ import App from './App';
 import Campaign from './components/Campaign';
 import Login from './components/Login';
 import Layout from './components/Layouts/Layout';
+import CampaignForm from './components/CampaignForm';
 
 const AppRoutes = () => {
   const CommonLayout = ({ children }) => (
@@ -43,6 +44,16 @@ const AppRoutes = () => {
             <HistoryProvider>
               <CommonLayout>
                 <Campaign />
+              </CommonLayout>
+            </HistoryProvider>
+          }
+        />
+        <Route
+          path="/campaign-details"
+          element={
+            <HistoryProvider>
+              <CommonLayout>
+                <CampaignForm />
               </CommonLayout>
             </HistoryProvider>
           }

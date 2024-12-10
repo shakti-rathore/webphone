@@ -31,6 +31,13 @@ const TopBarPage = () => {
           >
             <Link to={'/campaign'}>Campaign</Link>
           </li>
+          <li
+            className={` hover:text-blue transition-colors dark:hover:text-[#00498e] ${
+              isActive('/campaign-details') ? 'text-blue dark:text-[#00498e]' : 'text-black dark:text-white'
+            }`}
+          >
+            <Link to={'/campaign-details'}>Campaign Details</Link>
+          </li>
         </ul>
         <div className="flex items-center md:gap-x-6 gap-x-3">
           <DarkModeToggle toggleTheme={toggleTheme} />
