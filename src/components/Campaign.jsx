@@ -237,7 +237,6 @@ const Campaign = () => {
           campaignFields: {
             campaignName: formData.campaignName,
             fields: fields,
-            formData: formData,
           },
           metadata: {
             timestamp: new Date().toISOString(),
