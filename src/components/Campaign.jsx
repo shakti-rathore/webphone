@@ -8,7 +8,6 @@ const Campaign = () => {
   const [formData, setFormData] = useState({
     campaignName: '',
   });
-  const [preview, setPreview] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const addField = () => {
@@ -55,7 +54,6 @@ const Campaign = () => {
   const resetForm = () => {
     setFields([]);
     setFormData({ campaignName: '' });
-    setPreview(false);
   };
 
   const handleInputChange = (id, value) => {
@@ -263,144 +261,159 @@ const Campaign = () => {
   };
 
   return (
-    <div className="p-6 mx-auto bg-white rounded-lg shadow">
+    <>
       <Toaster position="top-right" reverseOrder={false} />
 
-      <h1 className="text-2xl font-bold mb-4">Campaign Form</h1>
+      <div className="mx-auto bg-white rounded-lg shadow p-6">
+        <div className="flex items justify-between space-x-6">
+          <div className="w-full">
+            <h1 className="text-2xl font-bold mb-4">Campaign Form</h1>
 
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Campaign Name</label>
-        <input
-          type="text"
-          placeholder="Enter Campaign Name"
-          className="w-full px-3 py-2 border rounded outline-none"
-          value={formData.campaignName}
-          onChange={(e) => setFormData({ ...formData, campaignName: e.target.value })}
-          required
-        />
-      </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">Campaign Name</label>
+              <input
+                type="text"
+                placeholder="Enter Campaign Name"
+                className="w-full px-3 py-2 border rounded outline-none"
+                value={formData.campaignName}
+                onChange={(e) => setFormData({ ...formData, campaignName: e.target.value })}
+                required
+              />
+            </div>
 
-      <div className="mb-6">
-        <button
-          onClick={addField}
-          className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 flex items-center gap-2"
-        >
-          <FaPlus /> Add Field
-        </button>
-      </div>
+            <div className="mb-6">
+              <button
+                onClick={addField}
+                className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 flex items-center gap-2"
+              >
+                <FaPlus /> Add Field
+              </button>
+            </div>
 
-      <div className="space-y-4">
-        {fields.map(
-          (field) =>
-            field.visible && (
-              <div key={field.id} className="p-4 bg-white border rounded-lg shadow-sm">
-                <div className="flex items-center gap-4">
-                  <input
-                    type="text"
-                    placeholder="Field Label"
-                    className="flex-1 px-3 py-2 border rounded outline-none"
-                    value={field.label}
-                    onChange={(e) => handleFieldChange(field.id, 'label', e.target.value)}
-                  />
-                  <select
-                    className="px-3 py-2 border rounded outline-none"
-                    value={field.type}
-                    onChange={(e) => handleFieldChange(field.id, 'type', e.target.value)}
-                  >
-                    <option value="text">Text</option>
-                    <option value="number">Number</option>
-                    <option value="email">Email</option>
-                    <option value="date">Date</option>
-                    <option value="textarea">Textarea</option>
-                    <option value="checkbox">Checkbox</option>
-                    <option value="radio">Radio Button</option>
-                    <option value="select">Select Box</option>
-                  </select>
-                  <button onClick={() => removeField(field.id)} className="text-red-500 hover:text-red-600">
-                    <FaTrash />
-                  </button>
-                </div>
-
-                <div className="mt-4 bg-gray-50 p-3 rounded border">
-                  <div className="flex items-center gap-2 mb-2">
-                    <FaFilter className="text-gray-500" />
-                    <span className="font-semibold text-sm">Conditional Logic</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <select
-                      value={field.condition.dependentField || ''}
-                      onChange={(e) => updateCondition(field.id, 'dependentField', e.target.value)}
-                      className="px-2 py-1 border rounded"
-                    >
-                      <option value="">Select Dependent Field</option>
-                      {fields
-                        .filter((f) => f.id !== field.id)
-                        .map((f) => (
-                          <option key={f.id} value={f.id.toString()}>
-                            {f.label || `Field ${f.id}`}
-                          </option>
-                        ))}
-                    </select>
-
-                    <select
-                      value={field.condition.operator}
-                      onChange={(e) => updateCondition(field.id, 'operator', e.target.value)}
-                      className="px-2 py-1 border rounded"
-                    >
-                      <option value="equals">Equals</option>
-                      <option value="not equals">Not Equals</option>
-                    </select>
-
-                    <input
-                      type="text"
-                      placeholder="Condition Value"
-                      value={field.condition.value}
-                      onChange={(e) => updateCondition(field.id, 'value', e.target.value)}
-                      className="px-2 py-1 border rounded outline-none"
-                    />
-                  </div>
-                </div>
-
-                {['select', 'radio'].includes(field.type) && (
-                  <div className="mt-4 space-y-2">
-                    {field.options.map((option, index) => (
-                      <div key={index} className="flex items-center gap-4">
+            <div className="space-y-4">
+              {fields.map(
+                (field) =>
+                  field.visible && (
+                    <div key={field.id} className="p-4 bg-white border rounded-lg shadow-sm">
+                      <div className="flex items-center gap-4">
                         <input
                           type="text"
-                          placeholder={`Option ${index + 1}`}
+                          placeholder="Field Label"
                           className="flex-1 px-3 py-2 border rounded outline-none"
-                          value={option}
-                          onChange={(e) => updateOption(field.id, index, e.target.value)}
+                          value={field.label}
+                          onChange={(e) => handleFieldChange(field.id, 'label', e.target.value)}
                         />
-                        <button
-                          onClick={() => removeOption(field.id, index)}
-                          className="text-red-500 hover:text-red-600"
+                        <select
+                          className="px-3 py-2 border rounded outline-none"
+                          value={field.type}
+                          onChange={(e) => handleFieldChange(field.id, 'type', e.target.value)}
                         >
+                          <option value="text">Text</option>
+                          <option value="number">Number</option>
+                          <option value="email">Email</option>
+                          <option value="date">Date</option>
+                          <option value="textarea">Textarea</option>
+                          <option value="checkbox">Checkbox</option>
+                          <option value="radio">Radio Button</option>
+                          <option value="select">Select Box</option>
+                        </select>
+                        <button onClick={() => removeField(field.id)} className="text-red-500 hover:text-red-600">
                           <FaTrash />
                         </button>
                       </div>
-                    ))}
-                    <button
-                      onClick={() => addOption(field.id)}
-                      className="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600"
-                    >
-                      Add Option
-                    </button>
-                  </div>
-                )}
+
+                      <div className="mt-4 bg-gray-50 p-3 rounded border">
+                        <div className="flex items-center gap-2 mb-2">
+                          <FaFilter className="text-gray-500" />
+                          <span className="font-semibold text-sm">Conditional Logic</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <select
+                            value={field.condition.dependentField || ''}
+                            onChange={(e) => updateCondition(field.id, 'dependentField', e.target.value)}
+                            className="px-2 py-1 border rounded"
+                          >
+                            <option value="">Select Dependent Field</option>
+                            {fields
+                              .filter((f) => f.id !== field.id)
+                              .map((f) => (
+                                <option key={f.id} value={f.id.toString()}>
+                                  {f.label || `Field ${f.id}`}
+                                </option>
+                              ))}
+                          </select>
+
+                          <select
+                            value={field.condition.operator}
+                            onChange={(e) => updateCondition(field.id, 'operator', e.target.value)}
+                            className="px-2 py-1 border rounded"
+                          >
+                            <option value="equals">Equals</option>
+                            <option value="not equals">Not Equals</option>
+                          </select>
+
+                          <input
+                            type="text"
+                            placeholder="Condition Value"
+                            value={field.condition.value}
+                            onChange={(e) => updateCondition(field.id, 'value', e.target.value)}
+                            className="px-2 py-1 border rounded outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {['select', 'radio'].includes(field.type) && (
+                        <div className="mt-4 space-y-2">
+                          {field.options.map((option, index) => (
+                            <div key={index} className="flex items-center gap-4">
+                              <input
+                                type="text"
+                                placeholder={`Option ${index + 1}`}
+                                className="flex-1 px-3 py-2 border rounded outline-none"
+                                value={option}
+                                onChange={(e) => updateOption(field.id, index, e.target.value)}
+                              />
+                              <button
+                                onClick={() => removeOption(field.id, index)}
+                                className="text-red-500 hover:text-red-600"
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
+                          ))}
+                          <button
+                            onClick={() => addOption(field.id)}
+                            className="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600"
+                          >
+                            Add Option
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )
+              )}
+            </div>
+          </div>
+          <div className="w-full border-l-2 ps-8">
+            <h2 className="text-2xl font-semibold mb-4">Form Preview</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">Campaign Name</label>
+                <input
+                  type="text"
+                  placeholder="Enter Campaign Name"
+                  className="w-full px-3 py-2 border rounded outline-none"
+                  value={formData.campaignName}
+                  onChange={(e) => setFormData({ ...formData, campaignName: e.target.value })}
+                  required
+                />
               </div>
-            )
-        )}
+              {fields.map((field) => renderFormField(field))}
+            </form>
+          </div>
+        </div>
       </div>
-
-      <div className="mt-6 flex justify-between items-center">
-        <button
-          onClick={() => setPreview(!preview)}
-          className="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600 flex items-center gap-2"
-        >
-          <FaEye /> {preview ? 'Hide Preview' : 'Show Preview'}
-        </button>
-
+      <div>
         <button
           type="submit"
           disabled={isLoading}
@@ -418,27 +431,7 @@ const Campaign = () => {
           )}
         </button>
       </div>
-
-      {preview && (
-        <div className="mt-6 bg-white p-6 border rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Form Preview</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Campaign Name</label>
-              <input
-                type="text"
-                placeholder="Enter Campaign Name"
-                className="w-full px-3 py-2 border rounded outline-none"
-                value={formData.campaignName}
-                onChange={(e) => setFormData({ ...formData, campaignName: e.target.value })}
-                required
-              />
-            </div>
-            {fields.map((field) => renderFormField(field))}
-          </form>
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 
