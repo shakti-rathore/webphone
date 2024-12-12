@@ -6,8 +6,8 @@ import { HistoryProvider } from './context/HistoryContext';
 import App from './App';
 import Campaign from './components/Campaign';
 import Login from './components/Login';
-import Layout from './components/Layouts/Layout';
-import CampaignForm from './components/CampaignForm';
+import Layout from './components/layouts/Layout';
+import CampaignDetails from './components/CampaignDetails';
 
 const AppRoutes = () => {
   const CommonLayout = ({ children }) => (
@@ -53,7 +53,7 @@ const AppRoutes = () => {
           element={
             <HistoryProvider>
               <CommonLayout>
-                <CampaignForm />
+                <CampaignDetails />
               </CommonLayout>
             </HistoryProvider>
           }

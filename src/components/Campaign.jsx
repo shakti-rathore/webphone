@@ -1,437 +1,125 @@
-import React, { useState } from 'react';
 import axios from 'axios';
-import { Toaster, toast } from 'react-hot-toast';
-import { FaPlus, FaTrash, FaEye, FaFilter, FaSpinner } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
+import CommonTable from './table/CommonTable';
+import { BiEdit, BiTrash } from 'react-icons/bi';
+import toast from 'react-hot-toast';
+import CampaignForm from './CampaignForm';
+import Modal from './table/Modal';
 
-const Campaign = () => {
-  const [fields, setFields] = useState([]);
-  const [formData, setFormData] = useState({
-    campaignName: '',
-  });
-  const [isLoading, setIsLoading] = useState(false);
+function Campaign() {
+  const [campaigns, setCampaigns] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [addCampaign, setAddCampaign] = useState(false);
+  const [editingCampaign, setEditingCampaign] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [campaignToDelete, setCampaignToDelete] = useState(null);
 
-  const addField = () => {
-    setFields([
-      ...fields,
-      {
-        id: Date.now(),
-        label: '',
-        type: 'text',
-        options: [],
-        condition: {
-          dependentField: null,
-          operator: 'equals',
-          value: '',
-        },
-        visible: true,
-      },
-    ]);
+  const handleEdit = (campaign) => {
+    setEditingCampaign(campaign);
+    setAddCampaign(true);
   };
 
-  const removeField = (id) => {
-    setFields(fields.filter((field) => field.id !== id));
-    const updatedData = { ...formData };
-    delete updatedData[id];
-    setFormData(updatedData);
-  };
-
-  const handleFieldChange = (id, key, value) => {
-    setFields(fields.map((field) => (field.id === id ? { ...field, [key]: value } : field)));
-  };
-
-  const updateCondition = (id, conditionKey, value) => {
-    setFields(
-      fields.map((field) =>
-        field.id === id
-          ? {
-              ...field,
-              condition: { ...field.condition, [conditionKey]: value },
-            }
-          : field
-      )
+  const renderAction = (id) => {
+    const campaign = campaigns.find((c) => c.id === id);
+    return (
+      <>
+        <button
+          onClick={() => handleEdit(campaign)}
+          className="bg-green-500 text-white px-2.5 py-2 rounded hover:bg-green-800 me-3"
+        >
+          <BiEdit size={20} />
+        </button>
+        <button
+          onClick={() => {
+            setCampaignToDelete(id);
+            setIsDeleteModalOpen(true);
+          }}
+          className="bg-red-500 text-white px-2.5 py-2 rounded hover:bg-red-800"
+        >
+          <BiTrash size={20} />
+        </button>
+      </>
     );
   };
-  const resetForm = () => {
-    setFields([]);
-    setFormData({ campaignName: '' });
-  };
 
-  const handleInputChange = (id, value) => {
-    const updatedFormData = { ...formData, [id]: value };
-    setFormData(updatedFormData);
+  useEffect(() => {
+    fetchCampaigns();
+  }, []);
 
-    const updatedFields = fields.map((field) => {
-      if (field.condition.dependentField) {
-        const dependentValue = updatedFormData[field.condition.dependentField];
-
-        switch (field.condition.operator) {
-          case 'equals':
-            field.visible = dependentValue === field.condition.value;
-            break;
-          case 'not equals':
-            field.visible = dependentValue !== field.condition.value;
-            break;
-          default:
-            field.visible = true;
-        }
+  const fetchCampaigns = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/campaign');
+      if (response.data.status) {
+        setCampaigns(
+          response.data.data.map((campaign) => ({
+            id: campaign._id,
+            campaignName: campaign.data.campaignFields.campaignName,
+            fields: campaign.data.campaignFields.fields,
+          }))
+        );
       }
-      return field;
-    });
-
-    setFields(updatedFields);
-  };
-
-  const addOption = (id) => {
-    setFields(fields.map((field) => (field.id === id ? { ...field, options: [...(field.options || []), ''] } : field)));
-  };
-
-  const updateOption = (id, index, value) => {
-    setFields(
-      fields.map((field) =>
-        field.id === id
-          ? {
-              ...field,
-              options: field.options.map((opt, i) => (i === index ? value : opt)),
-            }
-          : field
-      )
-    );
-  };
-
-  const removeOption = (id, index) => {
-    setFields(
-      fields.map((field) =>
-        field.id === id
-          ? {
-              ...field,
-              options: field.options.filter((_, i) => i !== index),
-            }
-          : field
-      )
-    );
-  };
-
-  const renderFormField = (field) => {
-    if (!field.visible) return null;
-
-    switch (field.type) {
-      case 'text':
-      case 'number':
-      case 'email':
-      case 'date':
-        return (
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2 capitalize">{field.label}</label>
-            <input
-              type={field.type}
-              placeholder={`Enter ${field.label}`}
-              className="w-full px-3 py-2 border rounded outline-none"
-              value={formData[field.id] || ''}
-              onChange={(e) => handleInputChange(field.id, e.target.value)}
-            />
-          </div>
-        );
-
-      case 'textarea':
-        return (
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">{field.label}</label>
-            <textarea
-              placeholder={`Enter ${field.label}`}
-              className="w-full px-3 py-2 border rounded outline-none"
-              value={formData[field.id] || ''}
-              onChange={(e) => handleInputChange(field.id, e.target.value)}
-            />
-          </div>
-        );
-
-      case 'checkbox':
-        return (
-          <div className="mb-4 flex items-center">
-            <input
-              type="checkbox"
-              id={`checkbox-${field.id}`}
-              checked={formData[field.id] || false}
-              onChange={(e) => handleInputChange(field.id, e.target.checked)}
-              className="mr-2"
-            />
-            <label htmlFor={`checkbox-${field.id}`} className="text-gray-700">
-              {field.label}
-            </label>
-          </div>
-        );
-
-      case 'radio':
-        return (
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">{field.label}</label>
-            <div className="space-y-2">
-              {field.options.map((option, index) => (
-                <div key={index} className="flex items-center">
-                  <input
-                    type="radio"
-                    id={`radio-${field.id}-${index}`}
-                    name={`radio-${field.id}`}
-                    value={option}
-                    checked={formData[field.id] === option}
-                    onChange={(e) => handleInputChange(field.id, e.target.value)}
-                    className="mr-2"
-                  />
-                  <label htmlFor={`radio-${field.id}-${index}`} className="text-gray-700">
-                    {option}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'select':
-        return (
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">{field.label}</label>
-            <select
-              className="w-full px-3 py-2 border rounded outline-none"
-              value={formData[field.id] || ''}
-              onChange={(e) => handleInputChange(field.id, e.target.value)}
-            >
-              <option value="">Select {field.label}</option>
-              {field.options.map((option, index) => (
-                <option key={index} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    if (!formData.campaignName) {
-      toast.error('Campaign Name is required');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to fetch campaigns');
+    } finally {
       setIsLoading(false);
-      return;
     }
+  };
 
-    const requiredFieldsMissing = fields.some(
-      (field) => field.visible && (!formData[field.id] || formData[field.id] === '')
-    );
-
-    if (requiredFieldsMissing) {
-      toast.error('Please fill out all required fields');
-      setIsLoading(false);
-      return;
-    }
+  const handleDelete = async () => {
+    if (!campaignToDelete) return;
 
     try {
-      const response = await axios.post(
-        'http://localhost:5000/api/campaign',
-        {
-          campaignFields: {
-            campaignName: formData.campaignName,
-            fields: fields,
-          },
-          metadata: {
-            timestamp: new Date().toISOString(),
-            source: 'dynamic-form-builder',
-          },
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      toast.success('Form submitted successfully!');
-      resetForm();
-      setIsLoading(false);
+      const response = await axios.post(`http://localhost:5000/api/campaign-delete/${campaignToDelete}`);
+      if (response.data.status) {
+        toast.success('Campaign deleted successfully');
+        setCampaigns((prev) => prev.filter((campaign) => campaign.id !== campaignToDelete));
+        setIsDeleteModalOpen(false);
+      }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to submit form');
-      setIsLoading(false);
+      console.error('Error deleting campaign:', error.response?.data || error.message);
+      toast.error('Failed to delete campaign');
     }
   };
+
+  const columns = [
+    { label: 'Campaign Name', accessor: 'campaignName' },
+    { label: 'Action', accessor: 'id', render: renderAction, sorting: false },
+  ];
 
   return (
     <>
-      <Toaster position="top-right" reverseOrder={false} />
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Confirm Delete"
+        handleSubmit={handleDelete}
+        submitButtonText="Delete"
+        submitButtonClassName="bg-red-500 hover:bg-red-600 text-white"
+      >
+        <p className="text-gray-700 dark:text-gray-300 p-4 text-center">Are you sure you want to delete this campaign? </p>
+      </Modal>
 
-      <div className="mx-auto bg-white rounded-lg shadow p-6">
-        <div className="flex items justify-between space-x-6">
-          <div className="w-full">
-            <h1 className="text-2xl font-bold mb-4">Campaign Form</h1>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Campaign Name</label>
-              <input
-                type="text"
-                placeholder="Enter Campaign Name"
-                className="w-full px-3 py-2 border rounded outline-none"
-                value={formData.campaignName}
-                onChange={(e) => setFormData({ ...formData, campaignName: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="mb-6">
-              <button
-                onClick={addField}
-                className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 flex items-center gap-2"
-              >
-                <FaPlus /> Add Field
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {fields.map(
-                (field) =>
-                  field.visible && (
-                    <div key={field.id} className="p-4 bg-white border rounded-lg shadow-sm">
-                      <div className="flex items-center gap-4">
-                        <input
-                          type="text"
-                          placeholder="Field Label"
-                          className="flex-1 px-3 py-2 border rounded outline-none"
-                          value={field.label}
-                          onChange={(e) => handleFieldChange(field.id, 'label', e.target.value)}
-                        />
-                        <select
-                          className="px-3 py-2 border rounded outline-none"
-                          value={field.type}
-                          onChange={(e) => handleFieldChange(field.id, 'type', e.target.value)}
-                        >
-                          <option value="text">Text</option>
-                          <option value="number">Number</option>
-                          <option value="email">Email</option>
-                          <option value="date">Date</option>
-                          <option value="textarea">Textarea</option>
-                          <option value="checkbox">Checkbox</option>
-                          <option value="radio">Radio Button</option>
-                          <option value="select">Select Box</option>
-                        </select>
-                        <button onClick={() => removeField(field.id)} className="text-red-500 hover:text-red-600">
-                          <FaTrash />
-                        </button>
-                      </div>
-
-                      <div className="mt-4 bg-gray-50 p-3 rounded border">
-                        <div className="flex items-center gap-2 mb-2">
-                          <FaFilter className="text-gray-500" />
-                          <span className="font-semibold text-sm">Conditional Logic</span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2">
-                          <select
-                            value={field.condition.dependentField || ''}
-                            onChange={(e) => updateCondition(field.id, 'dependentField', e.target.value)}
-                            className="px-2 py-1 border rounded"
-                          >
-                            <option value="">Select Dependent Field</option>
-                            {fields
-                              .filter((f) => f.id !== field.id)
-                              .map((f) => (
-                                <option key={f.id} value={f.id.toString()}>
-                                  {f.label || `Field ${f.id}`}
-                                </option>
-                              ))}
-                          </select>
-
-                          <select
-                            value={field.condition.operator}
-                            onChange={(e) => updateCondition(field.id, 'operator', e.target.value)}
-                            className="px-2 py-1 border rounded"
-                          >
-                            <option value="equals">Equals</option>
-                            <option value="not equals">Not Equals</option>
-                          </select>
-
-                          <input
-                            type="text"
-                            placeholder="Condition Value"
-                            value={field.condition.value}
-                            onChange={(e) => updateCondition(field.id, 'value', e.target.value)}
-                            className="px-2 py-1 border rounded outline-none"
-                          />
-                        </div>
-                      </div>
-
-                      {['select', 'radio'].includes(field.type) && (
-                        <div className="mt-4 space-y-2">
-                          {field.options.map((option, index) => (
-                            <div key={index} className="flex items-center gap-4">
-                              <input
-                                type="text"
-                                placeholder={`Option ${index + 1}`}
-                                className="flex-1 px-3 py-2 border rounded outline-none"
-                                value={option}
-                                onChange={(e) => updateOption(field.id, index, e.target.value)}
-                              />
-                              <button
-                                onClick={() => removeOption(field.id, index)}
-                                className="text-red-500 hover:text-red-600"
-                              >
-                                <FaTrash />
-                              </button>
-                            </div>
-                          ))}
-                          <button
-                            onClick={() => addOption(field.id)}
-                            className="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600"
-                          >
-                            Add Option
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )
-              )}
-            </div>
-          </div>
-          <div className="w-full border-l-2 ps-8">
-            <h2 className="text-2xl font-semibold mb-4">Form Preview</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Campaign Name</label>
-                <input
-                  type="text"
-                  placeholder="Enter Campaign Name"
-                  className="w-full px-3 py-2 border rounded outline-none"
-                  value={formData.campaignName}
-                  onChange={(e) => setFormData({ ...formData, campaignName: e.target.value })}
-                  required
-                />
-              </div>
-              {fields.map((field) => renderFormField(field))}
-            </form>
-          </div>
-        </div>
-      </div>
-      <div>
+      <div className="text-end mb-4">
         <button
-          type="submit"
-          disabled={isLoading}
-          onClick={handleSubmit}
-          className={`px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-600 ${
-            isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white'
-          }`}
+          className="py-2 px-4 bg-blue hover:bg-blue-dark text-white font-medium rounded-md shadow-sm outline-none"
+          onClick={() => {
+            setEditingCampaign(null);
+            setAddCampaign(!addCampaign);
+          }}
         >
-          {isLoading ? (
-            <>
-              <FaSpinner className="animate-spin" /> Submitting...
-            </>
-          ) : (
-            'Submit'
-          )}
+          {(!addCampaign && 'Add Campaign') || 'Campaign Details'}
         </button>
       </div>
+      {(addCampaign && (
+        <CampaignForm
+          setAddCampaign={setAddCampaign}
+          fetchCampaigns={fetchCampaigns}
+          editingCampaign={editingCampaign}
+        />
+      )) || <CommonTable title="Campaign" data={campaigns} columns={columns} loading={isLoading} />}
     </>
   );
-};
+}
 
 export default Campaign;
