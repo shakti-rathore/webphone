@@ -8,6 +8,7 @@ import Campaign from './components/Campaign';
 import Login from './components/Login';
 import Layout from './components/layouts/Layout';
 import CampaignDetails from './components/CampaignDetails';
+import './index.css';
 
 const AppRoutes = () => {
   const CommonLayout = ({ children }) => (

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { Link, useLocation } from 'react-router-dom';
 import { RiMoonLine, RiSunLine } from 'react-icons/ri';
+import BreakDropdown from '../BreakDropdown';
 
 const TopBarPage = () => {
   const toggleTheme = useTheme();
@@ -40,6 +41,7 @@ const TopBarPage = () => {
           </li>
         </ul>
         <div className="flex items-center md:gap-x-6 gap-x-3">
+          <BreakDropdown />
           <DarkModeToggle toggleTheme={toggleTheme} />
         </div>
       </header>

@@ -48,12 +48,14 @@ const Modal = ({ isOpen, onClose, title, handleSubmit, children, loading }) => {
               Save
             </button>
           )}
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-md shadow-sm flex items-center gap-2 hover:bg-gray-600 bg-gray-400  text-white"
-          >
-            Close
-          </button>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded-md shadow-sm flex items-center gap-2 hover:bg-gray-600 bg-gray-400  text-white"
+            >
+              Close
+            </button>
+          )}
         </div>
       </div>
     </div>

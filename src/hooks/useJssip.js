@@ -3,6 +3,7 @@ import HistoryContext from '../context/HistoryContext';
 import { useNavigate } from 'react-router-dom';
 import { useStopwatch } from 'react-timer-hook';
 import JsSIP from 'jssip';
+import axios from 'axios';
 
 const useJssip = () => {
   const { setHistory, username, password } = useContext(HistoryContext);
@@ -20,6 +21,7 @@ const useJssip = () => {
   const [customerText, setCustomerText] = useState('');
   const [isHeld, setIsHeld] = useState(false);
   const [conferenceStatus, setConferenceStatus] = useState(false);
+  const [dispositionModal, setDispositionModal] = useState(false);
   const agentSocketRef = useRef(null);
   const customerSocketRef = useRef(null);
   const agentMediaRecorderRef = useRef(null);
@@ -45,7 +47,6 @@ const useJssip = () => {
       });
 
       const data = await response.json();
-
       if (data.message === 'conferance call dialed') {
         if (data.result) {
           setBridgeID(data.result);
@@ -105,8 +106,8 @@ const useJssip = () => {
       return socket;
     };
 
-    createWebSocket(true); 
-    createWebSocket(false); 
+    createWebSocket(true);
+    createWebSocket(false);
   };
 
   const startSpeechToText = (stream, isAgent = true) => {
@@ -169,6 +170,30 @@ const useJssip = () => {
       }
     };
   }, []);
+
+  const answercall = async () => {
+    try {
+      const response = await axios.post(
+        `https://callapp.iotcom.io/useroncall/${username}`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setBridgeID(response.data.currentcalldata.bridgeID);
+        setConferenceStatus(false);
+        console.log('Call unhold successful');
+      } else {
+        console.error('Failed to unhold call');
+      }
+    } catch (error) {
+      console.error('Error unholding call:', error);
+    }
+  };
 
   const reqUnHold = async () => {
     if (!session) return;
@@ -256,10 +281,10 @@ const useJssip = () => {
         .map((receiver) => receiver.track)
         .filter(Boolean);
 
-      startSpeechToText(micStream, true); 
+      startSpeechToText(micStream, true);
       if (remoteTracks.length > 0) {
         const remoteStream = new MediaStream(remoteTracks);
-        startSpeechToText(remoteStream, false); 
+        startSpeechToText(remoteStream, false);
       }
 
       remoteTracks.forEach((track) => {
@@ -463,6 +488,7 @@ const useJssip = () => {
         uri: `${username.replace('@', '-')}@callapp.iotcom.io:8089`,
         password: password,
       };
+
       var ua = new JsSIP.UA(configuration);
       ua.start();
       ua.on('newRTCSession', function (e) {
@@ -551,6 +577,7 @@ const useJssip = () => {
               pause();
               setStatus('start');
               setPhoneNumber('');
+              setDispositionModal(true)
               console.log('bridge id', bridgeID);
             });
           }
@@ -603,7 +630,6 @@ const useJssip = () => {
         },
       ]);
       localStorage.setItem('dialing', true);
-
       fetch(`https://callapp.iotcom.io/dialnumber`, {
         method: 'POST',
         headers: {
@@ -612,10 +638,10 @@ const useJssip = () => {
         body: JSON.stringify({ caller: username, receiver: phoneNumber }),
       }).then(() => {
         console.log('dial api called');
+        answercall();
       });
     }
   };
-
   return [
     conferenceStatus,
     reqUnHold,
@@ -634,13 +660,15 @@ const useJssip = () => {
     isRunning,
     audioRef,
     setStatus,
-    setBridgeID,
     devices,
     selectedDeviceId,
     changeAudioDevice,
     isRecording,
     startRecording,
     stopRecording,
+    bridgeID,
+    dispositionModal,
+    setDispositionModal,
   ];
 };
 

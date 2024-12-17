@@ -1,4 +1,3 @@
-import './index.css';
 import Home from './components/Home';
 import CallScreen from './components/CallScreen';
 import HistoryScreen from './components/HistoryScreen';
@@ -7,6 +6,7 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import InCallScreen from './components/InCallScreen';
 import HistoryContext from './context/HistoryContext';
 import CallConference from './components/CallConference';
+import Disposition from './components/Disposition';
 
 function App() {
   const [
@@ -27,13 +27,15 @@ function App() {
     isRunning,
     audioRef,
     setStatus,
-    setBridgeID,
     devices,
     selectedDeviceId,
     changeAudioDevice,
     isRecording,
     startRecording,
     stopRecording,
+    bridgeID,
+    dispositionModal,
+    setDispositionModal,
   ] = useJssip();
   const [seeLogs, setSeeLogs] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
@@ -130,15 +132,18 @@ function App() {
 
   return (
     <>
+      {dispositionModal && <Disposition bridgeID={bridgeID} setDispositionModal={setDispositionModal} />}
       {seeLogs ? (
         <HistoryScreen setSeeLogs={setSeeLogs} />
       ) : status === 'start' ? (
-        <Home
-          phoneNumber={phoneNumber}
-          setPhoneNumber={setPhoneNumber}
-          handleCall={handleCall}
-          setSeeLogs={setSeeLogs}
-        />
+        <>
+          <Home
+            phoneNumber={phoneNumber}
+            setPhoneNumber={setPhoneNumber}
+            handleCall={handleCall}
+            setSeeLogs={setSeeLogs}
+          />
+        </>
       ) : status === 'calling' || status === 'conference' ? (
         <>
           {(callConference && (
@@ -164,7 +169,6 @@ function App() {
               seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
               minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
               isRunning={isRunning}
-              setBridgeID={setBridgeID}
               devices={devices}
               selectedDeviceId={selectedDeviceId}
               changeAudioDevice={changeAudioDevice}
