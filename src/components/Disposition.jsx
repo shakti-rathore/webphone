@@ -7,7 +7,6 @@ const Disposition = ({ bridgeID, setDispositionModal }) => {
   const { username } = useContext(HistoryContext);
   const [selectedAction, setSelectedAction] = useState(null);
   const [isAutoLeadDialDisabled, setIsAutoLeadDialDisabled] = useState(false);
-  const [isBreakChecked, setIsBreakChecked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const dispositionActions = [
     { action: 'Busy', label: 'B - Busy', color: '#1D4ED8' }, // Blue
@@ -18,21 +17,6 @@ const Disposition = ({ bridgeID, setDispositionModal }) => {
     { action: 'Test Call', label: 'TEST - Test Call', color: '#9333EA' }, // Purple
     { action: 'Connected', label: 'CO - Connected', color: '#0D9488' }, // Teal
   ];
-
-  const sendBreakSelection = async (breakType) => {
-    try {
-      const response = await axios.post(`https://callapp.iotcom.io/user/breakuser:${username}`, {
-        breakType,
-      });
-
-      if (response.status === 200) {
-        toast.success(`${breakType} selected successfully!`);
-      }
-    } catch (error) {
-      toast.error('Something went wrong! Please try again.');
-      console.error(error);
-    }
-  };
 
   const submitForm = useCallback(async () => {
     setIsSubmitting(true);
@@ -52,9 +36,6 @@ const Disposition = ({ bridgeID, setDispositionModal }) => {
       if (response.data && response.data.message === 'disposition done sucessfully.') {
         toast.success('Disposition submitted successfully');
         setDispositionModal(false);
-        if (isBreakChecked) {
-          await sendBreakSelection('TeaBreak');
-        }
       } else {
         setSubmissionStatus({
           type: 'error',
@@ -70,12 +51,11 @@ const Disposition = ({ bridgeID, setDispositionModal }) => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedAction, isBreakChecked]);
+  }, [selectedAction]);
 
   const clearForm = useCallback(() => {
     setSelectedAction(null);
     setIsAutoLeadDialDisabled(false);
-    setIsBreakChecked(false);
     setSubmissionStatus(null);
   }, []);
 
@@ -116,7 +96,7 @@ const Disposition = ({ bridgeID, setDispositionModal }) => {
             </label>
           </div>
 
-          <div className="flex items-center space-x-3">
+          {/* <div className="flex items-center space-x-3">
             <input
               type="checkbox"
               id="breakCheckbox"
@@ -127,7 +107,7 @@ const Disposition = ({ bridgeID, setDispositionModal }) => {
             <label htmlFor="breakCheckbox" className="text-gray-700 font-medium">
               Add Break
             </label>
-          </div>
+          </div> */}
 
           <div className="flex space-x-4">
             <button

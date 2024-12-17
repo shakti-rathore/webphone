@@ -40,6 +40,7 @@ function App() {
   const [seeLogs, setSeeLogs] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const [callConference, setCallConference] = useState(false);
+  const [breakStatus, setBreakStatus] = useState(false);
   const [timeoutArray, setTimeoutArray] = useState([]);
   const keepAliveRef = useRef(null);
   const { username } = useContext(HistoryContext);
@@ -132,7 +133,9 @@ function App() {
 
   return (
     <>
-      {dispositionModal && <Disposition bridgeID={bridgeID} setDispositionModal={setDispositionModal} />}
+      {dispositionModal && (
+        <Disposition bridgeID={bridgeID} setDispositionModal={setDispositionModal} setBreakStatus={setBreakStatus} />
+      )}
       {seeLogs ? (
         <HistoryScreen setSeeLogs={setSeeLogs} />
       ) : status === 'start' ? (
