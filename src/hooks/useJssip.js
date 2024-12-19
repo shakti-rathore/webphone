@@ -502,7 +502,6 @@ const useJssip = () => {
           if (isdialing === null || isdialing === 'false') {
             console.log('handle fresh incoming call');
             setStatus('Incalling');
-            showIncomingCallNotification({ caller: incomingnumber });
             setSession(e.session);
             e.session.once('failed', (e) => {
               console.log('Call failed local event');
@@ -552,7 +551,7 @@ const useJssip = () => {
             reset();
             setStatus('calling');
             localStorage.setItem('dialing', false);
-
+            answercall( );
             setHistory((prev) => {
               setPhoneNumber(incomingnumber);
               console.log('phoneNumber', incomingnumber);
@@ -577,7 +576,7 @@ const useJssip = () => {
               pause();
               setStatus('start');
               setPhoneNumber('');
-              setDispositionModal(true)
+              setDispositionModal(true);
               console.log('bridge id', bridgeID);
             });
           }

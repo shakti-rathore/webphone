@@ -7,6 +7,8 @@ import InCallScreen from './components/InCallScreen';
 import HistoryContext from './context/HistoryContext';
 import CallConference from './components/CallConference';
 import Disposition from './components/Disposition';
+import AutoDial from './components/AutoDial';
+import Modal from './components/table/Modal';
 
 function App() {
   const [
@@ -40,7 +42,7 @@ function App() {
   const [seeLogs, setSeeLogs] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const [callConference, setCallConference] = useState(false);
-  const [breakStatus, setBreakStatus] = useState(false);
+  const [isAutoDialOpen, setIsAutoDialOpen] = useState(false);
   const [timeoutArray, setTimeoutArray] = useState([]);
   const keepAliveRef = useRef(null);
   const { username } = useContext(HistoryContext);
@@ -133,72 +135,88 @@ function App() {
 
   return (
     <>
-      {dispositionModal && (
-        <Disposition bridgeID={bridgeID} setDispositionModal={setDispositionModal} setBreakStatus={setBreakStatus} />
-      )}
-      {seeLogs ? (
-        <HistoryScreen setSeeLogs={setSeeLogs} />
-      ) : status === 'start' ? (
-        <>
-          <Home
-            phoneNumber={phoneNumber}
-            setPhoneNumber={setPhoneNumber}
-            handleCall={handleCall}
-            setSeeLogs={setSeeLogs}
-          />
-        </>
-      ) : status === 'calling' || status === 'conference' ? (
-        <>
-          {(callConference && (
-            <CallConference
-              conferenceNumber={conferenceNumber}
-              setCallConference={setCallConference}
-              setConferenceNumber={setConferenceNumber}
-              handleCall={handleCalls}
+      <Modal isOpen={isAutoDialOpen} onClose={() => setIsAutoDialOpen(false)} title="Caller/Campaign">
+        <AutoDial setIsAutoDialOpen={setIsAutoDialOpen} setPhoneNumber={setPhoneNumber} />
+      </Modal>
+
+      {dispositionModal && <Disposition bridgeID={bridgeID} setDispositionModal={setDispositionModal} />}
+      <div className="mx-auto bg-white rounded-lg shadow p-4">
+        <div className="flex items-center justify-between">
+          <h1 className="font-semibold leading-5 text-start capitalize text-2xl text-gray-900 dark:text-white">
+            Dashboard
+          </h1>
+          <button
+            className="px-4 py-2 text-white bg-blue rounded-md hover:bg-blue-dark focus:outline-none"
+            onClick={() => setIsAutoDialOpen(true)}
+          >
+            Auto Dial
+          </button>
+        </div>
+
+        {seeLogs ? (
+          <HistoryScreen setSeeLogs={setSeeLogs} />
+        ) : status === 'start' ? (
+          <>
+            <Home
+              phoneNumber={phoneNumber}
+              setPhoneNumber={setPhoneNumber}
+              handleCall={handleCall}
               setSeeLogs={setSeeLogs}
-              phoneNumber={phoneNumber}
             />
-          )) || (
-            <CallScreen
-              reqUnHold={reqUnHold}
-              setCallConference={setCallConference}
-              toggleHold={toggleHold}
-              isHeld={isHeld}
-              isRecording={isRecording}
-              startRecording={startRecording}
-              stopRecording={stopRecording}
-              phoneNumber={phoneNumber}
-              session={session}
-              seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
-              minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
-              isRunning={isRunning}
-              devices={devices}
-              selectedDeviceId={selectedDeviceId}
-              changeAudioDevice={changeAudioDevice}
-              conferenceStatus={conferenceStatus}
-            />
-          )}
-        </>
-      ) : status === 'Incalling' ? (
-        <InCallScreen
-          isRecording={isRecording}
-          startRecording={startRecording}
-          stopRecording={stopRecording}
-          phoneNumber={phoneNumber}
-          session={session}
-          setPhoneNumber={setPhoneNumber}
-          seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
-          minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
-          isRunning={isRunning}
-          setStatus={setStatus}
-          audioRef={audioRef}
-          devices={devices}
-          selectedDeviceId={selectedDeviceId}
-        />
-      ) : (
-        <div>No content available</div>
-      )}
-      <audio ref={audioRef} autoPlay hidden />
+          </>
+        ) : status === 'calling' || status === 'conference' ? (
+          <>
+            {(callConference && (
+              <CallConference
+                conferenceNumber={conferenceNumber}
+                setCallConference={setCallConference}
+                setConferenceNumber={setConferenceNumber}
+                handleCall={handleCalls}
+                setSeeLogs={setSeeLogs}
+                phoneNumber={phoneNumber}
+              />
+            )) || (
+              <CallScreen
+                reqUnHold={reqUnHold}
+                setCallConference={setCallConference}
+                toggleHold={toggleHold}
+                isHeld={isHeld}
+                isRecording={isRecording}
+                startRecording={startRecording}
+                stopRecording={stopRecording}
+                phoneNumber={phoneNumber}
+                session={session}
+                seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
+                minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
+                isRunning={isRunning}
+                devices={devices}
+                selectedDeviceId={selectedDeviceId}
+                changeAudioDevice={changeAudioDevice}
+                conferenceStatus={conferenceStatus}
+              />
+            )}
+          </>
+        ) : status === 'Incalling' ? (
+          <InCallScreen
+            isRecording={isRecording}
+            startRecording={startRecording}
+            stopRecording={stopRecording}
+            phoneNumber={phoneNumber}
+            session={session}
+            setPhoneNumber={setPhoneNumber}
+            seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
+            minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
+            isRunning={isRunning}
+            setStatus={setStatus}
+            audioRef={audioRef}
+            devices={devices}
+            selectedDeviceId={selectedDeviceId}
+          />
+        ) : (
+          <div>No content available</div>
+        )}
+        <audio ref={audioRef} autoPlay hidden />
+      </div>
     </>
   );
 }

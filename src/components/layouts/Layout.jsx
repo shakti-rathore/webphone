@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Footer from './Footer';
 import TopBarPage from './TopBar';
+import AutoDial from '../AutoDial';
+import Modal from '../table/Modal';
 
 function Layout({ children }) {
   return (

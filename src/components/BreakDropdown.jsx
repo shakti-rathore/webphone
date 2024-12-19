@@ -70,10 +70,10 @@ const BreakDropdown = () => {
 
   const buttonClassName =
     selectedBreak === 'Break'
-      ? 'px-4 py-2 text-white bg-blue rounded-md shadow-md hover:bg-blue-dark focus:outline-none'
+      ? 'px-4 py-2 text-white bg-blue rounded-md hover:bg-blue-dark focus:outline-none'
       : `px-4 py-2 text-white bg-${
           breakTypes.find((b) => b.type === selectedBreak)?.color
-        } rounded-md shadow-md focus:outline-none`;
+        } rounded-md focus:outline-none`;
 
   return (
     <div className="relative inline-block text-left">

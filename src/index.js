@@ -9,6 +9,7 @@ import Login from './components/Login';
 import Layout from './components/layouts/Layout';
 import CampaignDetails from './components/CampaignDetails';
 import './index.css';
+import AutoDial from './components/AutoDial';
 
 const AppRoutes = () => {
   const CommonLayout = ({ children }) => (
@@ -55,6 +56,16 @@ const AppRoutes = () => {
             <HistoryProvider>
               <CommonLayout>
                 <CampaignDetails />
+              </CommonLayout>
+            </HistoryProvider>
+          }
+        />
+        <Route
+          path="/auto-dial"
+          element={
+            <HistoryProvider>
+              <CommonLayout>
+                <AutoDial />
               </CommonLayout>
             </HistoryProvider>
           }

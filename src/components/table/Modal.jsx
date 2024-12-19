@@ -34,7 +34,7 @@ const Modal = ({ isOpen, onClose, title, handleSubmit, children, loading }) => {
         <div className="flex items-center justify-between p-4 border-b dark:border-[#999]">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <IoIosClose />
+            <IoIosClose size={30} />
           </button>
         </div>
         <div className="">{children}</div>
