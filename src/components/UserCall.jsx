@@ -23,7 +23,8 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
     if (userCall) {
       setFormData((prev) => ({
         ...prev,
-        ...userCall,
+        firstName: userCall.firstName || '',
+        lastName: userCall.LastName || '',
         number: userCall.contactNumber || '',
         alternateNumber: userCall.alternateNumber || '',
         address: userCall.Contactaddress || '',
@@ -72,7 +73,7 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
       const response = await axios.post('https://callapp.iotcom.io/addModifyContact', payload);
       if (response.data) {
         toast.success(response.data.message || 'Contact saved successfully.');
-        setUserCallOpen(false)
+        setUserCallOpen(false);
       } else {
         toast.error('Failed to save contact.');
       }
@@ -84,8 +85,11 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
   }, [formData, userCall]);
 
   return (
-    <div className={`${!userCallOpen && 'max-w-lg mx-auto p-4 bg-white shadow-md rounded-md dark:bg-[#333]' || 'p-4'}`}>
-      {(!userCallOpen && <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">User Details</h2>) || ''}
+    <div
+      className={`${(!userCallOpen && 'max-w-lg mx-auto p-4 bg-white shadow-md rounded-md dark:bg-[#333]') || 'p-4'}`}
+    >
+      {(!userCallOpen && <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">User Details</h2>) ||
+        ''}
       <form>
         {/* Name Fields */}
         <div className="flex space-x-2">
