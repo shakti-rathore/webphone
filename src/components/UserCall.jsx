@@ -54,7 +54,7 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
     setLoading(true);
     const payload = {
       user: username,
-      isFresh: !userCall?.name,
+      isFresh: !userCall?.number,
       data: {
         firstName: formData.firstName,
         lastName: formData.lastName,
