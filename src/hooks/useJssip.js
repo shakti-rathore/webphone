@@ -144,7 +144,9 @@ const useJssip = () => {
   };
 
   useEffect(() => {
-    initializeWebSocketTranscription();
+    if (status != 'start') {
+      initializeWebSocketTranscription();
+    }
 
     return () => {
       if (agentSocketRef.current) {
