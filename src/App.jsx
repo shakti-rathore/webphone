@@ -142,7 +142,7 @@ function App() {
       </Modal>
 
       {dispositionModal && <Disposition bridgeID={bridgeID} setDispositionModal={setDispositionModal} userCall={userCall} />}
-      <div className="mx-auto bg-white rounded-lg shadow p-4">
+      <div className="mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-4">
         <div className="flex items-center justify-between">
           <h1 className="font-semibold leading-5 text-start capitalize text-2xl text-gray-900 dark:text-white">
             Dashboard

@@ -84,13 +84,13 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
   }, [formData, userCall]);
 
   return (
-    <div className={`${!userCallOpen && 'max-w-lg mx-auto p-6 bg-white shadow-md rounded-md' || 'p-4'}`}>
-      {(!userCallOpen && <h2 className="text-xl font-semibold text-gray-800 mb-4">User Details</h2>) || ''}
+    <div className={`${!userCallOpen && 'max-w-lg mx-auto p-4 bg-white shadow-md rounded-md dark:bg-[#333]' || 'p-4'}`}>
+      {(!userCallOpen && <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">User Details</h2>) || ''}
       <form>
         {/* Name Fields */}
         <div className="flex space-x-2">
           <div className="w-1/2">
-            <label className="block text-sm font-medium text-gray-700">First Name</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white">First Name</label>
             <input
               type="text"
               name="firstName"
@@ -100,7 +100,7 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
             />
           </div>
           <div className="w-1/2">
-            <label className="block text-sm font-medium text-gray-700">Last Name</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white">Last Name</label>
             <input
               type="text"
               name="lastName"
@@ -114,7 +114,7 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
         {/* Number Fields */}
         <div className="mt-4 flex space-x-2">
           <div className="w-2/3">
-            <label className="block text-sm font-medium text-gray-700">Number</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white">Mobile Number</label>
             <input
               type="text"
               name="number"
@@ -125,7 +125,7 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
             />
           </div>
           <div className="w-1/3">
-            <label className="block text-sm font-medium text-gray-700">Alternate Number</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white">Alternate Number</label>
             <input
               type="text"
               name="alternateNumber"
@@ -139,7 +139,7 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
 
         {/* Address Fields */}
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700">Address</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-white">Address</label>
           <input
             type="text"
             name="address"
@@ -186,7 +186,7 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
 
         {/* Email Field */}
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700">Email</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-white">Email</label>
           <input
             type="email"
             name="email"
@@ -199,7 +199,7 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
 
         {/* Comment Field */}
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700">Comment</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-white">Comment</label>
           <textarea
             name="comment"
             value={formData.comment}

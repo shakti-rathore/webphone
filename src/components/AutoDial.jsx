@@ -143,7 +143,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
                 value={formData.fullName}
                 onChange={handleInputChange}
                 placeholder="Enter full name"
-                className="w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none"
+                className="w-full dark:border-[#999] dark:text-white pl-10 pr-3 py-2 border rounded-md focus:outline-none"
               />
             </div>
           </div>
@@ -160,7 +160,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
                 value={formData.emailAddress}
                 onChange={handleInputChange}
                 placeholder="Enter email address"
-                className="w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none"
+                className="w-full dark:border-[#999] dark:text-white pl-10 pr-3 py-2 border rounded-md focus:outline-none"
               />
             </div>
           </div>
@@ -177,7 +177,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
               value={formData.phoneNumber}
               onChange={handleInputChange}
               placeholder="Enter phone number"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none"
+              className="w-full dark:border-[#999] dark:text-white px-3 py-2 border rounded-md focus:outline-none"
             />
           </div>
         </div>
@@ -195,7 +195,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
                 value={formData.address1}
                 onChange={handleInputChange}
                 placeholder="Enter street address"
-                className="w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none mb-2"
+                className="w-full dark:border-[#999] dark:text-white pl-10 pr-3 py-2 border rounded-md focus:outline-none mb-2"
               />
             </div>
             <input
@@ -205,7 +205,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
               value={formData.address2}
               onChange={handleInputChange}
               placeholder="Enter street address 2"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none mb-2"
+              className="w-full dark:border-[#999] dark:text-white px-3 py-2 border rounded-md focus:outline-none mb-2"
             />
             <input
               type="text"
@@ -214,7 +214,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
               value={formData.city}
               onChange={handleInputChange}
               placeholder="Enter your city"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none mb-2"
+              className="w-full dark:border-[#999] dark:text-white px-3 py-2 border rounded-md focus:outline-none mb-2"
             />
             <input
               type="text"
@@ -223,7 +223,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
               value={formData.state}
               onChange={handleInputChange}
               placeholder="Enter your state"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none mb-2"
+              className="w-full dark:border-[#999] dark:text-white px-3 py-2 border rounded-md focus:outline-none mb-2"
             />
             <input
               type="number"
@@ -232,7 +232,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
               value={formData.postalCode}
               onChange={handleInputChange}
               placeholder="Postal code"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none mb-2"
+              className="w-full dark:border-[#999] dark:text-white px-3 py-2 border rounded-md focus:outline-none mb-2"
             />
           </div>
         </div>

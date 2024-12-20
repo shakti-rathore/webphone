@@ -69,7 +69,7 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
       <Modal isOpen={userCallOpen} onClose={() => setUserCallOpen(false)} title="User Details">
         <UserCall userCall={userCall} username={username} userCallOpen={userCallOpen} setUserCallOpen={setUserCallOpen} />
       </Modal>
-        <div className="p-4 bg-white shadow-lg rounded-xl">
+        <div className="p-4 bg-white shadow-lg rounded-xl dark:bg-[#333]">
           <div className="grid grid-cols-3 gap-4 mb-6">
             {dispositionActions.map((item) => {
               const isSelected = selectedAction === item.action;
@@ -99,7 +99,7 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
                 onChange={(e) => setIsAutoLeadDialDisabled(e.target.checked)}
                 className="form-checkbox h-5 w-5 text-blue-600 rounded"
               />
-              <label htmlFor="checkautoleaddial" className="text-gray-700 font-medium">
+              <label htmlFor="checkautoleaddial" className="text-gray-700 font-medium dark:text-white">
                 Auto Dial off
               </label>
             </div>
