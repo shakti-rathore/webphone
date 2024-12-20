@@ -145,7 +145,7 @@ function App() {
       <div className="mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-4">
         <div className="flex items-center justify-between">
           <h1 className="font-semibold leading-5 text-start capitalize text-2xl text-gray-900 dark:text-white">
-            Dashboard
+            {/* Dashboard */}
           </h1>
           <button
             className="px-4 py-2 text-white bg-blue rounded-md hover:bg-blue-dark focus:outline-none"

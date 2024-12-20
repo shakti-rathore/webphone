@@ -15,8 +15,8 @@ export const HistoryProvider = ({ children }) => {
   const callHistory = localStorage.getItem("call-history");
   const initialHistory = callHistory ? JSON.parse(callHistory) : [];
   const [history, setHistory] = useState(initialHistory);
-  const [username, setUsername] = useState('demo@surya');
-  const [password, setPassword] = useState('Demo@123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   // Update localStorage whenever history changes
   useEffect(() => {

@@ -17,8 +17,6 @@ const useJssip = () => {
   const [selectedDeviceId, setSelectedDeviceId] = useState('');
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [agentText, setAgentText] = useState('');
-  const [customerText, setCustomerText] = useState('');
   const [userCall, setUserCall] = useState('');
   const [isHeld, setIsHeld] = useState(false);
   const [conferenceStatus, setConferenceStatus] = useState(false);
@@ -71,37 +69,23 @@ const useJssip = () => {
   const initializeWebSocketTranscription = () => {
     const createWebSocket = (isAgent = true) => {
       const socketRef = isAgent ? agentSocketRef : customerSocketRef;
-      const setTextFunction = isAgent ? setAgentText : setCustomerText;
 
       const socket = new WebSocket('wss://callapp.iotcom.io/socket');
       socketRef.current = socket;
 
       socket.onopen = () => {
-        console.log(`${isAgent ? 'Agent' : 'Customer'} WebSocket Connected`);
+        // console.log(`${isAgent ? 'Agent' : 'Customer'} WebSocket Connected`);
       };
 
       socket.onerror = (error) => {
-        console.error(`${isAgent ? 'Agent' : 'Customer'} WebSocket Error:`, error);
+        // console.error(`${isAgent ? 'Agent' : 'Customer'} WebSocket Error:`, error);
       };
 
       socket.onclose = () => {
-        console.log(`${isAgent ? 'Agent' : 'Customer'} WebSocket Closed`);
+        // console.log(`${isAgent ? 'Agent' : 'Customer'} WebSocket Closed`);
         setTimeout(() => {
           createWebSocket(isAgent);
         }, 3000);
-      };
-
-      socket.onmessage = (msg) => {
-        try {
-          const text = JSON.parse(msg.data);
-          if (text.isFixed === 'true' || text.isFixed === true) {
-            setTextFunction((prev) => prev + text.data);
-          } else {
-            setTextFunction((prev) => prev + text.data);
-          }
-        } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
-        }
       };
 
       return socket;
