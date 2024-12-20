@@ -22,6 +22,11 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
   ];
 
   const submitForm = useCallback(async () => {
+    if (!selectedAction) {
+      toast.error('Please select an action before submitting.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -40,17 +45,11 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
         toast.success('Disposition submitted successfully');
         setDispositionModal(false);
       } else {
-        setSubmissionStatus({
-          type: 'error',
-          message: response.data.message || 'Submission failed',
-        });
+        toast.error(response.data.message || 'Submission failed');
       }
     } catch (err) {
       console.error('Error:', err);
-      setSubmissionStatus({
-        type: 'error',
-        message: 'An unexpected error occurred',
-      });
+      toast.error('An unexpected error occurred');
     } finally {
       setIsSubmitting(false);
     }
@@ -64,11 +63,15 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
 
   return (
     <>
-
       <div className="fixed inset-0 z-50 flex items-center justify-center dark:bg-gray-900/60 bg-black/60">
-      <Modal isOpen={userCallOpen} onClose={() => setUserCallOpen(false)} title="User Details">
-        <UserCall userCall={userCall} username={username} userCallOpen={userCallOpen} setUserCallOpen={setUserCallOpen} />
-      </Modal>
+        <Modal isOpen={userCallOpen} onClose={() => setUserCallOpen(false)} title="User Details">
+          <UserCall
+            userCall={userCall}
+            username={username}
+            userCallOpen={userCallOpen}
+            setUserCallOpen={setUserCallOpen}
+          />
+        </Modal>
         <div className="p-4 bg-white shadow-lg rounded-xl dark:bg-[#333]">
           <div className="grid grid-cols-3 gap-4 mb-6">
             {dispositionActions.map((item) => {
