@@ -10,10 +10,9 @@ const TopBar = () => {
 
   const navLinks = useMemo(
     () => [
-      { path: '/dashboard', label: 'Dashboard' },
-      { path: '/campaign', label: 'Campaign' },
-      { path: '/campaign-details', label: 'Campaign Details' },
-      { path: '/auto-dial', label: 'Auto Dial' },
+      // { path: '/dashboard', label: 'Dashboard' },
+      // { path: '/campaign', label: 'Campaign' },
+      // { path: '/campaign-details', label: 'Campaign Details' },
     ],
     []
   );

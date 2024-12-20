@@ -4,7 +4,7 @@ import { FiPhone } from 'react-icons/fi';
 import axios from 'axios';
 import HistoryContext from '../context/HistoryContext';
 
-const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen,  }) => {
+const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
   const { username } = useContext(HistoryContext);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -101,7 +101,6 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen,  }) => {
   }, [currentLeadId]);
 
   const handleLeadCall = async () => {
-    console.log('Preparing to call lead...');
     const payload = {
       caller: username,
       leaddata: {
@@ -116,7 +115,6 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen,  }) => {
       const response = await axios.post('https://callapp.iotcom.io/leaddialnumber', payload);
       if (response.data && response.data) {
         localStorage.setItem('dialing', true);
-        console.log(formData.phoneNumber, 'formData.phoneNumber');
         setPhoneNumber(formData.phoneNumber);
         setIsAutoDialOpen(false);
       } else {
@@ -141,6 +139,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen,  }) => {
               <input
                 type="text"
                 id="leadfullname"
+                disabled
                 value={formData.fullName}
                 onChange={handleInputChange}
                 placeholder="Enter full name"
@@ -157,6 +156,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen,  }) => {
               <input
                 type="email"
                 id="leademailaddress"
+                disabled
                 value={formData.emailAddress}
                 onChange={handleInputChange}
                 placeholder="Enter email address"
@@ -173,6 +173,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen,  }) => {
             <input
               type="tel"
               id="leadphonenumber"
+              disabled
               value={formData.phoneNumber}
               onChange={handleInputChange}
               placeholder="Enter phone number"
@@ -190,6 +191,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen,  }) => {
               <input
                 type="text"
                 id="leadaddress1"
+                disabled
                 value={formData.address1}
                 onChange={handleInputChange}
                 placeholder="Enter street address"
@@ -199,6 +201,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen,  }) => {
             <input
               type="text"
               id="leadaddress2"
+              disabled
               value={formData.address2}
               onChange={handleInputChange}
               placeholder="Enter street address 2"
@@ -207,6 +210,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen,  }) => {
             <input
               type="text"
               id="leadcity"
+              disabled
               value={formData.city}
               onChange={handleInputChange}
               placeholder="Enter your city"
@@ -215,6 +219,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen,  }) => {
             <input
               type="text"
               id="leadstate"
+              disabled
               value={formData.state}
               onChange={handleInputChange}
               placeholder="Enter your state"
@@ -223,6 +228,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen,  }) => {
             <input
               type="number"
               id="leadpostal"
+              disabled
               value={formData.postalCode}
               onChange={handleInputChange}
               placeholder="Postal code"

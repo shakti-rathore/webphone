@@ -19,6 +19,7 @@ const useJssip = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [agentText, setAgentText] = useState('');
   const [customerText, setCustomerText] = useState('');
+  const [userCall, setUserCall] = useState('');
   const [isHeld, setIsHeld] = useState(false);
   const [conferenceStatus, setConferenceStatus] = useState(false);
   const [dispositionModal, setDispositionModal] = useState(false);
@@ -185,6 +186,7 @@ const useJssip = () => {
 
       if (response.status === 200) {
         setBridgeID(response.data.currentcalldata.bridgeID);
+        setUserCall(response.data.contactData);
         setConferenceStatus(false);
         console.log('Call unhold successful');
       } else {
@@ -551,7 +553,7 @@ const useJssip = () => {
             reset();
             setStatus('calling');
             localStorage.setItem('dialing', false);
-            answercall( );
+            answercall();
             setHistory((prev) => {
               setPhoneNumber(incomingnumber);
               console.log('phoneNumber', incomingnumber);
@@ -668,6 +670,7 @@ const useJssip = () => {
     bridgeID,
     dispositionModal,
     setDispositionModal,
+    userCall,
   ];
 };
 

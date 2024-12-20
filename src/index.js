@@ -40,7 +40,7 @@ const AppRoutes = () => {
             </HistoryProvider>
           }
         />
-        <Route
+        {/* <Route
           path="/campaign"
           element={
             <HistoryProvider>
@@ -49,27 +49,17 @@ const AppRoutes = () => {
               </CommonLayout>
             </HistoryProvider>
           }
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="/campaign-details"
-          element={
+        element={
             <HistoryProvider>
               <CommonLayout>
                 <CampaignDetails />
               </CommonLayout>
             </HistoryProvider>
           }
-        />
-        <Route
-          path="/auto-dial"
-          element={
-            <HistoryProvider>
-              <CommonLayout>
-                <AutoDial />
-              </CommonLayout>
-            </HistoryProvider>
-          }
-        />
+        /> */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Router>
