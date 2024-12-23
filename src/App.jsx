@@ -155,7 +155,7 @@ function App() {
           </button>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center">
+        <div className="flex flex-col lg:flex-row items-center">
           <div className={`w-full ${status !== 'start' ? 'lg:w-2/3' : ''}`}>
             {seeLogs ? (
               <HistoryScreen setSeeLogs={setSeeLogs} />
