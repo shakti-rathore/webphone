@@ -579,7 +579,7 @@ const useJssip = () => {
       setUa(ua);
     } catch (e) {
       console.error(e);
-      navigate('/login');
+      navigate('/webphone/login');
     }
 
     const enumerateDevices = async () => {

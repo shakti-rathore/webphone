@@ -1,8 +1,8 @@
+import { useState, useEffect, useRef, useContext } from 'react';
 import Home from './components/Home';
 import CallScreen from './components/CallScreen';
 import HistoryScreen from './components/HistoryScreen';
 import useJssip from './hooks/useJssip';
-import { useState, useEffect, useRef, useContext } from 'react';
 import InCallScreen from './components/InCallScreen';
 import HistoryContext from './context/HistoryContext';
 import CallConference from './components/CallConference';
@@ -74,7 +74,7 @@ function App() {
         ]);
 
         if (response.status === 401) {
-          window.location.href = '/login';
+          window.location.href = '/webphone/login';
         } else {
           const data = await response.json();
           if (data.message === 'ok connection for user') {
@@ -136,39 +136,38 @@ function App() {
   }
 
   return (
-    <>
+    <div className="min-h-screen w-full">
       <Modal isOpen={isAutoDialOpen} onClose={() => setIsAutoDialOpen(false)} title="Caller/Campaign">
         <AutoDial setIsAutoDialOpen={setIsAutoDialOpen} setPhoneNumber={setPhoneNumber} />
       </Modal>
 
-      {dispositionModal && <Disposition bridgeID={bridgeID} setDispositionModal={setDispositionModal} userCall={userCall} />}
-      <div className="mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-4">
-        <div className="flex items-center justify-between">
-          <h1 className="font-semibold leading-5 text-start capitalize text-2xl text-gray-900 dark:text-white">
-            {/* Dashboard */}
-          </h1>
+      {dispositionModal && (
+        <Disposition bridgeID={bridgeID} setDispositionModal={setDispositionModal} userCall={userCall} />
+      )}
+
+      <div className="w-full mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-3">
+        <div className="text-end mb-3">
           <button
-            className="px-4 py-2 text-white bg-blue rounded-md hover:bg-blue-dark focus:outline-none"
+            className="px-4 py-2 text-white bg-blue rounded-md hover:bg-blue-dark focus:outline-none transition-colors"
             onClick={() => setIsAutoDialOpen(true)}
           >
             Auto Dial
           </button>
         </div>
-        <div className={`flex items-center ${(status != 'start' && 'justify-between') || 'justify-center'}`}>
-          {seeLogs ? (
-            <HistoryScreen setSeeLogs={setSeeLogs} />
-          ) : status === 'start' ? (
-            <>
+
+        <div className="flex flex-col md:flex-row items-center">
+          <div className={`w-full ${status !== 'start' ? 'lg:w-2/3' : ''}`}>
+            {seeLogs ? (
+              <HistoryScreen setSeeLogs={setSeeLogs} />
+            ) : status === 'start' ? (
               <Home
                 phoneNumber={phoneNumber}
                 setPhoneNumber={setPhoneNumber}
                 handleCall={handleCall}
                 setSeeLogs={setSeeLogs}
               />
-            </>
-          ) : status === 'calling' || status === 'conference' ? (
-            <>
-              {(callConference && (
+            ) : status === 'calling' || status === 'conference' ? (
+              callConference ? (
                 <CallConference
                   conferenceNumber={conferenceNumber}
                   setCallConference={setCallConference}
@@ -177,7 +176,7 @@ function App() {
                   setSeeLogs={setSeeLogs}
                   phoneNumber={phoneNumber}
                 />
-              )) || (
+              ) : (
                 <CallScreen
                   reqUnHold={reqUnHold}
                   setCallConference={setCallConference}
@@ -196,32 +195,38 @@ function App() {
                   changeAudioDevice={changeAudioDevice}
                   conferenceStatus={conferenceStatus}
                 />
-              )}
-            </>
-          ) : status === 'Incalling' ? (
-            <InCallScreen
-              isRecording={isRecording}
-              startRecording={startRecording}
-              stopRecording={stopRecording}
-              phoneNumber={phoneNumber}
-              session={session}
-              setPhoneNumber={setPhoneNumber}
-              seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
-              minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
-              isRunning={isRunning}
-              setStatus={setStatus}
-              audioRef={audioRef}
-              devices={devices}
-              selectedDeviceId={selectedDeviceId}
-            />
-          ) : (
-            <div>No content available</div>
+              )
+            ) : status === 'Incalling' ? (
+              <InCallScreen
+                isRecording={isRecording}
+                startRecording={startRecording}
+                stopRecording={stopRecording}
+                phoneNumber={phoneNumber}
+                session={session}
+                setPhoneNumber={setPhoneNumber}
+                seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
+                minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
+                isRunning={isRunning}
+                setStatus={setStatus}
+                audioRef={audioRef}
+                devices={devices}
+                selectedDeviceId={selectedDeviceId}
+              />
+            ) : (
+              <div className="text-center p-4">No content available</div>
+            )}
+          </div>
+
+          {status !== 'start' && userCall && (
+            <div className="w-full lg:w-1/3">
+              <UserCall userCall={userCall} username={username} />
+            </div>
           )}
-          <audio ref={audioRef} autoPlay hidden />
-          {status != 'start' && userCall && <UserCall userCall={userCall} username={username} />}
         </div>
+
+        <audio ref={audioRef} autoPlay hidden />
       </div>
-    </>
+    </div>
   );
 }
 

@@ -6,7 +6,6 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { login } from '../utils/apiUtils';
 
 function Login() {
-  const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
   const { username, setUsername, password, setPassword } = useContext(HistoryContext);
   const navigate = useNavigate();
@@ -30,7 +29,6 @@ function Login() {
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      setError(null);
 
       const errors = formValidation({ username, password });
       setValidationErrors(errors);
@@ -43,15 +41,19 @@ function Login() {
 
         if (data.message === 'wrong login info') {
           toast.error('Incorrect username or password');
-          navigate('/login');
+          navigate('/webphone/login');
+          return;
+        }
+
+        if (data.message === 'User already login somewhere else') {
+          toast.error(data.message || 'User already logged in elsewhere. Please log out from other devices.');
           return;
         }
 
         localStorage.setItem('token', JSON.stringify(data));
         toast.success('Login successfully');
-        navigate('/dashboard');
+        navigate('/webphone/dashboard');
       } catch (err) {
-        setError(err.message);
         toast.error('Login failed. Please try again.');
       }
     },
@@ -67,7 +69,7 @@ function Login() {
       <Toaster position="top-right" reverseOrder={false} />
 
       <div className="flex justify-center items-center min-h-screen">
-        <div className="w-full max-w-4xl bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] overflow-hidden">
+        <div className="w-full max-w-xs sm:max-w-xl lg:max-w-4xl bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2">
             <div className="hidden lg:block">
               <img src="/images/calling.svg" alt="Login Image" className="object-cover w-full h-full" />
@@ -101,7 +103,7 @@ function Login() {
                       onClick={togglePasswordVisibility}
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
                     >
-                      {showPassword ? <FaEye/> : <FaEyeSlash />}
+                      {showPassword ? <FaEye /> : <FaEyeSlash />}
                     </button>
                   </div>
                   {validationErrors.password && (
@@ -115,7 +117,6 @@ function Login() {
                   Login
                 </button>
               </form>
-              {error && <p className="mt-2 text-center text-red-600">{error}</p>}
             </div>
           </div>
         </div>

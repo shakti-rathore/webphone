@@ -31,14 +31,14 @@ const Modal = ({ isOpen, onClose, title, handleSubmit, children, loading }) => {
         className="max-w-lg bg-white dark:bg-[#131212] w-full mx-4 rounded-lg shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4 border-b dark:border-[#999]">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
+        <div className="flex items-center justify-between p-3 border-b dark:border-[#999]">
+          <h2 className="md:text-xl text-base font-semibold text-gray-900 dark:text-white">{title}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <IoIosClose size={30} />
           </button>
         </div>
         <div className="">{children}</div>
-        <div className="flex justify-end p-4 border-t mt-1 dark:border-[#999] gap-x-4">
+        <div className="flex justify-end p-3 border-t mt-1 dark:border-[#999] gap-x-4">
           {handleSubmit && (
             <button
               onClick={handleSubmit}

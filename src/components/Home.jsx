@@ -10,8 +10,8 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs }) => {
   const formatPhoneNumber = useFormatPhoneNumber();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="w-full max-w-72 p-4 bg-white dark:bg-[#3333] rounded-lg shadow-none md:shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
+    <div className="flex flex-col items-center md:justify-center min-h-screen">
+      <div className="w-full max-w-72 p-4 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className="flex justify-between items-center mb-4">
           <div className="text-xl font-bold text-blue-dark">WebPhone</div>
           <div

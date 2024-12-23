@@ -129,114 +129,194 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
 
   return (
     <>
-      <form className="space-y-4 p-4">
-        <div className="grid grid-cols-2 gap-4">
+      <form className="px-3 py-2">
+        {/* Personal Information Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
           {/* Full Name */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+            <label
+              htmlFor="leadfullname"
+              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
+            >
+              Full Name
+            </label>
             <div className="flex items-center">
-              <FaUser className="absolute left-3 text-gray-400" />
+              <FaUser className="absolute left-3 text-gray-400 text-sm sm:text-base" aria-hidden="true" />
               <input
                 type="text"
                 id="leadfullname"
+                name="fullName"
                 disabled
                 value={formData.fullName}
                 onChange={handleInputChange}
                 placeholder="Enter full name"
-                className="w-full dark:border-[#999] dark:text-white pl-10 pr-3 py-2 border rounded-md focus:outline-none"
+                className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white pl-9 sm:pl-10 pr-3 text-sm sm:text-base border rounded-md outline-none"
+                aria-label="Full Name"
               />
             </div>
           </div>
 
           {/* Email Address */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+            <label
+              htmlFor="leademailaddress"
+              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
+            >
+              Email Address
+            </label>
             <div className="flex items-center">
-              <FaEnvelope className="absolute left-3 text-gray-400" />
+              <FaEnvelope className="absolute left-3 text-gray-400 text-sm sm:text-base" aria-hidden="true" />
               <input
                 type="email"
                 id="leademailaddress"
+                name="emailAddress"
                 disabled
                 value={formData.emailAddress}
                 onChange={handleInputChange}
                 placeholder="Enter email address"
-                className="w-full dark:border-[#999] dark:text-white pl-10 pr-3 py-2 border rounded-md focus:outline-none"
+                className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white pl-9 sm:pl-10 pr-3 text-sm sm:text-base border rounded-md outline-none"
+                aria-label="Email Address"
               />
             </div>
           </div>
-        </div>
 
-        {/* Phone Number & Country in a line */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-            <input
-              type="tel"
-              id="leadphonenumber"
-              disabled
-              value={formData.phoneNumber}
-              onChange={handleInputChange}
-              placeholder="Enter phone number"
-              className="w-full dark:border-[#999] dark:text-white px-3 py-2 border rounded-md focus:outline-none"
-            />
+          {/* Phone Number */}
+          <div className="relative">
+            <label
+              htmlFor="leadphonenumber"
+              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
+            >
+              Phone Number
+            </label>
+            <div className="flex items-center">
+              <FiPhone className="absolute left-3 text-gray-400 text-sm sm:text-base" aria-hidden="true" />
+              <input
+                type="tel"
+                id="leadphonenumber"
+                name="phoneNumber"
+                disabled
+                value={formData.phoneNumber}
+                onChange={handleInputChange}
+                placeholder="Enter phone number"
+                className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white pl-9 sm:pl-10 pr-3 text-sm sm:text-base border rounded-md outline-none"
+                aria-label="Phone Number"
+              />
+            </div>
           </div>
-        </div>
-
-        {/* Address Section */}
-        <div className="space-y-3">
-          <label className="block text-sm font-medium text-gray-700">Address</label>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="relative col-span-2">
-              <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-400" />
+          {/* Street Address */}
+          <div className="relative">
+            <label
+              htmlFor="leadaddress1"
+              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
+            >
+              Street Address
+            </label>
+            <div className="flex items-center">
+              <FaMapMarkerAlt className="absolute left-3 text-gray-400 text-sm sm:text-base" aria-hidden="true" />
               <input
                 type="text"
                 id="leadaddress1"
+                name="address1"
                 disabled
                 value={formData.address1}
                 onChange={handleInputChange}
                 placeholder="Enter street address"
-                className="w-full dark:border-[#999] dark:text-white pl-10 pr-3 py-2 border rounded-md focus:outline-none mb-2"
+                className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white pl-9 sm:pl-10 pr-3 text-sm sm:text-base border rounded-md outline-none"
+                aria-label="Street Address"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Address Section */}
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 mt-4">
+          {/* Address Line 2 */}
+          <div>
+            <label
+              htmlFor="leadaddress2"
+              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
+            >
+              Address Line 2
+            </label>
             <input
               type="text"
               id="leadaddress2"
+              name="address2"
               disabled
               value={formData.address2}
               onChange={handleInputChange}
-              placeholder="Enter street address 2"
-              className="w-full dark:border-[#999] dark:text-white px-3 py-2 border rounded-md focus:outline-none mb-2"
+              placeholder="Apartment, suite, etc."
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
+              aria-label="Address Line 2"
             />
+          </div>
+
+          {/* City */}
+          <div>
+            <label
+              htmlFor="leadcity"
+              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
+            >
+              City
+            </label>
             <input
               type="text"
               id="leadcity"
+              name="city"
               disabled
               value={formData.city}
               onChange={handleInputChange}
               placeholder="Enter your city"
-              className="w-full dark:border-[#999] dark:text-white px-3 py-2 border rounded-md focus:outline-none mb-2"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
+              aria-label="City"
             />
+          </div>
+
+          {/* State */}
+          <div>
+            <label
+              htmlFor="leadstate"
+              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
+            >
+              State
+            </label>
             <input
               type="text"
               id="leadstate"
+              name="state"
               disabled
               value={formData.state}
               onChange={handleInputChange}
               placeholder="Enter your state"
-              className="w-full dark:border-[#999] dark:text-white px-3 py-2 border rounded-md focus:outline-none mb-2"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
+              aria-label="State"
             />
+          </div>
+
+          {/* Postal Code */}
+          <div>
+            <label
+              htmlFor="leadpostal"
+              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
+            >
+              Postal Code
+            </label>
             <input
               type="number"
               id="leadpostal"
+              name="postalCode"
               disabled
               value={formData.postalCode}
               onChange={handleInputChange}
-              placeholder="Postal code"
-              className="w-full dark:border-[#999] dark:text-white px-3 py-2 border rounded-md focus:outline-none mb-2"
+              placeholder="Enter postal code"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
+              aria-label="Postal Code"
             />
           </div>
         </div>
-        <div className="flex space-x-4">
+
+        {/* Action Buttons */}
+        <div className="flex gap-3 sm:mt-4 mt-2">
           <button
             type="button"
             onClick={(e) => {
@@ -244,29 +324,32 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
               handleLeadCall();
             }}
             disabled={isLoading}
-            className={`py-2 px-4 text-white font-medium rounded-md shadow-sm outline-none transition-colors flex items-center 
-    ${isLoading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue hover:bg-blue-dark'}`}
+            className={`w-full sm:w-auto py-2 px-4 text-white font-medium rounded-md shadow-sm outline-none transition-colors flex items-center justify-center text-sm sm:text-base
+            ${isLoading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue hover:bg-blue-dark'}`}
+            aria-label={isLoading ? 'Dialing...' : 'Dial Lead'}
           >
             {isLoading ? (
               'Dial...'
             ) : (
               <>
-                <FiPhone className="mr-2" /> Dial
+                <FiPhone className="mr-2" aria-hidden="true" /> Dial
               </>
             )}
           </button>
 
           <button
+            type="button"
             onClick={handleNextLead}
             disabled={isLoading}
-            className={`flex items-center text-white px-4 py-2 rounded transition-colors
-              ${isLoading ? 'bg-green-300 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
+            className={`w-full sm:w-auto flex items-center justify-center text-white px-4 py-2 rounded transition-colors text-sm sm:text-base
+            ${isLoading ? 'bg-green-300 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
+            aria-label={isLoading ? 'Loading next lead...' : 'Next Lead'}
           >
             {isLoading ? (
               'Loading...'
             ) : (
               <>
-                Next Lead <FaArrowRight className="ml-2" />
+                Next Lead <FaArrowRight className="ml-2" aria-hidden="true" />
               </>
             )}
           </button>

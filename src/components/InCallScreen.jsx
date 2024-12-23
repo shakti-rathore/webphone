@@ -33,7 +33,7 @@ const InCallScreen = ({
 
   const formatPhoneNumber = useFormatPhoneNumber();
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center md:justify-center min-h-screen">
       <audio id="ringtoneII" autoPlay hidden={true} src="ringtone.mp3" />
       <div className="flex flex-col items-center w-full max-w-72 p-6 bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className={`flex flex-col items-center ${showKeyPad ? '' : 'mb-24'}`}>

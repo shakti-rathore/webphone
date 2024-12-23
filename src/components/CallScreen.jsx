@@ -33,7 +33,7 @@ const CallScreen = ({
   const formatPhoneNumber = useFormatPhoneNumber();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center md:justify-center min-h-screen">
       <div className="flex flex-col items-center w-full max-w-72 p-6 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className={`flex flex-col items-center ${showKeyPad ? '' : 'mb-24'}`}>
           <div className="w-12 h-12 rounded-full bg-blue-dark flex items-center justify-center mb-4">
@@ -70,7 +70,11 @@ const CallScreen = ({
               </div>
               <div className="flex justify-around items-center">
                 {(conferenceStatus && (
-                  <button className="p-4 rounded-full text-gray-600 dark:text-white" disabled={!session} onClick={reqUnHold}>
+                  <button
+                    className="p-4 rounded-full text-gray-600 dark:text-white"
+                    disabled={!session}
+                    onClick={reqUnHold}
+                  >
                     <MdCallMerge className="text-3xl" />
                   </button>
                 )) || (

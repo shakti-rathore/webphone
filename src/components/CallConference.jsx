@@ -9,8 +9,8 @@ const CallConference = ({ conferenceNumber, handleCall, setCallConference, phone
   const formatPhoneNumber = useFormatPhoneNumber();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="w-full max-w-72 p-4 bg-white dark:bg-[#3333] rounded-lg shadow-none md:shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
+    <div className="flex flex-col items-center md:justify-center min-h-screen">
+      <div className="w-full max-w-72 p-4 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className="text-xl font-bold text-blue-dark mb-2">WebPhone</div>
         <marquee
           className="text-sm text-white p-1 cursor-pointer bg-blue-dark mb-4"

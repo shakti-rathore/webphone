@@ -63,7 +63,7 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center dark:bg-gray-900/60 bg-black/60">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 dark:bg-gray-900/60 bg-black/60">
         <Modal isOpen={userCallOpen} onClose={() => setUserCallOpen(false)} title="User Details">
           <UserCall
             userCall={userCall}
@@ -72,8 +72,10 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
             setUserCallOpen={setUserCallOpen}
           />
         </Modal>
-        <div className="p-4 bg-white shadow-lg rounded-xl dark:bg-[#333]">
-          <div className="grid grid-cols-3 gap-4 mb-6">
+
+        <div className="w-full max-w-xl bg-white shadow-lg rounded-xl dark:bg-[#333] p-3">
+          {/* Action Buttons Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
             {dispositionActions.map((item) => {
               const isSelected = selectedAction === item.action;
               return (
@@ -84,7 +86,7 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
                     backgroundColor: isSelected ? item.color : '#F3F4F6',
                     color: isSelected ? '#FFFFFF' : '#374151',
                   }}
-                  className="px-4 py-3 rounded-lg font-semibold transition-all duration-300 ease-in-out"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-300 ease-in-out hover:opacity-90"
                   onClick={() => setSelectedAction(item.action)}
                 >
                   {item.label}
@@ -93,53 +95,40 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
             })}
           </div>
 
-          <div className="flex flex-wrap justify-between items-center space-y-4 md:space-y-0 border-t pt-3">
-            <div className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                id="checkautoleaddial"
-                checked={isAutoLeadDialDisabled}
-                onChange={(e) => setIsAutoLeadDialDisabled(e.target.checked)}
-                className="form-checkbox h-5 w-5 text-blue-600 rounded"
-              />
-              <label htmlFor="checkautoleaddial" className="text-gray-700 font-medium dark:text-white">
-                Auto Dial off
+          {/* Bottom Section */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center border-t pt-3">
+            {/* Checkbox Section */}
+            <div className="w-full sm:w-auto">
+              <label className="flex items-center space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="checkautoleaddial"
+                  checked={isAutoLeadDialDisabled}
+                  onChange={(e) => setIsAutoLeadDialDisabled(e.target.checked)}
+                  className="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-blue-600 rounded"
+                />
+                <span className="text-sm sm:text-base text-gray-700 font-medium dark:text-white">Auto Dial off</span>
               </label>
             </div>
 
-            {/* <div className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id="breakCheckbox"
-              checked={isBreakChecked}
-              onChange={(e) => setIsBreakChecked(e.target.checked)}
-              className="form-checkbox h-5 w-5 text-green-600 rounded"
-            />
-            <label htmlFor="breakCheckbox" className="text-gray-700 font-medium">
-              Add Break
-            </label>
-          </div> */}
-
-            <div className="flex space-x-4">
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setUserCallOpen(true)}
-                className="py-2 px-4 bg-green-500 hover:bg-green-600 text-white rounded-md outline-none"
+                className=" sm:w-auto py-2 px-4 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm sm:text-base transition-colors duration-300"
               >
                 See form
               </button>
+
               <button
                 type="button"
                 onClick={submitForm}
                 disabled={isSubmitting}
                 className={`
-              px-4 py-2 rounded-md transition-all duration-300 ease-in-out
-              ${
-                isSubmitting
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'py-2 px-4 bg-blue hover:bg-blue-dark text-white rounded-md outline-none'
-              }
-            `}
+                 sm:w-auto px-4 py-2 rounded-md text-sm sm:text-base transition-all duration-300
+                ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue hover:bg-blue-dark text-white'}
+              `}
               >
                 {isSubmitting ? 'Submitting...' : 'Submit'}
               </button>
@@ -147,7 +136,7 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
               <button
                 type="button"
                 onClick={clearForm}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-300"
+                className=" sm:w-auto px-4 py-2 bg-gray-200 text-gray-700 text-sm sm:text-base rounded-md hover:bg-gray-300 transition-colors duration-300"
               >
                 Clear
               </button>

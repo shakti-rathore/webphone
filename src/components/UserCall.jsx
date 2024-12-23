@@ -86,38 +86,40 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
 
   return (
     <div
-      className={`${(!userCallOpen && 'max-w-lg mx-auto p-4 bg-white shadow-md rounded-md dark:bg-[#333]') || 'p-4'}`}
+      className={`${(!userCallOpen && 'max-w-lg mx-auto p-3 bg-white shadow-md rounded-md dark:bg-[#333]') || 'p-3'}`}
     >
-      {(!userCallOpen && <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">User Details</h2>) ||
+      {(!userCallOpen && (
+        <h2 className="md:text-xl text-base font-semibold text-gray-900 dark:text-white">User Details</h2>
+      )) ||
         ''}
       <form>
-        {/* Name Fields */}
-        <div className="flex space-x-2">
-          <div className="w-1/2">
+        <div className="grid grid-cols-2 gap-2 md:gap-4">
+          {/* First Name */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-white">First Name</label>
             <input
               type="text"
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
-              className="mt-1 p-2 border rounded-md w-full outline-none"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
             />
           </div>
-          <div className="w-1/2">
+
+          {/* Last Name */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-white">Last Name</label>
             <input
               type="text"
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
-              className="mt-1 p-2 border rounded-md w-full outline-none"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
             />
           </div>
-        </div>
 
-        {/* Number Fields */}
-        <div className="mt-4 flex space-x-2">
-          <div className="w-2/3">
+          {/* Mobile Number */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-white">Mobile Number</label>
             <input
               type="text"
@@ -125,10 +127,12 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
               value={formData.number}
               onChange={handleChange}
               placeholder="Primary Number"
-              className="mt-1 p-2 border rounded-md w-full outline-none"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
             />
           </div>
-          <div className="w-1/3">
+
+          {/* Alternate Number */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-white">Alternate Number</label>
             <input
               type="text"
@@ -136,87 +140,106 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
               value={formData.alternateNumber}
               onChange={handleChange}
               placeholder="Alternate"
-              className="mt-1 p-2 border rounded-md w-full outline-none"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
             />
           </div>
-        </div>
 
-        {/* Address Fields */}
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-white">Address</label>
-          <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            placeholder="Address Line 1"
-            className="mt-1 p-2 border rounded-md w-full outline-none"
-          />
-          <div className="mt-2 flex space-x-2">
+          {/* Address */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white">Address</label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              placeholder="Address Line 1"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
+            />
+          </div>
+
+          {/* State */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white">State</label>
             <input
               type="text"
               name="state"
               value={formData.state}
               onChange={handleChange}
               placeholder="State"
-              className="p-2 border rounded-md w-1/3 outline-none"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
             />
+          </div>
+
+          {/* District */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white">District</label>
             <input
               type="text"
               name="district"
               value={formData.district}
               onChange={handleChange}
               placeholder="District"
-              className="p-2 border rounded-md w-1/3 outline-none"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
             />
+          </div>
+
+          {/* City */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white">City</label>
             <input
               type="text"
               name="city"
               value={formData.city}
               onChange={handleChange}
               placeholder="City"
-              className="p-2 border rounded-md w-1/3 outline-none"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
             />
           </div>
-          <input
-            type="text"
-            name="postalCode"
-            value={formData.postalCode}
-            onChange={handleChange}
-            placeholder="Postal Code"
-            className="mt-2 p-2 border rounded-md w-full outline-none"
-          />
-        </div>
 
-        {/* Email Field */}
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-white">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email Address"
-            className="mt-1 p-2 border rounded-md w-full outline-none"
-          />
+          {/* Postal Code */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white">Postal Code</label>
+            <input
+              type="text"
+              name="postalCode"
+              value={formData.postalCode}
+              onChange={handleChange}
+              placeholder="Postal Code"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Email Address"
+              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
+            />
+          </div>
         </div>
 
         {/* Comment Field */}
-        <div className="mt-4">
+        <div className="mt-2">
           <label className="block text-sm font-medium text-gray-700 dark:text-white">Comment</label>
           <textarea
             name="comment"
             value={formData.comment}
             onChange={handleChange}
             placeholder="Your comment here!"
-            className="mt-1 p-2 border rounded-md w-full outline-none"
+            className="mt-1 p-2 border rounded-md w-full outline-none dark:bg-black/50 dark:text-white dark:border-[#999]"
           />
         </div>
 
+        {/* Submit Button */}
         <button
           type="button"
           onClick={handleCall}
-          className={`mt-6 w-full py-2 px-4 rounded-md text-white transition ${
+          className={`mt-2 w-full py-2 px-4 rounded-md text-white transition ${
             loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue hover:bg-blue-dark'
           }`}
           disabled={loading}

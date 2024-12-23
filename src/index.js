@@ -23,7 +23,7 @@ const AppRoutes = () => {
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         <Route
-          path="/login"
+          path="/webphone/login"
           element={
             <HistoryProvider>
               <Login />
@@ -31,7 +31,7 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/dashboard"
+          path="/webphone/dashboard"
           element={
             <HistoryProvider>
               <CommonLayout>
@@ -60,7 +60,7 @@ const AppRoutes = () => {
             </HistoryProvider>
           }
         /> */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/webphone/dashboard" replace />} />
       </Routes>
     </Router>
   );
