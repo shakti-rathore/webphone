@@ -9,6 +9,12 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs }) => {
   const [isHovered, setIsHovered] = useState(false);
   const formatPhoneNumber = useFormatPhoneNumber();
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleCall();
+    }
+  };
+
   return (
     <div className="flex flex-col items-center md:justify-center min-h-screen">
       <div className="w-full max-w-72 p-4 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
@@ -30,6 +36,8 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs }) => {
             onChange={(e) => {
               setPhoneNumber(e.target.value);
             }}
+            onKeyDown={handleKeyDown}
+            autoFocus
             placeholder="Phone number"
             className="w-full outline-none text-2xl indent-1.5 bg-white dark:bg-[#1a1a1a]/20 dark:text-white text-[#070707]"
           />
