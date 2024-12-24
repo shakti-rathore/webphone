@@ -20,7 +20,7 @@ const KeyPad = ({ setPhoneNumber }) => {
         {keyboard.map((item) => (
           <button
             key={item.num}
-            className="flex flex-col items-center justify-center w-16 h-16 rounded-full dark:border-[#999] border-[#ddd] border dark:bg-[#333] bg-[#EAEAEA] shadow-sm hover:bg-blue-light focus:outline-none transition-colors duration-200"
+            className=" hover:bg-slate-200 hover:dark:bg-gray-600 flex flex-col items-center justify-center w-16 h-16 rounded-full dark:border-[#999] border-[#ddd] border dark:bg-[#333] bg-[#EAEAEA] shadow-sm focus:outline-none transition-colors duration-200"
             onClick={() => setPhoneNumber((prev) => prev + String(item.num))}
           >
             <span className="text-3xl font-semibold text-[#070707] dark:text-white">{item.num}</span>

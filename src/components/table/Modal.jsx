@@ -40,19 +40,12 @@ const Modal = ({ isOpen, onClose, title, handleSubmit, children, loading }) => {
         <div className="">{children}</div>
         <div className="flex justify-end p-3 border-t mt-1 dark:border-[#999] gap-x-4">
           {handleSubmit && (
-            <button
-              onClick={handleSubmit}
-              className="px-4 py-2 rounded-md shadow-sm flex items-center gap-2 hover:bg-blue-dark bg-blue text-white"
-              disabled={loading}
-            >
+            <button onClick={handleSubmit} className="primary-btn" disabled={loading}>
               Save
             </button>
           )}
           {onClose && (
-            <button
-              onClick={onClose}
-              className="px-4 py-2 rounded-md shadow-sm flex items-center gap-2 hover:bg-gray-600 bg-gray-400  text-white"
-            >
+            <button onClick={onClose} className="secondary-btn">
               Close
             </button>
           )}

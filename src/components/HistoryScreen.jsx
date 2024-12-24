@@ -9,20 +9,20 @@ const HistoryScreen = ({ setSeeLogs, setPhoneNumber, handleCall }) => {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="w-full max-w-sm p-4 bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
+      <div className="w-full max-w-sm p-3 bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className="flex items-center mb-4 gap-x-1">
           <div
-            className="cursor-pointer text-blue-dark"
+            className="cursor-pointer text-primary"
             onClick={() => {
               setSeeLogs(false);
             }}
           >
             <IoMdArrowBack className="text-xl" />
           </div>
-          <h3 className="text-xl font-bold text-blue-dark">Call logs</h3>
+          <h3 className="text-xl font-bold text-primary">Call logs</h3>
 
           <div
-            className="cursor-pointer text-blue-dark ml-auto hover:text-red-700 transition-all"
+            className="cursor-pointer text-primary ml-auto hover:text-red-700 transition-all"
             onClick={() => {
               setHistory([]);
             }}

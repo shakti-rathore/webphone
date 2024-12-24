@@ -11,9 +11,9 @@ const CallConference = ({ conferenceNumber, handleCall, setCallConference, phone
   return (
     <div className="flex flex-col items-center md:justify-center min-h-screen">
       <div className="w-full max-w-72 p-4 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
-        <div className="text-xl font-bold text-blue-dark mb-2">WebPhone</div>
+        <div className="text-xl font-bold text-primary mb-2">WebPhone</div>
         <marquee
-          className="text-sm text-white p-1 cursor-pointer bg-blue-dark mb-4"
+          className="text-sm text-white p-1 cursor-pointer bg-primary mb-4"
           onClick={() => setCallConference(false)}
         >
           Return on {phoneNumber}
@@ -30,7 +30,7 @@ const CallConference = ({ conferenceNumber, handleCall, setCallConference, phone
           />
           {phoneNumber && (
             <div
-              className="absolute inset-y-0 right-0 flex items-center cursor-pointer text-blue-dark"
+              className="absolute inset-y-0 right-0 flex items-center cursor-pointer text-primary"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               onClick={() => setConferenceNumber((prev) => prev.slice(0, -1).trim())}

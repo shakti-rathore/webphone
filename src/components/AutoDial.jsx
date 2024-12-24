@@ -3,8 +3,9 @@ import { FaArrowRight, FaUser, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa
 import { FiPhone } from 'react-icons/fi';
 import axios from 'axios';
 import HistoryContext from '../context/HistoryContext';
+import { InputField } from './table/InputField';
 
-const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
+const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
   const { username } = useContext(HistoryContext);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -31,6 +32,12 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
   useEffect(() => {
     handleDial();
   }, []);
+
+  useEffect(() => {
+    if (dispositionModal) {
+      handleNextLead();
+    }
+  }, [dispositionModal]);
 
   const handleDial = async () => {
     const payload = {
@@ -116,7 +123,6 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
       if (response.data && response.data) {
         localStorage.setItem('dialing', true);
         setPhoneNumber(formData.phoneNumber);
-        setIsAutoDialOpen(false);
       } else {
         console.error('Failed to initiate call:', response.data.message || 'Unknown error');
       }
@@ -128,194 +134,111 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
   };
 
   return (
-    <>
-      <form className="px-3 py-2">
-        {/* Personal Information Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-          {/* Full Name */}
-          <div className="relative">
-            <label
-              htmlFor="leadfullname"
-              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Full Name
-            </label>
-            <div className="flex items-center">
-              <FaUser className="absolute left-3 text-gray-400 text-sm sm:text-base" aria-hidden="true" />
-              <input
-                type="text"
-                id="leadfullname"
-                name="fullName"
-                disabled
-                value={formData.fullName}
-                onChange={handleInputChange}
-                placeholder="Enter full name"
-                className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white pl-9 sm:pl-10 pr-3 text-sm sm:text-base border rounded-md outline-none"
-                aria-label="Full Name"
-              />
-            </div>
-          </div>
+    <div className="max-w-lg p-3 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] dark:bg-[#333]">
+      <form>
+        <div className="grid grid-cols-2 gap-2 md:gap-4">
+          <InputField
+            id="leadfullname"
+            label="Full Name"
+            name="fullName"
+            type="text"
+            placeholder="Enter full name"
+            value={formData.fullName}
+            onChange={handleInputChange}
+            disabled
+          />
 
-          {/* Email Address */}
-          <div className="relative">
-            <label
-              htmlFor="leademailaddress"
-              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Email Address
-            </label>
-            <div className="flex items-center">
-              <FaEnvelope className="absolute left-3 text-gray-400 text-sm sm:text-base" aria-hidden="true" />
-              <input
-                type="email"
-                id="leademailaddress"
-                name="emailAddress"
-                disabled
-                value={formData.emailAddress}
-                onChange={handleInputChange}
-                placeholder="Enter email address"
-                className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white pl-9 sm:pl-10 pr-3 text-sm sm:text-base border rounded-md outline-none"
-                aria-label="Email Address"
-              />
-            </div>
-          </div>
+          <InputField
+            id="leademailaddress"
+            label="Email Address"
+            name="emailAddress"
+            type="email"
+            placeholder="Enter email address"
+            value={formData.emailAddress}
+            onChange={handleInputChange}
+            disabled
+          />
 
-          {/* Phone Number */}
-          <div className="relative">
-            <label
-              htmlFor="leadphonenumber"
-              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Phone Number
-            </label>
-            <div className="flex items-center">
-              <FiPhone className="absolute left-3 text-gray-400 text-sm sm:text-base" aria-hidden="true" />
-              <input
-                type="tel"
-                id="leadphonenumber"
-                name="phoneNumber"
-                disabled
-                value={formData.phoneNumber}
-                onChange={handleInputChange}
-                placeholder="Enter phone number"
-                className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white pl-9 sm:pl-10 pr-3 text-sm sm:text-base border rounded-md outline-none"
-                aria-label="Phone Number"
-              />
-            </div>
-          </div>
-          {/* Street Address */}
-          <div className="relative">
-            <label
-              htmlFor="leadaddress1"
-              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Street Address
-            </label>
-            <div className="flex items-center">
-              <FaMapMarkerAlt className="absolute left-3 text-gray-400 text-sm sm:text-base" aria-hidden="true" />
-              <input
-                type="text"
-                id="leadaddress1"
-                name="address1"
-                disabled
-                value={formData.address1}
-                onChange={handleInputChange}
-                placeholder="Enter street address"
-                className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white pl-9 sm:pl-10 pr-3 text-sm sm:text-base border rounded-md outline-none"
-                aria-label="Street Address"
-              />
-            </div>
-          </div>
+          <InputField
+            id="leadphonenumber"
+            label="Mobile Number"
+            name="phoneNumber"
+            type="text"
+            placeholder="Enter phone number"
+            value={formData.phoneNumber}
+            onChange={handleInputChange}
+            disabled
+          />
+
+          <InputField
+            label="Alternate Number"
+            type="text"
+            name="alternateNumber"
+            placeholder="Enter Alternate Number"
+            disabled
+          />
+
+          <InputField
+            id="leadaddress1"
+            label="Address"
+            name="address1"
+            type="text"
+            placeholder="Enter address"
+            value={formData.address1}
+            onChange={handleInputChange}
+            disabled
+          />
+
+          <InputField
+            id="leadaddress2"
+            label="Address Line 2"
+            name="address2"
+            type="text"
+            placeholder="Apartment, suite, etc."
+            value={formData.address2}
+            onChange={handleInputChange}
+            disabled
+          />
+
+          <InputField label="District" type="text" name="district" disabled placeholder="Enter District" />
+          <InputField
+            id="leadstate"
+            label="State"
+            name="state"
+            type="text"
+            placeholder="Enter your state"
+            value={formData.state}
+            onChange={handleInputChange}
+            disabled
+          />
+
+          <InputField
+            id="leadcity"
+            label="City"
+            name="city"
+            type="text"
+            placeholder="Enter your city"
+            value={formData.city}
+            onChange={handleInputChange}
+            disabled
+          />
+
+          <InputField
+            id="leadpostal"
+            label="Postal Code"
+            name="postalCode"
+            type="number"
+            placeholder="Enter postal code"
+            value={formData.postalCode}
+            onChange={handleInputChange}
+            disabled
+          />
+        </div>
+        <div className="mt-2">
+          <label className="input-label">Comment</label>
+          <textarea name="comment" disabled placeholder="Enter Your comment here!" className="input-box" />
         </div>
 
-        {/* Address Section */}
-        <div className="grid grid-cols-2 gap-2 sm:gap-4 mt-4">
-          {/* Address Line 2 */}
-          <div>
-            <label
-              htmlFor="leadaddress2"
-              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Address Line 2
-            </label>
-            <input
-              type="text"
-              id="leadaddress2"
-              name="address2"
-              disabled
-              value={formData.address2}
-              onChange={handleInputChange}
-              placeholder="Apartment, suite, etc."
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-              aria-label="Address Line 2"
-            />
-          </div>
-
-          {/* City */}
-          <div>
-            <label
-              htmlFor="leadcity"
-              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              City
-            </label>
-            <input
-              type="text"
-              id="leadcity"
-              name="city"
-              disabled
-              value={formData.city}
-              onChange={handleInputChange}
-              placeholder="Enter your city"
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-              aria-label="City"
-            />
-          </div>
-
-          {/* State */}
-          <div>
-            <label
-              htmlFor="leadstate"
-              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              State
-            </label>
-            <input
-              type="text"
-              id="leadstate"
-              name="state"
-              disabled
-              value={formData.state}
-              onChange={handleInputChange}
-              placeholder="Enter your state"
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-              aria-label="State"
-            />
-          </div>
-
-          {/* Postal Code */}
-          <div>
-            <label
-              htmlFor="leadpostal"
-              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Postal Code
-            </label>
-            <input
-              type="number"
-              id="leadpostal"
-              name="postalCode"
-              disabled
-              value={formData.postalCode}
-              onChange={handleInputChange}
-              placeholder="Enter postal code"
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-              aria-label="Postal Code"
-            />
-          </div>
-        </div>
-
-        {/* Action Buttons */}
         <div className="flex gap-3 sm:mt-4 mt-2">
           <button
             type="button"
@@ -324,8 +247,8 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
               handleLeadCall();
             }}
             disabled={isLoading}
-            className={`w-full sm:w-auto py-2 px-4 text-white font-medium rounded-md shadow-sm outline-none transition-colors flex items-center justify-center text-sm sm:text-base
-            ${isLoading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue hover:bg-blue-dark'}`}
+            className={`primary-btn flex items-center
+      ${isLoading ? 'bg-blue-300 cursor-not-allowed' : ''}`}
             aria-label={isLoading ? 'Dialing...' : 'Dial Lead'}
           >
             {isLoading ? (
@@ -341,8 +264,8 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
             type="button"
             onClick={handleNextLead}
             disabled={isLoading}
-            className={`w-full sm:w-auto flex items-center justify-center text-white px-4 py-2 rounded transition-colors text-sm sm:text-base
-            ${isLoading ? 'bg-green-300 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
+            className={`sm:w-auto flex items-center justify-center text-white px-4 py-2 rounded transition-colors text-sm sm:text-base
+      ${isLoading ? 'bg-green-300 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
             aria-label={isLoading ? 'Loading next lead...' : 'Next Lead'}
           >
             {isLoading ? (
@@ -355,7 +278,7 @@ const AutoDial = ({ setPhoneNumber, setIsAutoDialOpen }) => {
           </button>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 

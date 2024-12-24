@@ -44,7 +44,6 @@ function App() {
   const [seeLogs, setSeeLogs] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const [callConference, setCallConference] = useState(false);
-  const [isAutoDialOpen, setIsAutoDialOpen] = useState(false);
   const [timeoutArray, setTimeoutArray] = useState([]);
   const keepAliveRef = useRef(null);
   const { username } = useContext(HistoryContext);
@@ -137,25 +136,22 @@ function App() {
 
   return (
     <div className="min-h-screen w-full">
-      <Modal isOpen={isAutoDialOpen} onClose={() => setIsAutoDialOpen(false)} title="Caller/Campaign">
-        <AutoDial setIsAutoDialOpen={setIsAutoDialOpen} setPhoneNumber={setPhoneNumber} />
-      </Modal>
-
       {dispositionModal && (
         <Disposition bridgeID={bridgeID} setDispositionModal={setDispositionModal} userCall={userCall} />
       )}
 
       <div className="w-full mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-3">
-        <div className="text-end mb-3">
-          <button
-            className="px-4 py-2 text-white bg-blue rounded-md hover:bg-blue-dark focus:outline-none transition-colors"
-            onClick={() => setIsAutoDialOpen(true)}
-          >
-            Auto Dial
-          </button>
-        </div>
+        <div className="flex flex-col lg:flex-row items-center gap-5">
+          {(status !== 'start' && userCall && (
+            <div className="w-full lg:w-2/5">
+              <UserCall userCall={userCall} username={username} />
+            </div>
+          )) || (
+            <div className="w-full lg:w-2/5">
+              <AutoDial setPhoneNumber={setPhoneNumber} dispositionModal={dispositionModal} />
+            </div>
+          )}
 
-        <div className="flex flex-col lg:flex-row items-center">
           <div className={`w-full ${status !== 'start' ? 'lg:w-2/3' : ''}`}>
             {seeLogs ? (
               <HistoryScreen setSeeLogs={setSeeLogs} />
@@ -216,12 +212,6 @@ function App() {
               <div className="text-center p-4">No content available</div>
             )}
           </div>
-
-          {status !== 'start' && userCall && (
-            <div className="w-full lg:w-1/3">
-              <UserCall userCall={userCall} username={username} />
-            </div>
-          )}
         </div>
 
         <audio ref={audioRef} autoPlay hidden />

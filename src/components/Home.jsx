@@ -19,9 +19,9 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs }) => {
     <div className="flex flex-col items-center md:justify-center min-h-screen">
       <div className="w-full max-w-72 p-4 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className="flex justify-between items-center mb-4">
-          <div className="text-xl font-bold text-blue-dark">WebPhone</div>
+          <div className="text-xl font-bold text-primary">WebPhone</div>
           <div
-            className="cursor-pointer text-blue-dark"
+            className="cursor-pointer text-primary"
             onClick={() => {
               setSeeLogs(true);
             }}
@@ -43,7 +43,7 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs }) => {
           />
           {phoneNumber && (
             <div
-              className="absolute inset-y-0 right-0 flex items-center cursor-pointer text-blue-dark"
+              className="absolute inset-y-0 right-0 flex items-center cursor-pointer text-primary"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               onClick={() => setPhoneNumber((prev) => prev.slice(0, -1).trim())}

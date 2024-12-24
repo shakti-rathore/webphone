@@ -75,7 +75,7 @@ function Login() {
               <img src="/images/calling.svg" alt="Login Image" className="object-cover w-full h-full" />
             </div>
             <div className="p-8 space-y-8">
-              <h2 className="text-3xl font-semibold text-center text-blue-dark">Login</h2>
+              <h2 className="text-3xl font-semibold text-center text-primary">Login</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700">Username</label>
@@ -86,7 +86,7 @@ function Login() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue focus:border-blue"
                   />
                   {validationErrors.username && (
-                    <p className="mt-2 text-sm text-red-600">{validationErrors.username}</p>
+                    <p className="error-msg">{validationErrors.username}</p>
                   )}
                 </div>
                 <div>
@@ -106,14 +106,9 @@ function Login() {
                       {showPassword ? <FaEye /> : <FaEyeSlash />}
                     </button>
                   </div>
-                  {validationErrors.password && (
-                    <p className="mt-2 text-sm text-red-600">{validationErrors.password}</p>
-                  )}
+                  {validationErrors.password && <p className="error-msg">{validationErrors.password}</p>}
                 </div>
-                <button
-                  type="submit"
-                  className="w-full py-2 px-4 bg-blue hover:bg-blue-dark text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue"
-                >
+                <button type="submit" className="primary-btn w-full">
                   Login
                 </button>
               </form>

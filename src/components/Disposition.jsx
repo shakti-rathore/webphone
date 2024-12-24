@@ -125,9 +125,8 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
                 type="button"
                 onClick={submitForm}
                 disabled={isSubmitting}
-                className={`
-                 sm:w-auto px-4 py-2 rounded-md text-sm sm:text-base transition-all duration-300
-                ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue hover:bg-blue-dark text-white'}
+                className={`primary-btn
+                ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : ''}
               `}
               >
                 {isSubmitting ? 'Submitting...' : 'Submit'}

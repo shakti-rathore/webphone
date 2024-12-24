@@ -70,7 +70,7 @@ const BreakDropdown = () => {
 
   const buttonClassName =
     selectedBreak === 'Break'
-      ? 'px-4 py-2 text-white bg-blue rounded-md hover:bg-blue-dark focus:outline-none'
+      ? 'primary-btn'
       : `px-4 py-2 text-white bg-${
           breakTypes.find((b) => b.type === selectedBreak)?.color
         } rounded-md focus:outline-none`;
@@ -82,12 +82,15 @@ const BreakDropdown = () => {
       </button>
 
       {isOpen && selectedBreak === 'Break' && (
-        <ul ref={dropdownRef} className="absolute z-10 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg">
+        <ul
+          ref={dropdownRef}
+          className="absolute z-10 mt-2 w-48 bg-white border dark:bg-black/50 dark:text-white dark:border-[#999] border-gray-200 rounded-md shadow-lg"
+        >
           {breakTypes.map(({ type, label, color }) => (
             <li
               key={type}
               onClick={() => sendBreakSelection(type)}
-              className="px-4 py-2 cursor-pointer hover:bg-gray-100 flex justify-between items-center group"
+              className="px-4 py-2 cursor-pointer hover:bg-gray-100 hover:dark:bg-gray-600 flex justify-between items-center group"
             >
               {label}
             </li>

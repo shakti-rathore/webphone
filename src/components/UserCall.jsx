@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { InputField } from './table/InputField';
 
 const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
   const [formData, setFormData] = useState({
@@ -86,161 +87,104 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
 
   return (
     <div
-      className={`${(!userCallOpen && 'max-w-lg mx-auto p-3 bg-white shadow-md rounded-md dark:bg-[#333]') || 'p-3'}`}
+      className={`${
+        (!userCallOpen &&
+          'max-w-lg p-3 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] dark:bg-[#333]') ||
+        'p-3'
+      }`}
     >
-      {(!userCallOpen && (
-        <h2 className="md:text-xl text-base font-semibold text-gray-900 dark:text-white">User Details</h2>
-      )) ||
-        ''}
       <form>
         <div className="grid grid-cols-2 gap-2 md:gap-4">
-          {/* First Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-white">First Name</label>
-            <input
-              type="text"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-            />
-          </div>
-
-          {/* Last Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-white">Last Name</label>
-            <input
-              type="text"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-            />
-          </div>
-
-          {/* Mobile Number */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-white">Mobile Number</label>
-            <input
-              type="text"
-              name="number"
-              value={formData.number}
-              onChange={handleChange}
-              placeholder="Primary Number"
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-            />
-          </div>
-
-          {/* Alternate Number */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-white">Alternate Number</label>
-            <input
-              type="text"
-              name="alternateNumber"
-              value={formData.alternateNumber}
-              onChange={handleChange}
-              placeholder="Alternate"
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-            />
-          </div>
-
-          {/* Address */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-white">Address</label>
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              placeholder="Address Line 1"
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-            />
-          </div>
-
-          {/* State */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-white">State</label>
-            <input
-              type="text"
-              name="state"
-              value={formData.state}
-              onChange={handleChange}
-              placeholder="State"
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-            />
-          </div>
-
-          {/* District */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-white">District</label>
-            <input
-              type="text"
-              name="district"
-              value={formData.district}
-              onChange={handleChange}
-              placeholder="District"
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-            />
-          </div>
-
-          {/* City */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-white">City</label>
-            <input
-              type="text"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              placeholder="City"
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-            />
-          </div>
-
-          {/* Postal Code */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-white">Postal Code</label>
-            <input
-              type="text"
-              name="postalCode"
-              value={formData.postalCode}
-              onChange={handleChange}
-              placeholder="Postal Code"
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-white">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email Address"
-              className="w-full h-10 sm:h-11 dark:border-[#999] dark:text-white px-3 text-sm sm:text-base border dark:bg-black/50 rounded-md outline-none"
-            />
-          </div>
+          <InputField
+            label="First Name"
+            type="text"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+          />
+          <InputField label="Last Name" type="text" name="lastName" value={formData.lastName} onChange={handleChange} />
+          <InputField
+            label="Mobile Number"
+            type="text"
+            name="number"
+            value={formData.number}
+            onChange={handleChange}
+            placeholder="Enter Primary Number"
+          />
+          <InputField
+            label="Alternate Number"
+            type="text"
+            name="alternateNumber"
+            value={formData.alternateNumber}
+            onChange={handleChange}
+            placeholder="Enter Alternate Number"
+          />
+          <InputField
+            label="Address"
+            type="text"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            placeholder="Enter Address Line 1"
+          />
+          <InputField
+            label="State"
+            type="text"
+            name="state"
+            value={formData.state}
+            onChange={handleChange}
+            placeholder="Enter State"
+          />
+          <InputField
+            label="District"
+            type="text"
+            name="district"
+            value={formData.district}
+            onChange={handleChange}
+            placeholder="Enter District"
+          />
+          <InputField
+            label="City"
+            type="text"
+            name="city"
+            value={formData.city}
+            onChange={handleChange}
+            placeholder="Enter City"
+          />
+          <InputField
+            label="Postal Code"
+            type="text"
+            name="postalCode"
+            value={formData.postalCode}
+            onChange={handleChange}
+            placeholder="Enter Postal Code"
+          />
+          <InputField
+            label="Email"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Enter Email Address"
+          />
         </div>
 
-        {/* Comment Field */}
         <div className="mt-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-white">Comment</label>
+          <label className="input-label">Comment</label>
           <textarea
             name="comment"
             value={formData.comment}
             onChange={handleChange}
-            placeholder="Your comment here!"
-            className="mt-1 p-2 border rounded-md w-full outline-none dark:bg-black/50 dark:text-white dark:border-[#999]"
+            placeholder="Enter Your comment here!"
+            className="input-box"
           />
         </div>
 
-        {/* Submit Button */}
         <button
           type="button"
           onClick={handleCall}
-          className={`mt-2 w-full py-2 px-4 rounded-md text-white transition ${
-            loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue hover:bg-blue-dark'
+          className={`primary-btn w-full sm:mt-4 mt-2 ${
+            loading ? 'bg-gray-400 cursor-not-allowed' : ''
           }`}
           disabled={loading}
         >

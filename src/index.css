@@ -2,6 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+.input-label {
+  @apply block mb-2 font-medium leading-5 text-start capitalize text-gray-700 dark:text-white;
+}
+
+.input-box {
+  @apply border border-gray-300 bg-white placeholder:capitalize dark:border-[#4D4D4D] dark:placeholder:text-white dark:bg-transparent focus:border-primary outline-none block w-full p-2.5 leading-5 text-gray-700 dark:text-white rounded-md;
+}
+
+.error-msg {
+  @apply text-start whitespace-nowrap text-sm text-red-500 mt-1 capitalize;
+}
+
+.primary-btn {
+  @apply md:text-base text-sm bg-primary dark:bg-[#001750] dark:border-[#001750] dark:hover:text-white text-white px-5 py-2 rounded-md font-medium cursor-pointer hover:!bg-transparent hover:text-primary transition-all duration-500 border-primary border focus:outline-none outline-none;
+}
+
+.primary-btn-outline {
+  @apply md:text-base text-sm bg-white dark:bg-transparent text-primary dark:border-[#001750] dark:text-white dark:hover:bg-[#001750] px-5 py-2 rounded-md font-medium cursor-pointer hover:bg-primary hover:text-white transition-all duration-500 border-primary border focus:outline-none;
+}
+
+.secondary-btn {
+  @apply md:text-base text-sm bg-slate-600 text-white px-5 py-2 rounded-md hover:bg-slate-700 font-medium cursor-pointer me-2;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 4px;

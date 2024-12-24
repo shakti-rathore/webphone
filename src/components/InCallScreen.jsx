@@ -37,10 +37,10 @@ const InCallScreen = ({
       <audio id="ringtoneII" autoPlay hidden={true} src="ringtone.mp3" />
       <div className="flex flex-col items-center w-full max-w-72 p-6 bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className={`flex flex-col items-center ${showKeyPad ? '' : 'mb-24'}`}>
-          <div className="w-12 h-12 rounded-full bg-blue-dark flex items-center justify-center mb-4">
+          <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center mb-4">
             <BsPersonFill className="text-white text-2xl" />
           </div>
-          <div className="text-2xl font-bold text-blue-dark mb-2">{formatPhoneNumber(phoneNumber)}</div>
+          <div className="text-2xl font-bold text-primary mb-2">{formatPhoneNumber(phoneNumber)}</div>
           {!isRunning ? (
             <span className="text-gray-500">Calling...</span>
           ) : (
@@ -73,10 +73,10 @@ const InCallScreen = ({
             </div>
           ) : (
             <div className="flex flex-col items-center mb-4 relative">
-              <div className="text-xl font-bold text-blue-dark mb-2">{currNum}</div>
+              <div className="text-xl font-bold text-primary mb-2">{currNum}</div>
               <KeyPad setPhoneNumber={setCurrNum} />
               <div
-                className="flex items-center justify-center mt-4 text-blue-dark cursor-pointer absolute -top-6 right-1"
+                className="flex items-center justify-center mt-4 text-primary cursor-pointer absolute -top-6 right-1"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={() => {
