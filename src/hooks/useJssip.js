@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStopwatch } from 'react-timer-hook';
 import JsSIP from 'jssip';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const useJssip = () => {
   const { setHistory, username, password } = useContext(HistoryContext);
@@ -468,124 +469,119 @@ const useJssip = () => {
   };
 
   useEffect(() => {
-    try {
-      var socket = new JsSIP.WebSocketInterface('wss://callapp.iotcom.io:8089/ws');
-      var configuration = {
-        sockets: [socket],
-        session_timers: false,
-        uri: `${username.replace('@', '-')}@callapp.iotcom.io:8089`,
-        password: password,
-      };
+    const initializeJsSIP = () => {
+      try {
+        var socket = new JsSIP.WebSocketInterface('wss://callapp.iotcom.io:8089/ws');
+        var configuration = {
+          sockets: [socket],
+          session_timers: false,
+          uri: `${username.replace('@', '-')}@callapp.iotcom.io:8089`,
+          password: password,
+        };
 
-      var ua = new JsSIP.UA(configuration);
-      ua.start();
-      ua.on('newRTCSession', function (e) {
-        console.log(e.session.direction);
-        console.log(e.session);
-        console.log(e.session.direction);
-        if (e.session.direction === 'incoming') {
-          const incomingnumber = e.request.from._uri._user;
-          const isdialing = localStorage.getItem('dialing');
-          console.log('isdialing', isdialing);
-          if (isdialing === null || isdialing === 'false') {
-            console.log('handle fresh incoming call');
-            setStatus('Incalling');
-            setSession(e.session);
-            e.session.once('failed', (e) => {
-              console.log('Call failed local event');
-              setHistory((prev) => [
-                ...prev.slice(0, -1),
-                { ...prev[prev.length - 1], end: new Date().getTime(), status: 'Fail' },
-              ]);
-              pause();
-              setStatus('start');
-              setPhoneNumber('');
-              fetch(`https://callapp.iotcom.io/user/callended${username}`, {
-                method: 'POST',
-              }).then(() => {
-                console.log('call ended API Called');
-                fetch(`https://callapp.iotcom.io/user/disposition${username}`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    bridgeID: 'web-phone-test',
-                    Disposition: 'Webponecall',
-                  }),
-                }).then(() => {
-                  console.log('dispo req send to server');
-                });
-              });
-            });
-            reset();
-            setHistory((prev) => {
-              setPhoneNumber(incomingnumber);
-              console.log('phoneNumber', incomingnumber);
-              return [
-                ...prev,
-                {
-                  phoneNumber: incomingnumber,
-                  type: 'incoming',
-                  status: 'Success',
-                  start: new Date().getTime(),
-                  startTime: new Date(),
-                },
-              ];
-            });
+        var ua = new JsSIP.UA(configuration);
+        ua.start();
+
+        ua.on('newRTCSession', function (e) {
+          console.log('Session Direction:', e.session.direction);
+
+          if (e.session.direction === 'incoming') {
+            handleIncomingCall(e.session, e.request);
           } else {
-            e.session.answer();
             setSession(e.session);
-            reset();
-            setStatus('calling');
-            localStorage.setItem('dialing', false);
-            answercall();
-            setHistory((prev) => {
-              setPhoneNumber(incomingnumber);
-              console.log('phoneNumber', incomingnumber);
-              return [
-                ...prev,
-                {
-                  phoneNumber: incomingnumber,
-                  type: 'incoming',
-                  status: 'Success',
-                  start: new Date().getTime(),
-                  startTime: new Date(),
-                },
-              ];
-            });
-
             e.session.connection.addEventListener('addstream', (event) => {
               audioRef.current.srcObject = event.stream;
             });
-            e.session.once('ended', (e) => {
-              console.log('Call ended local event');
-              setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
-              pause();
-              setStatus('start');
-              setPhoneNumber('');
-              setDispositionModal(true);
-              console.log('bridge id', bridgeID);
-            });
           }
-        } else {
-          setSession(e.session);
-          e.session.connection.addEventListener('addstream', (event) => {
-            audioRef.current.srcObject = event.stream;
-          });
-        }
+        });
+
+        setUa(ua);
+      } catch (error) {
+        console.error('Error initializing JsSIP:', error);
+        toast.error('You Are Logout');
+        navigate('/webphone/login');
+      }
+    };
+
+    const handleIncomingCall = (session, request) => {
+      const incomingNumber = request.from._uri._user;
+      const isDialing = localStorage.getItem('dialing');
+
+      if (!isDialing || isDialing === 'false') {
+        console.log('Handling fresh incoming call');
+        setStatus('Incalling');
+        setSession(session);
+
+        session.once('failed', () => {
+          console.log('Call failed');
+          handleCallFailed();
+        });
+
+        reset();
+        setHistory((prev) => [
+          ...prev,
+          {
+            phoneNumber: incomingNumber,
+            type: 'incoming',
+            status: 'Success',
+            start: new Date().getTime(),
+            startTime: new Date(),
+          },
+        ]);
+      } else {
+        session.answer();
+        handleActiveCall(session, incomingNumber);
+      }
+    };
+
+    const handleCallFailed = () => {
+      setHistory((prev) => [
+        ...prev.slice(0, -1),
+        { ...prev[prev.length - 1], end: new Date().getTime(), status: 'Fail' },
+      ]);
+      pause();
+      setStatus('start');
+      setPhoneNumber('');
+    };
+
+    const handleActiveCall = (session, number) => {
+      setSession(session);
+      reset();
+      setStatus('calling');
+      localStorage.setItem('dialing', false);
+      answercall();
+      setHistory((prev) => [
+        ...prev,
+        {
+          phoneNumber: number,
+          type: 'incoming',
+          status: 'Success',
+          start: new Date().getTime(),
+          startTime: new Date(),
+        },
+      ]);
+
+      session.connection.addEventListener('addstream', (event) => {
+        audioRef.current.srcObject = event.stream;
       });
 
-      setUa(ua);
-    } catch (e) {
-      console.error(e);
-      navigate('/webphone/login');
-    }
+      session.once('ended', () => {
+        console.log('Call ended');
+        handleCallEnded();
+      });
+    };
+
+    const handleCallEnded = () => {
+      setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
+      pause();
+      setStatus('start');
+      setPhoneNumber('');
+      setDispositionModal(true);
+    };
 
     const enumerateDevices = async () => {
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true });
-
         const devices = await navigator.mediaDevices.enumerateDevices();
         const audioDevices = devices.filter((device) => device.kind === 'audioinput');
         setDevices(audioDevices);
@@ -598,6 +594,7 @@ const useJssip = () => {
       }
     };
 
+    initializeJsSIP();
     enumerateDevices();
 
     navigator.mediaDevices.addEventListener('devicechange', enumerateDevices);
@@ -605,7 +602,7 @@ const useJssip = () => {
     return () => {
       navigator.mediaDevices.removeEventListener('devicechange', enumerateDevices);
     };
-  }, []);
+  }, [username, password, navigate]);
 
   const handleCall = () => {
     if (phoneNumber) {
