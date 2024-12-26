@@ -10,14 +10,12 @@ const TopBar = () => {
 
   const navLinks = useMemo(
     () => [
-      // { path: '/dashboard', label: 'Dashboard' },
-      // { path: '/campaign', label: 'Campaign' },
-      // { path: '/campaign-details', label: 'Campaign Details' },
+      // { path: '/webphone/dashboard', label: 'Dashboard' },
+      // { path: '/webphone/campaign', label: 'Campaign' },
+      // { path: '/webphone/campaign-details', label: 'Campaign' },
     ],
     []
   );
-
-  const isActive = (path) => location.pathname === path;
 
   return (
     <header className="bg-white h-16 flex items-center p-4 justify-between dark:bg-[#1a1a1a] border-b dark:border-[#333] border-[#ddd] sticky top-0 z-50">
@@ -29,7 +27,7 @@ const TopBar = () => {
 
       <ul className="flex gap-x-6">
         {navLinks.map(({ path, label }) => (
-          <NavLink key={path} path={path} label={label} isActive={isActive(path)} />
+          <NavLink key={path} path={path} label={label} />
         ))}
       </ul>
 
@@ -41,10 +39,10 @@ const TopBar = () => {
   );
 };
 
-const NavLink = ({ path, label, isActive }) => (
+const NavLink = ({ path, label }) => (
   <li
-    className={`hover:text-blue transition-colors dark:hover:text-[#00498e] ${
-      isActive ? 'text-blue dark:text-[#00498e]' : 'text-black dark:text-white'
+    className={`hover:text-primary transition-colors dark:hover:text-[#00498e] ${
+      location.pathname === path ? 'text-primary dark:text-[#00498e]' : 'text-black dark:text-white'
     }`}
   >
     <Link to={path}>{label}</Link>

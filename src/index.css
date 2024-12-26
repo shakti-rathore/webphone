@@ -7,7 +7,7 @@
 }
 
 .input-box {
-  @apply border border-gray-300 bg-white placeholder:capitalize dark:border-[#4D4D4D] dark:placeholder:text-white dark:bg-transparent focus:border-primary outline-none block w-full p-2.5 leading-5 text-gray-700 dark:text-white rounded-md;
+  @apply border border-gray-300 bg-white placeholder:capitalize dark:border-[#4D4D4D] dark:placeholder:text-white dark:bg-transparent focus:border-primary outline-none block w-full p-2.5 leading-5 text-gray-700 dark:text-white rounded-md capitalize;
 }
 
 .error-msg {

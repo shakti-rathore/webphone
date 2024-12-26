@@ -97,12 +97,14 @@ function Campaign() {
         submitButtonText="Delete"
         submitButtonClassName="bg-red-500 hover:bg-red-600 text-white"
       >
-        <p className="text-gray-700 dark:text-gray-300 p-4 text-center">Are you sure you want to delete this campaign? </p>
+        <p className="text-gray-700 dark:text-gray-300 p-4 text-center">
+          Are you sure you want to delete this campaign?{' '}
+        </p>
       </Modal>
 
       <div className="text-end mb-4">
         <button
-          className="py-2 px-4 bg-blue hover:bg-blue-dark text-white font-medium rounded-md shadow-sm outline-none"
+          className="primary-btn"
           onClick={() => {
             setEditingCampaign(null);
             setAddCampaign(!addCampaign);

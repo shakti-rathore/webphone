@@ -9,7 +9,7 @@ const ALIGNMENT_CLASSES = {
   start: 'text-start',
 };
 
-const CommonTable = ({ title, data, columns, align = 'start', loading }) => {
+const CommonTable = ({ button, data, columns, align = 'start', loading }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
@@ -153,9 +153,7 @@ const CommonTable = ({ title, data, columns, align = 'start', loading }) => {
     <>
       <div className="space-y-4 bg-white shadow-md md:p-3 p-2 rounded-md dark:bg-[#1F1F1F]">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center md:gap-4">
-          <h2 className="font-semibold leading-5 text-start capitalize text-2xl text-gray-900 dark:text-white">
-            {title}
-          </h2>
+
           <div className="relative">
             <BiSearchAlt2 className="absolute top-[50%] left-2 transform -translate-y-1/2 text-xl text-gray-500 dark:text-white" />
             <input
@@ -165,9 +163,10 @@ const CommonTable = ({ title, data, columns, align = 'start', loading }) => {
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search..."
               aria-label="Search"
-              className="w-full pl-8 outline-none border p-1 rounded-md dark:bg-[#080E1C] dark:text-white dark:border-[#999] border-[#ddd]"
-            />
+              className="input-box !pl-8"
+              />
           </div>
+              {button}
         </div>
         <div className="overflow-x-auto">
           {loading ? (

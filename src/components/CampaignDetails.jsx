@@ -10,6 +10,7 @@ const CampaignDetails = () => {
   const [visibleFields, setVisibleFields] = useState([]);
   const [loading, setLoading] = useState(false);
   const [campaignDetails, setCampaignDetails] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -17,10 +18,21 @@ const CampaignDetails = () => {
         const response = await axios.get('http://localhost:5000/api/campaign');
         const campaignData = response.data.data.map((item) => ({
           name: item.data.campaignFields.campaignName,
-          fields: item.data.campaignFields.fields.map((field) => ({
-            ...field,
-            visible: field.condition.dependentField ? false : field.visible,
-          })),
+          fields: [
+            ...item.data.campaignFields.fields.map((field) => ({
+              ...field,
+              visible: field.condition.dependentField ? false : field.visible,
+            })),
+            {
+              id: 'status',
+              label: 'status',
+              type: 'select',
+              options: ['approved', 'rejected', 'pending'],
+              visible: true,
+              condition: { dependentField: null },
+              required: true,
+            },
+          ],
         }));
 
         setCampaigns(campaignData);
@@ -37,6 +49,27 @@ const CampaignDetails = () => {
     fetchCampaigns();
   }, []);
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    visibleFields.forEach((field) => {
+      if (field.visible && field.required) {
+        if (!formData[field.id] || formData[field.id].trim() === '') {
+          newErrors[field.id] = `${field.label} is required`;
+        }
+      }
+      if (
+        field.id === 'status' &&
+        (!formData.status || !['approved', 'rejected', 'pending'].includes(formData.status))
+      ) {
+        newErrors.status = 'Please select a valid status';
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const evaluateCondition = (dependentValue, operator, value) => {
     switch (operator) {
       case 'equals':
@@ -51,8 +84,8 @@ const CampaignDetails = () => {
   const handleCampaignChange = (e) => {
     const selected = campaigns.find((campaign) => campaign.name === e.target.value);
     setSelectedCampaign(selected.name);
-
     setFormData({});
+    setErrors({});
     setVisibleFields(
       selected.fields.map((field) => ({
         ...field,
@@ -64,6 +97,11 @@ const CampaignDetails = () => {
   const handleInputChange = (id, value) => {
     const updatedFormData = { ...formData, [id]: value };
     setFormData(updatedFormData);
+
+    // Clear error when field is filled
+    if (errors[id]) {
+      setErrors({ ...errors, [id]: undefined });
+    }
 
     const updatedFields = visibleFields.map((field) => {
       if (field.condition && field.condition.dependentField) {
@@ -84,17 +122,14 @@ const CampaignDetails = () => {
   };
 
   const handleSubmit = async () => {
+    if (!validateForm()) {
+      toast.error('Please fill the form submitting');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const requiredFieldsMissing = visibleFields.filter((field) => field.visible).some((field) => !formData[field.id]);
-
-      if (requiredFieldsMissing) {
-        toast.error('Please fill in all visible fields');
-        setLoading(false);
-        return;
-      }
-
       const labelBasedFormData = Object.keys(formData).reduce((acc, fieldId) => {
         const field = visibleFields.find((f) => String(f.id) === String(fieldId));
 
@@ -115,6 +150,7 @@ const CampaignDetails = () => {
       toast.success('Campaign data saved successfully!');
 
       setFormData({});
+      setErrors({});
       setVisibleFields(
         visibleFields.map((field) => ({
           ...field,
@@ -134,56 +170,69 @@ const CampaignDetails = () => {
       case 'text':
       case 'number':
         return (
-          <input
-            type={field.type}
-            id={field.id}
-            value={formData[field.id] || ''}
-            onChange={(e) => handleInputChange(field.id, e.target.value)}
-            className="w-full p-2 border rounded-md outline-none"
-          />
+          <div>
+            <input
+              type={field.type}
+              id={field.id}
+              value={formData[field.id] || ''}
+              onChange={(e) => handleInputChange(field.id, e.target.value)}
+              className={`input-box ${errors[field.id] ? 'border-red-500' : ''}`}
+            />
+            {errors[field.id] && <p className="text-red-500 text-sm mt-1">{errors[field.id]}</p>}
+          </div>
         );
       case 'textarea':
         return (
-          <textarea
-            id={field.id}
-            value={formData[field.id] || ''}
-            onChange={(e) => handleInputChange(field.id, e.target.value)}
-            className="w-full p-2 border rounded-md outline-none"
-            rows="3"
-          />
+          <div>
+            <textarea
+              id={field.id}
+              value={formData[field.id] || ''}
+              onChange={(e) => handleInputChange(field.id, e.target.value)}
+              className={`input-box ${errors[field.id] ? 'border-red-500' : ''}`}
+              rows="3"
+            />
+            {errors[field.id] && <p className="text-red-500 text-sm mt-1">{errors[field.id]}</p>}
+          </div>
         );
       case 'select':
         return (
-          <select
-            id={field.id}
-            value={formData[field.id] || ''}
-            onChange={(e) => handleInputChange(field.id, e.target.value)}
-            className="w-full p-2 border rounded-md outline-none capitalize"
-          >
-            <option value="">Select an option</option>
-            {field.options.map((option, index) => (
-              <option key={index} value={option} className="capitalize">
-                {option}
+          <div>
+            <select
+              id={field.id}
+              value={formData[field.id] || ''}
+              onChange={(e) => handleInputChange(field.id, e.target.value)}
+              className={`input-box ${errors[field.id] ? 'border-red-500' : ''}`}
+            >
+              <option value="" className="dark:bg-black/50">
+                Select an option
               </option>
-            ))}
-          </select>
+              {field.options.map((option, index) => (
+                <option key={index} value={option} className="dark:bg-black/50">
+                  {option}
+                </option>
+              ))}
+            </select>
+            {errors[field.id] && <p className="text-red-500 text-sm mt-1">{errors[field.id]}</p>}
+          </div>
         );
       case 'radio':
         return (
           <div>
-            {field.options.map((option, index) => (
-              <label key={index} className="inline-flex items-center mr-4 capitalize">
-                <input
-                  type="radio"
-                  name={field.id}
-                  value={option}
-                  checked={formData[field.id] === option}
-                  onChange={(e) => handleInputChange(field.id, e.target.value)}
-                  className="w-4 h-4 capitalize"
-                />
-                <span className="ml-2 text-sm capitalize">{option}</span>
-              </label>
-            ))}
+            <div className="flex gap-4">
+              {field.options.map((option, index) => (
+                <label key={index} className="!flex !items-center !gap-2 input-label">
+                  <input
+                    type="radio"
+                    name={field.id}
+                    value={option}
+                    checked={formData[field.id] === option}
+                    onChange={(e) => handleInputChange(field.id, e.target.value)}
+                  />
+                  <span className="text-sm capitalize">{option}</span>
+                </label>
+              ))}
+            </div>
+            {errors[field.id] && <p className="text-red-500 text-sm mt-1">{errors[field.id]}</p>}
           </div>
         );
       default:
@@ -191,53 +240,53 @@ const CampaignDetails = () => {
     }
   };
 
+  const handleButtonClick = () => {
+    setCampaignDetails(false);
+  };
+
+  const renderButton = () => (
+    <button className="primary-btn" onClick={handleButtonClick}>
+      Add Campaign
+    </button>
+  );
+
   return (
     <>
-      <div className="text-end mb-4">
-        <button
-          className="py-2 px-4 bg-blue hover:bg-blue-dark text-white font-medium rounded-md shadow-sm outline-none"
-          onClick={() => setCampaignDetails(!campaignDetails)}
-        >
-          {campaignDetails ? 'Add Campaign' : 'Campaign Details'}
-        </button>
-      </div>
       {campaignDetails ? (
-        <CampaignAgentTable />
+        <CampaignAgentTable button={renderButton()} />
       ) : (
-        <div className="p-4 mx-auto bg-white rounded-lg shadow">
-          <h1 className="font-semibold leading-5 text-start capitalize text-2xl text-gray-900 dark:text-white mb-4">
-            Campaign Form
-          </h1>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Select Campaign</label>
-          <select
-            className="w-full p-2 mb-4 border rounded-md outline-none capitalize"
-            value={selectedCampaign}
-            onChange={handleCampaignChange}
-          >
-            {campaigns.map((campaign) => (
-              <option key={campaign.name} value={campaign.name} className="capitalize">
-                {campaign.name}
-              </option>
-            ))}
-          </select>
+        <div className="w-full mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-3">
+          <div className="mb-4 text-end">
+            <button className="primary-btn" onClick={() => setCampaignDetails(true)}>
+              Campaign Details
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-2 md:gap-4">
+            <div>
+              <label className="input-label">Select Campaign</label>
+              <select className="input-box" value={selectedCampaign} onChange={handleCampaignChange}>
+                {campaigns.map((campaign) => (
+                  <option key={campaign.name} value={campaign.name} className="dark:bg-black/50">
+                    {campaign.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {visibleFields.map(
-            (field) =>
-              field.visible && (
-                <div key={field.id} className="mb-4">
-                  <label className="block mb-2 text-sm font-medium text-gray-700 capitalize" htmlFor={field.id}>
-                    {field.label}
-                  </label>
-                  {renderField(field)}
-                </div>
-              )
-          )}
+            {visibleFields.map(
+              (field) =>
+                field.visible && (
+                  <div key={field.id}>
+                    <label className="input-label" htmlFor={field.id}>
+                      {field.label}
+                    </label>
+                    {renderField(field)}
+                  </div>
+                )
+            )}
+          </div>
 
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 rounded-md shadow-sm flex items-center gap-2 hover:bg-blue-dark bg-blue text-white"
-            disabled={loading}
-          >
+          <button onClick={handleSubmit} className="primary-btn mt-4" disabled={loading}>
             {loading ? 'Saving...' : 'Save'}
           </button>
         </div>

@@ -41,7 +41,7 @@ const AppRoutes = () => {
           }
         />
         {/* <Route
-          path="/campaign"
+          path="/webphone/campaign"
           element={
             <HistoryProvider>
               <CommonLayout>
@@ -51,7 +51,7 @@ const AppRoutes = () => {
           }
         /> */}
         {/* <Route
-          path="/campaign-details"
+          path="/webphone/campaign-details"
         element={
             <HistoryProvider>
               <CommonLayout>
