@@ -482,6 +482,12 @@ const useJssip = () => {
         var ua = new JsSIP.UA(configuration);
         ua.start();
 
+        ua.on('newMessage', (e) => {
+          console.log('New message event:', e);
+          connectionTime = Date.now();
+          connectioncheck();
+        });
+
         ua.on('newRTCSession', function (e) {
           console.log('Session Direction:', e.session.direction);
 
@@ -622,6 +628,11 @@ const useJssip = () => {
 
     return () => {
       navigator.mediaDevices.removeEventListener('devicechange', enumerateDevices);
+
+      // Clean up the "newMessage" event listener
+      if (ua) {
+        ua.off('newMessage');
+      }
     };
   }, [username, password, navigate]);
 
