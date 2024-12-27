@@ -482,6 +482,21 @@ const useJssip = () => {
         var ua = new JsSIP.UA(configuration);
         ua.start();
 
+        ua?.on('newMessage', (e) => {
+          console.log('Message event:', e);
+        });
+
+        ua.on('registered', (data) => {
+          console.log('Successfully registered:', data);
+        });
+
+        ua.on('registrationFailed', (data) => {
+          console.error('Registration failed:', data);
+        });
+        ua.on('stopped', (e) => {
+          console.error('stopped', e);
+        });
+
         ua.on('newRTCSession', function (e) {
           console.log('Session Direction:', e.session.direction);
 

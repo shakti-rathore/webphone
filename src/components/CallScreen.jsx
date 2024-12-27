@@ -40,7 +40,7 @@ const CallScreen = ({
             <BsPersonFill className="text-white text-2xl" />
           </div>
           <div className="text-2xl font-bold text-primary mb-2">
-            {(phoneNumber && formatPhoneNumber(phoneNumber)) || userCall?.contactNumber}
+            {(phoneNumber && formatPhoneNumber(phoneNumber)) || userCall && userCall.contactNumber}
           </div>
           {!isRunning ? (
             <span className="text-gray-500">Calling...</span>
