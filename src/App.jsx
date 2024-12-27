@@ -179,6 +179,7 @@ function App() {
                 />
               ) : (
                 <CallScreen
+                  userCall={userCall}
                   reqUnHold={reqUnHold}
                   setCallConference={setCallConference}
                   toggleHold={toggleHold}

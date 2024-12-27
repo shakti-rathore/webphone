@@ -173,7 +173,9 @@ const useJssip = () => {
 
       if (response.status === 200) {
         setBridgeID(response.data.currentcalldata.bridgeID);
-        setUserCall(response.data.contactData);
+        if (response.data.contactData) {
+          setUserCall(response.data.contactData);
+        }
         setConferenceStatus(false);
         console.log('Call unhold successful');
       } else {
