@@ -505,33 +505,54 @@ const useJssip = () => {
 
     const handleIncomingCall = (session, request) => {
       const incomingNumber = request.from._uri._user;
-      const isDialing = localStorage.getItem('dialing');
 
-      if (!isDialing || isDialing === 'false') {
-        console.log('Handling fresh incoming call');
-        setStatus('Incalling');
-        setSession(session);
+      // Automatically answer the call
+      session.answer(options);
 
-        session.once('failed', () => {
-          console.log('Call failed');
-          handleCallFailed();
-        });
+      // Set up the call screen
+      setSession(session);
+      setStatus('calling');
+      reset();
 
-        reset();
+      // Update call history
+      setHistory((prev) => [
+        ...prev,
+        {
+          phoneNumber: incomingNumber,
+          type: 'incoming',
+          status: 'Success',
+          start: new Date().getTime(),
+          startTime: new Date(),
+        },
+      ]);
+
+      // Set up audio stream
+      session.connection.addEventListener('addstream', (event) => {
+        audioRef.current.srcObject = event.stream;
+      });
+
+      // Handle call ending
+      session.once('ended', () => {
+        setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
+        pause();
+        setStatus('start');
+        setPhoneNumber('');
+        setDispositionModal(true);
+      });
+
+      // Handle call failure
+      session.once('failed', () => {
         setHistory((prev) => [
-          ...prev,
-          {
-            phoneNumber: incomingNumber,
-            type: 'incoming',
-            status: 'Success',
-            start: new Date().getTime(),
-            startTime: new Date(),
-          },
+          ...prev.slice(0, -1),
+          { ...prev[prev.length - 1], end: new Date().getTime(), status: 'Fail' },
         ]);
-      } else {
-        session.answer();
-        handleActiveCall(session, incomingNumber);
-      }
+        pause();
+        setStatus('start');
+        setPhoneNumber('');
+      });
+
+      // Get user call data
+      answercall();
     };
 
     const handleCallFailed = () => {

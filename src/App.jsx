@@ -193,21 +193,7 @@ function App() {
                 />
               )
             ) : status === 'Incalling' ? (
-              <InCallScreen
-                isRecording={isRecording}
-                startRecording={startRecording}
-                stopRecording={stopRecording}
-                phoneNumber={phoneNumber}
-                session={session}
-                setPhoneNumber={setPhoneNumber}
-                seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
-                minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
-                isRunning={isRunning}
-                setStatus={setStatus}
-                audioRef={audioRef}
-                devices={devices}
-                selectedDeviceId={selectedDeviceId}
-              />
+              <></>
             ) : (
               <div className="text-center p-4">No content available</div>
             )}
