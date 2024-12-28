@@ -70,40 +70,66 @@ const useJssip = () => {
   };
 
   const connectioncheck = async () => {
-    if (isLogin && username) {
-      try {
-        const response = await Promise.race([
-          fetch('https://callapp.iotcom.io/userconnection', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user: username }),
-          }),
-          new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Timeout')), 3000);
-          }),
-        ]);
+    console.log('Starting connection check...');
 
-        if (response.status === 401) {
-          window.location.href = '/webphone/login';
-          return;
-        }
+    if (!isLogin || !username) {
+      console.log('User is not logged in or username is missing.');
+      return;
+    }
+    try {
+      console.log('Sending connection check request...');
+      const response = await Promise.race([
+        axios.post(
+          'https://callapp.iotcom.io/userconnection',
+          { user: username },
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        ),
+        new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Request Timeout')), 5000);
+        }),
+      ]);
 
-        const data = await response.json();
-        if (data.message === 'ok connection for user') {
-          setTimeoutArray([]);
-        } else if (data.message === 'poor connection problem ,please login again') {
-          setIsLogin(false);
-          localStorage.clear();
-          navigate('/webphone/login');
-          toast.error('Connection lost. Please log in again to continue');
-        }
-      } catch (err) {
-        handleConnectionError(err);
+      console.log('Response received:', response);
+
+      if (response.status === 401) {
+        console.log('Unauthorized response (401), redirecting to login page...');
+        window.location.href = '/webphone/login';
+        return;
       }
+
+      const data = response.data;
+      console.log('Response data:', data);
+
+      if (data.message === 'ok connection for user') {
+        console.log('Connection is okay for the user, clearing timeout array...');
+        setTimeoutArray([]);
+      } else if (data.message === 'poor connection problem ,please login again') {
+        console.log('Poor connection detected, logging user out...');
+        setIsLogin(false);
+        localStorage.clear();
+        window.location.href = '/webphone/login';
+        toast.error('Connection lost. Please log in again to continue');
+      }
+    } catch (err) {
+      if (err.message === 'Request Timeout') {
+        console.error('Request timed out.');
+      } else if (err.message.includes('Network')) {
+        console.error('Network error detected:', err.message);
+      } else {
+        console.error('Error during connection check:', err);
+      }
+
+      handleConnectionError(err);
     }
   };
+
+  window.addEventListener('offline', () => {
+    console.log('Network disconnected.');
+    window.location.href = '/webphone/login';
+    toast.error('Network connection lost. Please check your internet.');
+  });
 
   const handleConnectionError = (err) => {
     if (err.message === 'Timeout') {
@@ -122,20 +148,12 @@ const useJssip = () => {
   useEffect(() => {
     if (username) {
       const url = `https://callapp.iotcom.io/userready/${username}`;
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-        .then((response) => response.json())
-        .then((data) => {
+      axios
+        .post(url, {}, { headers: { 'Content-Type': 'application/json' } })
+        .then((response) => {
+          const data = response.data;
           if (data.message === 'success') {
             setIsLogin(true);
-            keepAliveRef.current = setInterval(() => {
-              ua?.on('newMessage', (e) => {
-                console.log('Message event:', e);
-                connectioncheck();
-              });
-            }, 5000);
           }
         })
         .catch((error) => {
@@ -594,7 +612,7 @@ const useJssip = () => {
       } catch (error) {
         console.error('Error initializing JsSIP:', error);
         toast.error('You Are Logout');
-        navigate('/webphone/login');
+        window.location.href = '/webphone/login';
       }
     };
 
