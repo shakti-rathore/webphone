@@ -7,6 +7,8 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const useJssip = () => {
+
+  console.log('useJssip is called===============>');
   const { setHistory, username, password } = useContext(HistoryContext);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [conferenceNumber, setConferenceNumber] = useState('');
@@ -86,7 +88,7 @@ const useJssip = () => {
           }
         ),
         new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Request Timeout')), 5000);
+          setTimeout(() => reject(new Error('Request Timeout')), 3000);
         }),
       ]);
 
