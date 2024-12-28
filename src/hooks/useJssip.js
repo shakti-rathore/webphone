@@ -24,7 +24,6 @@ const useJssip = () => {
   const [dispositionModal, setDispositionModal] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const [timeoutArray, setTimeoutArray] = useState([]);
-  const keepAliveRef = useRef(null);
   const agentSocketRef = useRef(null);
   const customerSocketRef = useRef(null);
   const agentMediaRecorderRef = useRef(null);
@@ -98,7 +97,7 @@ const useJssip = () => {
           setIsLogin(false);
           localStorage.clear();
           navigate('/webphone/login');
-          clearInterval(keepAliveRef.current);
+          toast.error('Connection lost. Please log in again to continue');
         }
       } catch (err) {
         handleConnectionError(err);
@@ -114,7 +113,6 @@ const useJssip = () => {
 
       if (newTimeoutArray.length > 2) {
         setIsLogin(false);
-        clearInterval(keepAliveRef.current);
       }
     } else {
       console.error('Error during connection check:', err);
@@ -144,12 +142,6 @@ const useJssip = () => {
           console.error('Error sending login request:', error);
         });
     }
-
-    return () => {
-      if (keepAliveRef.current) {
-        clearInterval(keepAliveRef.current);
-      }
-    };
   }, [username]);
 
   const initializeWebSocketTranscription = () => {
