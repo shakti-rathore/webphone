@@ -38,13 +38,9 @@ function App() {
     dispositionModal,
     setDispositionModal,
     userCall,
-    ua,
   ] = useJssip();
   const [seeLogs, setSeeLogs] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
   const [callConference, setCallConference] = useState(false);
-  const [timeoutArray, setTimeoutArray] = useState([]);
-  const keepAliveRef = useRef(null);
   const { username } = useContext(HistoryContext);
 
   useEffect(() => {
@@ -52,86 +48,6 @@ function App() {
       stopRecording();
     }
   }, [status]);
-
-  const connectioncheck = async () => {
-    if (isLogin && username) {
-      try {
-        const response = await Promise.race([
-          fetch('https://callapp.iotcom.io/userconnection', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user: username }),
-          }),
-          new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Timeout')), 3000);
-          }),
-        ]);
-
-        if (response.status === 401) {
-          window.location.href = '/webphone/login';
-          return;
-        }
-
-        const data = await response.json();
-        if (data.message === 'ok connection for user') {
-          setTimeoutArray([]);
-        } else if (data.message === 'poor connection problem ,please login again') {
-          setIsLogin(false);
-          clearInterval(keepAliveRef.current);
-        }
-      } catch (err) {
-        handleConnectionError(err);
-      }
-    }
-  };
-
-  const handleConnectionError = (err) => {
-    if (err.message === 'Timeout') {
-      const timeout = { timeout: true };
-      const newTimeoutArray = [...timeoutArray, timeout];
-      setTimeoutArray(newTimeoutArray);
-
-      if (newTimeoutArray.length > 2) {
-        setIsLogin(false);
-        clearInterval(keepAliveRef.current);
-      }
-    } else {
-      console.error('Error during connection check:', err);
-    }
-  };
-
-  useEffect(() => {
-    if (username) {
-      const url = `https://callapp.iotcom.io/userready/${username}`;
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.message === 'success') {
-            setIsLogin(true);
-            keepAliveRef.current = setInterval(() => {
-              ua?.on('newMessage', (e) => {
-                console.log('Message event:', e);
-                connectioncheck();
-              });
-            }, 5000);
-          }
-        })
-        .catch((error) => {
-          console.error('Error sending login request:', error);
-        });
-    }
-
-    return () => {
-      if (keepAliveRef.current) {
-        clearInterval(keepAliveRef.current); 
-      }
-    };
-  }, [username]);
 
   function handleCalls() {
     createConferenceCall();

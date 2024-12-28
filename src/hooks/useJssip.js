@@ -22,6 +22,9 @@ const useJssip = () => {
   const [isHeld, setIsHeld] = useState(false);
   const [conferenceStatus, setConferenceStatus] = useState(false);
   const [dispositionModal, setDispositionModal] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
+  const [timeoutArray, setTimeoutArray] = useState([]);
+  const keepAliveRef = useRef(null);
   const agentSocketRef = useRef(null);
   const customerSocketRef = useRef(null);
   const agentMediaRecorderRef = useRef(null);
@@ -66,6 +69,88 @@ const useJssip = () => {
       setStatus('calling');
     }
   };
+
+  const connectioncheck = async () => {
+    if (isLogin && username) {
+      try {
+        const response = await Promise.race([
+          fetch('https://callapp.iotcom.io/userconnection', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user: username }),
+          }),
+          new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Timeout')), 3000);
+          }),
+        ]);
+
+        if (response.status === 401) {
+          window.location.href = '/webphone/login';
+          return;
+        }
+
+        const data = await response.json();
+        if (data.message === 'ok connection for user') {
+          setTimeoutArray([]);
+        } else if (data.message === 'poor connection problem ,please login again') {
+          setIsLogin(false);
+          localStorage.clear();
+          navigate('/webphone/login');
+          clearInterval(keepAliveRef.current);
+        }
+      } catch (err) {
+        handleConnectionError(err);
+      }
+    }
+  };
+
+  const handleConnectionError = (err) => {
+    if (err.message === 'Timeout') {
+      const timeout = { timeout: true };
+      const newTimeoutArray = [...timeoutArray, timeout];
+      setTimeoutArray(newTimeoutArray);
+
+      if (newTimeoutArray.length > 2) {
+        setIsLogin(false);
+        clearInterval(keepAliveRef.current);
+      }
+    } else {
+      console.error('Error during connection check:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (username) {
+      const url = `https://callapp.iotcom.io/userready/${username}`;
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message === 'success') {
+            setIsLogin(true);
+            keepAliveRef.current = setInterval(() => {
+              ua?.on('newMessage', (e) => {
+                console.log('Message event:', e);
+                connectioncheck();
+              });
+            }, 5000);
+          }
+        })
+        .catch((error) => {
+          console.error('Error sending login request:', error);
+        });
+    }
+
+    return () => {
+      if (keepAliveRef.current) {
+        clearInterval(keepAliveRef.current);
+      }
+    };
+  }, [username]);
 
   const initializeWebSocketTranscription = () => {
     const createWebSocket = (isAgent = true) => {
@@ -486,6 +571,7 @@ const useJssip = () => {
 
         ua?.on('newMessage', (e) => {
           console.log('Message event:', e);
+          connectioncheck();
         });
 
         ua.on('registered', (data) => {
@@ -697,7 +783,6 @@ const useJssip = () => {
     dispositionModal,
     setDispositionModal,
     userCall,
-    ua,
   ];
 };
 
