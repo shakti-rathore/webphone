@@ -73,7 +73,6 @@ const useJssip = () => {
     console.log('Starting connection check...');
 
     if (!isLogin || !username) {
-      console.log('User is not logged in or username is missing.');
       return;
     }
     try {
