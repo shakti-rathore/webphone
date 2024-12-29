@@ -7,8 +7,6 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const useJssip = () => {
-
-  console.log('useJssip is called===============>');
   const { setHistory, username, password } = useContext(HistoryContext);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [conferenceNumber, setConferenceNumber] = useState('');
@@ -24,7 +22,6 @@ const useJssip = () => {
   const [isHeld, setIsHeld] = useState(false);
   const [conferenceStatus, setConferenceStatus] = useState(false);
   const [dispositionModal, setDispositionModal] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
   const [timeoutArray, setTimeoutArray] = useState([]);
   const agentSocketRef = useRef(null);
   const customerSocketRef = useRef(null);
@@ -74,9 +71,6 @@ const useJssip = () => {
   const connectioncheck = async () => {
     console.log('Starting connection check...');
 
-    if (!isLogin || !username) {
-      return;
-    }
     try {
       console.log('Sending connection check request...');
       const response = await Promise.race([
@@ -108,7 +102,6 @@ const useJssip = () => {
         setTimeoutArray([]);
       } else if (data.message === 'poor connection problem ,please login again') {
         console.log('Poor connection detected, logging user out...');
-        setIsLogin(false);
         localStorage.clear();
         window.location.href = '/webphone/login';
         toast.error('Connection lost. Please log in again to continue');
@@ -137,10 +130,6 @@ const useJssip = () => {
       const timeout = { timeout: true };
       const newTimeoutArray = [...timeoutArray, timeout];
       setTimeoutArray(newTimeoutArray);
-
-      if (newTimeoutArray.length > 2) {
-        setIsLogin(false);
-      }
     } else {
       console.error('Error during connection check:', err);
     }
@@ -153,9 +142,7 @@ const useJssip = () => {
         .post(url, {}, { headers: { 'Content-Type': 'application/json' } })
         .then((response) => {
           const data = response.data;
-          if (data.message === 'success') {
-            setIsLogin(true);
-          }
+          console.log(data);
         })
         .catch((error) => {
           console.error('Error sending login request:', error);

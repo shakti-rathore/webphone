@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import HistoryContext from '../context/HistoryContext';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { login } from '../utils/apiUtils';
 
 function Login() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -37,7 +36,21 @@ function Login() {
       }
 
       try {
-        const data = await login(username, password);
+        const headers = {
+          'Content-Type': 'application/json',
+        };
+
+        const response = await fetch(`https://callapp.iotcom.io/userlogin/${username}`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Something went wrong!');
+        }
 
         if (data.message === 'wrong login info') {
           toast.error('Incorrect username or password');
@@ -54,7 +67,7 @@ function Login() {
         toast.success('Login successfully');
         navigate('/webphone/dashboard');
       } catch (err) {
-        toast.error('Login failed. Please try again.');
+        toast.error(err.message || 'Login failed. Please try again.');
       }
     },
     [username, password, navigate]
@@ -85,9 +98,7 @@ function Login() {
                     value={username}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue focus:border-blue"
                   />
-                  {validationErrors.username && (
-                    <p className="error-msg">{validationErrors.username}</p>
-                  )}
+                  {validationErrors.username && <p className="error-msg">{validationErrors.username}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700">Password</label>
