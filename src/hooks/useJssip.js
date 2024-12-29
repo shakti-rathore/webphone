@@ -7,6 +7,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const useJssip = () => {
+  console.log("first")
   const { setHistory, username, password } = useContext(HistoryContext);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [conferenceNumber, setConferenceNumber] = useState('');
@@ -29,7 +30,6 @@ const useJssip = () => {
   const customerMediaRecorderRef = useRef(null);
   const audioRef = useRef();
   const chunks = useRef([]);
-
   const { seconds, minutes, isRunning, pause, reset } = useStopwatch({
     autoStart: false,
   });
