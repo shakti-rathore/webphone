@@ -1,44 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import axios from 'axios';
-import toast from 'react-hot-toast';
+import React from 'react';
 import { InputField } from './table/InputField';
 
-const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    number: '',
-    alternateNumber: '',
-    address: '',
-    state: '',
-    district: '',
-    city: '',
-    postalCode: '',
-    email: '',
-    comment: '',
-  });
-
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (userCall) {
-      setFormData((prev) => ({
-        ...prev,
-        firstName: userCall.firstName || '',
-        lastName: userCall.LastName || '',
-        number: userCall.contactNumber || '',
-        alternateNumber: userCall.alternateNumber || '',
-        address: userCall.Contactaddress || '',
-        state: userCall.ContactState || '',
-        district: userCall.ContactDistrict || '',
-        city: userCall.ContactCity || '',
-        postalCode: userCall.ContactPincode || '',
-        email: userCall.emailId || '',
-        comment: userCall.comment || '',
-      }));
-    }
-  }, [userCall]);
-
+const UserCall = ({ formData, setFormData, userCallOpen }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -46,44 +9,6 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
       [name]: value,
     }));
   };
-
-  const handleCall = useCallback(async () => {
-    if (!formData.firstName || !formData.email) {
-      toast.error('First name and email are required.');
-      return;
-    }
-
-    setLoading(true);
-    const payload = {
-      user: username,
-      isFresh: !userCall?.number,
-      data: {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        emailId: formData.email,
-        contactNumber: formData.number,
-        alternateNumber: formData.alternateNumber,
-        Contactaddress: formData.address,
-        ContactCity: formData.city,
-        ContactState: formData.state,
-        ContactPincode: formData.postalCode,
-      },
-    };
-
-    try {
-      const response = await axios.post('https://callapp.iotcom.io/addModifyContact', payload);
-      if (response.data) {
-        toast.success(response.data.message || 'Contact saved successfully.');
-        setUserCallOpen(false);
-      } else {
-        toast.error('Failed to save contact.');
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Error occurred.');
-    } finally {
-      setLoading(false);
-    }
-  }, [formData, userCall]);
 
   return (
     <div
@@ -179,17 +104,6 @@ const UserCall = ({ userCall, username, userCallOpen, setUserCallOpen }) => {
             className="input-box"
           />
         </div>
-
-        <button
-          type="button"
-          onClick={handleCall}
-          className={`primary-btn w-full sm:mt-4 mt-2 ${
-            loading ? 'bg-gray-400 cursor-not-allowed' : ''
-          }`}
-          disabled={loading}
-        >
-          {loading ? 'Submitting...' : 'Submit'}
-        </button>
       </form>
     </div>
   );

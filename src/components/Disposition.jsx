@@ -2,10 +2,10 @@ import React, { useState, useCallback, useContext } from 'react';
 import toast from 'react-hot-toast';
 import HistoryContext from '../context/HistoryContext';
 import axios from 'axios';
-import UserCall from './UserCall';
 import Modal from './table/Modal';
+import UserCall from './UserCall';
 
-const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
+const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData, formData }) => {
   const { username } = useContext(HistoryContext);
   const [selectedAction, setSelectedAction] = useState(null);
   const [isAutoLeadDialDisabled, setIsAutoLeadDialDisabled] = useState(false);
@@ -40,7 +40,7 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
           'Content-Type': 'application/json',
         },
       });
-
+      handleContact();
       if (response.data && response.data.message === 'disposition done sucessfully.') {
         toast.success('Disposition submitted successfully');
         setDispositionModal(false);
@@ -65,16 +65,10 @@ const Disposition = ({ bridgeID, setDispositionModal, userCall }) => {
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 dark:bg-gray-900/60 bg-black/60">
         <Modal isOpen={userCallOpen} onClose={() => setUserCallOpen(false)} title="User Details">
-          <UserCall
-            userCall={userCall}
-            username={username}
-            userCallOpen={userCallOpen}
-            setUserCallOpen={setUserCallOpen}
-          />
+          <UserCall userCallOpen={userCallOpen} formData={formData} setFormData={setFormData} />
         </Modal>
 
         <div className="w-full max-w-xl bg-white shadow-lg rounded-xl dark:bg-[#333] p-3">
-          {/* Action Buttons Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
             {dispositionActions.map((item) => {
               const isSelected = selectedAction === item.action;
