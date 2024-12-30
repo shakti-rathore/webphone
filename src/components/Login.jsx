@@ -10,6 +10,25 @@ function Login() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
+  const checkMicrophoneAccess = async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const hasAudioInput = devices.some(device => device.kind === 'audioinput');
+      
+      if (!hasAudioInput) {
+        toast.error('Please connect a microphone to continue');
+        return false;
+      }
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(track => track.stop());
+      return true;
+    } catch (err) {
+      toast.error('Please connect a microphone to continue');
+      return false;
+    }
+  };
+
   const formValidation = (values) => {
     const errors = {};
 
@@ -32,6 +51,11 @@ function Login() {
       const errors = formValidation({ username, password });
       setValidationErrors(errors);
       if (Object.keys(errors).length > 0) {
+        return;
+      }
+
+      const hasMicrophone = await checkMicrophoneAccess();
+      if (!hasMicrophone) {
         return;
       }
 
