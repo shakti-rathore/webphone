@@ -10,6 +10,7 @@ import Layout from './components/layouts/Layout';
 import CampaignDetails from './components/CampaignDetails';
 import './index.css';
 import AutoDial from './components/AutoDial';
+import BreakDropdown from './components/BreakDropdown';
 
 const AppRoutes = () => {
   const CommonLayout = ({ children }) => (

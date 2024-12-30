@@ -4,6 +4,7 @@ import HistoryContext from '../context/HistoryContext';
 import axios from 'axios';
 import Modal from './table/Modal';
 import UserCall from './UserCall';
+import BreakDropdown from './BreakDropdown';
 
 const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData, formData }) => {
   const { username } = useContext(HistoryContext);
@@ -107,6 +108,7 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
+              <BreakDropdown />
               <button
                 type="button"
                 onClick={() => setUserCallOpen(true)}

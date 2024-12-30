@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from 'react';
 
 // Define a type for the context value (if using TypeScript)
 const HistoryContext = createContext({
@@ -12,20 +12,23 @@ const HistoryContext = createContext({
 
 export const HistoryProvider = ({ children }) => {
   // Retrieve call history from localStorage or initialize as empty array
-  const callHistory = localStorage.getItem("call-history");
+  const callHistory = localStorage.getItem('call-history');
   const initialHistory = callHistory ? JSON.parse(callHistory) : [];
   const [history, setHistory] = useState(initialHistory);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedBreak, setSelectedBreak] = useState('Break'); // Default value for selectedBreak
 
   // Update localStorage whenever history changes
   useEffect(() => {
-    localStorage.setItem("call-history", JSON.stringify(history));
+    localStorage.setItem('call-history', JSON.stringify(history));
   }, [history]);
 
   // Provide context values to children components
   return (
-    <HistoryContext.Provider value={{ history, setHistory, username, setUsername, password, setPassword }}>
+    <HistoryContext.Provider
+      value={{ history, setHistory, username, setUsername, password, setPassword, selectedBreak, setSelectedBreak }}
+    >
       {children}
     </HistoryContext.Provider>
   );

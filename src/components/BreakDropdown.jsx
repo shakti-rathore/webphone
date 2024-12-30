@@ -3,12 +3,16 @@ import axios from 'axios';
 import HistoryContext from '../context/HistoryContext';
 
 const BreakDropdown = () => {
-  const { username } = useContext(HistoryContext);
+  const { username, selectedBreak, setSelectedBreak } = useContext(HistoryContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedBreak, setSelectedBreak] = useState('Break');
   const dropdownRef = useRef(null);
 
   useEffect(() => {
+    const savedBreak = localStorage.getItem('selectedBreak');
+    if (savedBreak) {
+      setSelectedBreak(savedBreak);
+    }
+
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
@@ -27,6 +31,7 @@ const BreakDropdown = () => {
 
       if (response.status === 200) {
         setSelectedBreak('Break');
+        localStorage.removeItem('selectedBreak'); // Remove from localStorage
         setIsOpen(false);
       }
     } catch (error) {
@@ -47,6 +52,7 @@ const BreakDropdown = () => {
 
       if (response.status === 200) {
         setSelectedBreak(breakType);
+        localStorage.setItem('selectedBreak', breakType);
         setIsOpen(false);
       }
     } catch (error) {
