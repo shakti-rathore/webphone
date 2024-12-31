@@ -7,7 +7,6 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const useJssip = () => {
-  console.log("first")
   const { setHistory, username, password } = useContext(HistoryContext);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [conferenceNumber, setConferenceNumber] = useState('');
@@ -69,10 +68,7 @@ const useJssip = () => {
   };
 
   const connectioncheck = async () => {
-    console.log('Starting connection check...');
-
     try {
-      console.log('Sending connection check request...');
       const response = await Promise.race([
         axios.post(
           'https://callapp.iotcom.io/userconnection',
@@ -86,22 +82,17 @@ const useJssip = () => {
         }),
       ]);
 
-      console.log('Response received:', response);
-
-      if (response.status === 401) {
-        console.log('Unauthorized response (401), redirecting to login page...');
+      if (response.status === 401 || !response.data.isUserLogin) {
         window.location.href = '/webphone/login';
+        localStorage.clear();
         return;
       }
 
       const data = response.data;
-      console.log('Response data:', data);
 
       if (data.message === 'ok connection for user') {
-        console.log('Connection is okay for the user, clearing timeout array...');
         setTimeoutArray([]);
       } else if (data.message === 'poor connection problem ,please login again') {
-        console.log('Poor connection detected, logging user out...');
         localStorage.clear();
         window.location.href = '/webphone/login';
         toast.error('Connection lost. Please log in again to continue');
@@ -120,7 +111,6 @@ const useJssip = () => {
   };
 
   window.addEventListener('offline', () => {
-    console.log('Network disconnected.');
     window.location.href = '/webphone/login';
     toast.error('Network connection lost. Please check your internet.');
   });
@@ -142,7 +132,6 @@ const useJssip = () => {
         .post(url, {}, { headers: { 'Content-Type': 'application/json' } })
         .then((response) => {
           const data = response.data;
-          console.log(data);
         })
         .catch((error) => {
           console.error('Error sending login request:', error);
@@ -260,7 +249,6 @@ const useJssip = () => {
           setUserCall(response.data.contactData);
         }
         setConferenceStatus(false);
-        console.log('Call unhold successful');
       } else {
         console.error('Failed to unhold call');
       }
@@ -288,7 +276,6 @@ const useJssip = () => {
           audioRef.current.play();
         }
         setConferenceStatus(false);
-        console.log('Call unhold successful');
       } else {
         console.error('Failed to unhold call');
       }
@@ -446,7 +433,6 @@ const useJssip = () => {
       if (isRecording) {
         stopRecording();
       }
-      console.log('call ended');
       setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
       pause();
       setStatus('start');
@@ -748,7 +734,6 @@ const useJssip = () => {
         },
         body: JSON.stringify({ caller: username, receiver: phoneNumber }),
       }).then(() => {
-        console.log('dial api called');
         answercall();
       });
     }
