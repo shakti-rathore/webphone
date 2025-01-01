@@ -10,9 +10,11 @@ import AutoDial from './components/AutoDial';
 import UserCall from './components/UserCall';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import ringtoneMp3 from './ringtone.mp3';
 
 function App() {
   const [
+    ringtone,
     conferenceStatus,
     reqUnHold,
     conferenceNumber,
@@ -129,7 +131,11 @@ function App() {
           formData={formData}
         />
       )}
-
+      {ringtone.length > 0 && (
+        <audio controls autoPlay hidden>
+          <source src={ringtoneMp3} type="audio/mp3" />
+        </audio>
+      )}
       <div className="w-full mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-3">
         <div className="flex flex-col lg:flex-row items-center gap-5">
           {(status !== 'start' && userCall && (
