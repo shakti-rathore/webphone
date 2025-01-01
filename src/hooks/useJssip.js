@@ -746,7 +746,7 @@ const useJssip = () => {
       if (dispositionModal) {
         try {
           await axios.post(
-            `https://callapp.iotcom.io/user/callendedd${username}`,
+            `https://callapp.iotcom.io/user/callended${username}`,
             {},
             {
               headers: {

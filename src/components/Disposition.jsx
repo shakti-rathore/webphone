@@ -90,9 +90,7 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
             })}
           </div>
 
-          {/* Bottom Section */}
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center border-t pt-3">
-            {/* Checkbox Section */}
             <div className="w-full sm:w-auto">
               <label className="flex items-center space-x-3 cursor-pointer">
                 <input
@@ -106,7 +104,6 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
               </label>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
               <BreakDropdown />
               <button
