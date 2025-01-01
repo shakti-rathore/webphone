@@ -92,6 +92,12 @@ const useJssip = () => {
 
       if (data.message === 'ok connection for user') {
         setTimeoutArray([]);
+        if (data.currentCallqueue.length > 0) {
+          const audio = new Audio('/ringtone.mp3');
+          audio.play().catch((error) => {
+            console.error('Error playing ringtone:', error);
+          });
+        }
       } else if (data.message === 'poor connection problem ,please login again') {
         localStorage.clear();
         window.location.href = '/webphone/login';
@@ -738,6 +744,29 @@ const useJssip = () => {
       });
     }
   };
+
+  useEffect(() => {
+    const callApi = async () => {
+      if (dispositionModal) {
+        try {
+          await axios.post(
+            `https://callapp.iotcom.io/user/callendedd${username}`,
+            {},
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+        } catch (error) {
+          console.error('Error calling callendedd API:', error);
+        }
+      }
+    };
+
+    callApi();
+  }, [dispositionModal, username]);
+
   return [
     conferenceStatus,
     reqUnHold,
