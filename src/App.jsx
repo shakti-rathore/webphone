@@ -138,6 +138,23 @@ function App() {
           <source src={ringtoneMp3} type="audio/mp3" />
         </audio>
       )}
+
+      {ringtone.length > 0 && (
+        <marquee>
+          <div className="text-sm">
+            Call Queue: ({ringtone.length})
+            {ringtone.map((call, index) => (
+              <div
+                key={index}
+                className="p-1 bg-white border border-gray-200 rounded-md shadow-sm flex items-center justify-between"
+              >
+                <p className="text-gray-800">{call.dialNumber},</p>
+              </div>
+            ))}
+          </div>
+        </marquee>
+      )}
+
       <div className="w-full mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-3">
         <div className="flex flex-col lg:flex-row items-center gap-5">
           {(status !== 'start' && userCall && (
