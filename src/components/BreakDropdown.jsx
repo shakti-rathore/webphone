@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import axios from 'axios';
 import HistoryContext from '../context/HistoryContext';
 
-const BreakDropdown = () => {
+const BreakDropdown = ({ breakDropdown }) => {
   const { username, selectedBreak, setSelectedBreak } = useContext(HistoryContext);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -21,9 +21,15 @@ const BreakDropdown = () => {
   }, []);
 
   const removeBreak = async () => {
+    if (breakDropdown) {
+      // If breakDropdown is true, just update the state without API call
+      setSelectedBreak('Break');
+      setIsOpen(false);
+      return;
+    }
+
     try {
       const response = await axios.post(`https://callapp.iotcom.io/user/removebreakuser:${username}`);
-
       if (response.status === 200) {
         setSelectedBreak('Break');
         setIsOpen(false);
@@ -36,6 +42,12 @@ const BreakDropdown = () => {
   const sendBreakSelection = async (breakType) => {
     if (selectedBreak !== 'Break') {
       await removeBreak();
+      return;
+    }
+
+    if (breakDropdown) {
+      setSelectedBreak(breakType);
+      setIsOpen(false);
       return;
     }
 
