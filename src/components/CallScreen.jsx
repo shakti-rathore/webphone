@@ -1,14 +1,19 @@
-import { BsPersonFill, BsMicMute, BsPause, BsCameraVideo, BsPersonPlus } from 'react-icons/bs';
+import { BsPersonFill, BsMicMute, BsPause, BsPersonPlus } from 'react-icons/bs';
 import { IoIosKeypad } from 'react-icons/io';
 import { IoCloseCircleOutline, IoCloseCircle } from 'react-icons/io5';
 import { ImPhoneHangUp } from 'react-icons/im';
 import { FaStopCircle } from 'react-icons/fa';
 import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import KeyPad from './KeyPad';
 import { MdCallMerge } from 'react-icons/md';
+import { FcCallTransfer } from 'react-icons/fc';
+import toast from 'react-hot-toast';
+import HistoryContext from '../context/HistoryContext';
+import axios from 'axios';
 
 const CallScreen = ({
+  conferenceNumber,
   reqUnHold,
   toggleHold,
   isHeld,
@@ -32,6 +37,18 @@ const CallScreen = ({
   const [showKeyPad, setShowKeyPad] = useState(false);
   const [muted, setMuted] = useState(false);
   const formatPhoneNumber = useFormatPhoneNumber();
+  const { username } = useContext(HistoryContext);
+
+  const handleTransfer = async () => {
+    try {
+      const response = await axios.post(`https://callapp.iotcom.io//reqTransfer/${username}`, {});
+      console.log('Response:', response.data);
+      toast.success('Request successful!');
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Request failed. Please try again.');
+    }
+  };
   return (
     <div className="flex flex-col items-center md:justify-center min-h-screen">
       <div className="flex flex-col items-center w-full max-w-72 p-6 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
@@ -39,9 +56,10 @@ const CallScreen = ({
           <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center mb-4">
             <BsPersonFill className="text-white text-2xl" />
           </div>
-          <div className="text-2xl font-bold text-primary mb-2">
-            {(phoneNumber && formatPhoneNumber(phoneNumber)) || userCall && userCall.contactNumber}
-          </div>
+          <marquee className="text-2xl font-bold text-primary mb-2">
+            {(phoneNumber && formatPhoneNumber(phoneNumber)) || (userCall && userCall.contactNumber)}
+            {conferenceNumber && ' Conference with ' + conferenceNumber}
+          </marquee>
           {!isRunning ? (
             <span className="text-gray-500">Calling...</span>
           ) : (
@@ -59,14 +77,26 @@ const CallScreen = ({
                   onClick={toggleHold}
                   disabled={!session}
                   className={`p-4 rounded-full ${isHeld ? 'bg-primary text-white' : 'text-gray-600 dark:text-white'}`}
+                  title="Hold"
                 >
                   <BsPause className="text-3xl" />
                 </button>
-                <button disabled className="p-4 rounded-full text-gray-600 dark:text-white">
-                  <BsCameraVideo className="text-3xl" />
+                <button
+                  disabled={!conferenceNumber}
+                  onClick={handleTransfer}
+                  className={`p-4 rounded-full dark:text-white ${
+                    (conferenceNumber && 'opacity-100') || 'opacity-45'
+                  }`}
+                  title="Call Transfer"
+                >
+                  <FcCallTransfer className="text-3xl" />
                 </button>
 
-                <button className="p-4 text-gray-600 dark:text-white rounded-full" onClick={() => setShowKeyPad(true)}>
+                <button
+                  className="p-4 text-gray-600 dark:text-white rounded-full"
+                  onClick={() => setShowKeyPad(true)}
+                  title="Keypad"
+                >
                   <IoIosKeypad className="text-3xl" />
                 </button>
               </div>
@@ -76,6 +106,7 @@ const CallScreen = ({
                     className="p-4 rounded-full text-gray-600 dark:text-white"
                     disabled={!session}
                     onClick={reqUnHold}
+                    title="Merge"
                   >
                     <MdCallMerge className="text-3xl" />
                   </button>
@@ -84,6 +115,7 @@ const CallScreen = ({
                     className="p-4 rounded-full text-gray-600 dark:text-white"
                     disabled={!session}
                     onClick={() => setCallConference(true)}
+                    title="Call Conference"
                   >
                     <BsPersonPlus className="text-3xl" />
                   </button>
@@ -96,6 +128,7 @@ const CallScreen = ({
                     className={`flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-white rounded-lg transition-opacity focus:outline-none ${
                       !session ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
+                    title="Recording"
                   >
                     <FaStopCircle className="text-3xl text-green-500" />
                   </button>
@@ -114,6 +147,7 @@ const CallScreen = ({
                     muted ? session.unmute() : session.mute();
                     setMuted(!muted);
                   }}
+                  title="Mute"
                 >
                   <BsMicMute className="text-3xl" />
                 </button>

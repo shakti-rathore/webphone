@@ -627,6 +627,7 @@ const useJssip = () => {
         setStatus('start');
         setPhoneNumber('');
         setDispositionModal(true);
+        setConferenceNumber('')
       });
 
       // Handle call failure
@@ -687,6 +688,7 @@ const useJssip = () => {
       setStatus('start');
       setPhoneNumber('');
       setDispositionModal(true);
+      setConferenceNumber('')
     };
 
     const enumerateDevices = async () => {

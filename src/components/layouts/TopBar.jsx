@@ -37,6 +37,11 @@ const TopBar = () => {
     []
   );
 
+  function handleLogout() {
+    localStorage.clear();
+    window.location.href = '/webphone/login';
+  }
+
   return (
     <header className="bg-white h-16 flex items-center p-4 justify-between dark:bg-[#1a1a1a] border-b dark:border-[#333] border-[#ddd] sticky top-0 z-50">
       <div className="flex gap-x-12 items-center">
@@ -67,6 +72,9 @@ const TopBar = () => {
           </div>
         </div>
         <BreakDropdown />
+        <button className="primary-btn" onClick={handleLogout}>
+          Logout
+        </button>
         <DarkModeToggle toggleTheme={toggleTheme} />
       </div>
     </header>

@@ -118,7 +118,6 @@ function App() {
   function handleCalls() {
     createConferenceCall();
     setCallConference(false);
-    setConferenceNumber('');
   }
 
   return (
@@ -189,6 +188,7 @@ function App() {
                 />
               ) : (
                 <CallScreen
+                  conferenceNumber={conferenceNumber}
                   userCall={userCall}
                   reqUnHold={reqUnHold}
                   setCallConference={setCallConference}
