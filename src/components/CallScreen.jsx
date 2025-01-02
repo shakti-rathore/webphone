@@ -4,7 +4,7 @@ import { IoCloseCircleOutline, IoCloseCircle } from 'react-icons/io5';
 import { ImPhoneHangUp } from 'react-icons/im';
 import { FaStopCircle } from 'react-icons/fa';
 import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import KeyPad from './KeyPad';
 import { MdCallMerge } from 'react-icons/md';
 import { FcCallTransfer } from 'react-icons/fc';
@@ -36,6 +36,7 @@ const CallScreen = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showKeyPad, setShowKeyPad] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [isMerged, setIsMerged] = useState(false);
   const formatPhoneNumber = useFormatPhoneNumber();
   const { username } = useContext(HistoryContext);
 
@@ -49,6 +50,19 @@ const CallScreen = ({
       toast.error('Request failed. Please try again.');
     }
   };
+
+  const handleMerge = () => {
+    reqUnHold();
+    setIsMerged(true);
+  };
+
+  useEffect(() => {
+    if (conferenceNumber) {
+      session.unmute();
+      setMuted(false);
+    }
+  }, []);
+
   return (
     <div className="flex flex-col items-center md:justify-center min-h-screen">
       <div className="flex flex-col items-center w-full max-w-72 p-6 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
@@ -58,7 +72,7 @@ const CallScreen = ({
           </div>
           <marquee className="text-2xl font-bold text-primary mb-2">
             {(phoneNumber && formatPhoneNumber(phoneNumber)) || (userCall && userCall.contactNumber)}
-            {conferenceNumber && ' Conference with ' + conferenceNumber}
+            {(isMerged && conferenceNumber) && ' Conference with ' + conferenceNumber}
           </marquee>
           {!isRunning ? (
             <span className="text-gray-500">Calling...</span>
@@ -82,11 +96,9 @@ const CallScreen = ({
                   <BsPause className="text-3xl" />
                 </button>
                 <button
-                  disabled={!conferenceNumber}
+                  disabled={!isMerged}
                   onClick={handleTransfer}
-                  className={`p-4 rounded-full dark:text-white ${
-                    (conferenceNumber && 'opacity-100') || 'opacity-45'
-                  }`}
+                  className={`p-4 rounded-full dark:text-white ${(isMerged ? 'opacity-100' : 'opacity-45')}`}
                   title="Call Transfer"
                 >
                   <FcCallTransfer className="text-3xl" />
@@ -105,7 +117,7 @@ const CallScreen = ({
                   <button
                     className="p-4 rounded-full text-gray-600 dark:text-white"
                     disabled={!session}
-                    onClick={reqUnHold}
+                    onClick={handleMerge}
                     title="Merge"
                   >
                     <MdCallMerge className="text-3xl" />

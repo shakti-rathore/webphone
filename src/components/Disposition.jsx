@@ -90,11 +90,6 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
     }
   }, [selectedAction, bridgeID, username, handleContact, setDispositionModal, selectedBreak, setSelectedBreak]);
 
-  const clearForm = useCallback(() => {
-    setSelectedAction(null);
-    setIsAutoLeadDialDisabled(false);
-  }, []);
-
   useEffect(() => {
     let isMounted = true;
     return () => {
@@ -160,14 +155,6 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
               className={`primary-btn ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : ''}`}
             >
               {isSubmitting ? 'Submitting...' : 'Submit'}
-            </button>
-
-            <button
-              type="button"
-              onClick={clearForm}
-              className="sm:w-auto px-4 py-2 bg-gray-200 text-gray-700 text-sm sm:text-base rounded-md hover:bg-gray-300 transition-colors duration-300"
-            >
-              Clear
             </button>
           </div>
         </div>
