@@ -23,33 +23,6 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
     { action: 'Connected', label: 'CO - Connected', color: '#0D9488' },
   ];
 
-  const handleBreakStatus = async () => {
-    try {
-      if (selectedBreak === 'Break') {
-        const response = await axios.post(`https://callapp.iotcom.io/user/removebreakuser:${username}`);
-        if (response.status === 200) {
-          setSelectedBreak('Break');
-        } else {
-          toast.error('Failed to remove break status');
-        }
-      } else {
-        const response = await axios.post(`https://callapp.iotcom.io/user/breakuser:${username}`, {
-          breakType: selectedBreak,
-        });
-
-        if (response.status === 200) {
-          setSelectedBreak(selectedBreak);
-        } else {
-          toast.error('Failed to set break status');
-          setSelectedBreak('Break');
-        }
-      }
-    } catch (error) {
-      console.error('Error managing break status:', error);
-      toast.error('Failed to update break status');
-      setSelectedBreak('Break');
-    }
-  };
   const submitForm = useCallback(async () => {
     if (!selectedAction) {
       toast.error('Please select an action before submitting.');
@@ -73,9 +46,7 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
           },
         }
       );
-
-      if (dispositionResponse.data && dispositionResponse.data.message === 'disposition done sucessfully.') {
-        await handleBreakStatus();
+      if (dispositionResponse.data.success) {
         handleContact();
         toast.success('Disposition submitted successfully');
         setDispositionModal(false);
@@ -139,7 +110,7 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
           </div>
 
           <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
-            <BreakDropdown breakDropdown={true} />
+            <BreakDropdown />
             <button
               type="button"
               onClick={() => setUserCallOpen(true)}

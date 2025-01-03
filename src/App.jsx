@@ -11,6 +11,8 @@ import UserCall from './components/UserCall';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import ringtoneMp3 from './ringtone.mp3';
+import Modal from './components/table/Modal';
+import CallerInfo from './components/CallerInfo';
 
 function App() {
   const [
@@ -43,9 +45,12 @@ function App() {
     setDispositionModal,
     userCall,
   ] = useJssip();
+
   const [seeLogs, setSeeLogs] = useState(false);
   const [callConference, setCallConference] = useState(false);
-  const { username } = useContext(HistoryContext);
+  const { username, dropCalls, setDropCalls } = useContext(HistoryContext);
+  const [usermissedCalls, setUsermissedCalls] = useState([]);
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -59,6 +64,20 @@ function App() {
     district: '',
     comment: '',
   });
+
+  useEffect(() => {
+    fetchUserMissedCalls();
+  }, [username]);
+
+  const fetchUserMissedCalls = async () => {
+    try {
+      const response = await axios.post(`https://callapp.iotcom.io/usermissedCalls/${username}`);
+      setUsermissedCalls(response.data.result || []);
+    } catch (error) {
+      console.error('Error fetching missed calls:', error);
+      setUsermissedCalls([]);
+    }
+  };
 
   useEffect(() => {
     if (status === 'start') {
@@ -132,6 +151,17 @@ function App() {
           formData={formData}
         />
       )}
+      {status == 'start' && (
+        <Modal isOpen={dropCalls} onClose={() => setDropCalls(false)} title={`User Missed Calls (${length})`}>
+          <CallerInfo
+            usermissedCalls={usermissedCalls}
+            setDropCalls={setDropCalls}
+            setPhoneNumber={setPhoneNumber}
+            handleCall={handleCall}
+          />
+        </Modal>
+      )}
+
       {ringtone.length > 0 && (
         <audio controls autoPlay hidden>
           <source src={ringtoneMp3} type="audio/mp3" />
@@ -142,14 +172,9 @@ function App() {
         <marquee>
           <div className="text-sm">
             Call Queue: ({ringtone.length})
-            {ringtone.map((call, index) => (
-              <div
-                key={index}
-                className="p-1 bg-white border border-gray-200 rounded-md shadow-sm flex items-center justify-between"
-              >
-                <p className="text-gray-800">{call.dialNumber},</p>
-              </div>
-            ))}
+            <div className="p-1 bg-white border border-gray-200 rounded-md shadow-sm">
+              <p className="text-gray-800">{ringtone.map((call) => call.Caller).join(', ')}</p>
+            </div>
           </div>
         </marquee>
       )}

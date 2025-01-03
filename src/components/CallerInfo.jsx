@@ -1,42 +1,77 @@
-import React from 'react';
-import moment from 'moment';
-import { BiPhoneOff } from 'react-icons/bi';
+import React, { useCallback, useMemo } from 'react';
+import { FiPhone } from 'react-icons/fi';
+import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 
-const CallerInfo = ({ usermissedCalls }) => {
-  if (!usermissedCalls.length) {
+const CallerInfo = ({ usermissedCalls, setDropCalls, setPhoneNumber, handleCall }) => {
+  const formatPhoneNumber = useFormatPhoneNumber();
+
+  const groupedCalls = useMemo(() => {
+    return Object.values(usermissedCalls || {}).reduce((acc, call) => {
+      if (!call?.Caller) return acc;
+
+      if (!acc[call.Caller]) {
+        acc[call.Caller] = {
+          count: 0,
+          calls: [],
+          latestTime: 0,
+        };
+      }
+
+      acc[call.Caller].count += 1;
+      acc[call.Caller].calls.push(call);
+      acc[call.Caller].latestTime = Math.max(acc[call.Caller].latestTime, parseInt(call.startTime) || 0);
+
+      return acc;
+    }, {});
+  }, [usermissedCalls]);
+
+  const removeCountryCode = (phoneNumber, countryCode = '+91') => {
+    return phoneNumber.startsWith(countryCode) ? phoneNumber.slice(countryCode.length) : phoneNumber;
+  };
+
+  const initiateCall = useCallback(
+    (caller) => {
+      const sanitizedCaller = removeCountryCode(caller);
+      setPhoneNumber(formatPhoneNumber(sanitizedCaller));
+      handleCall();
+      setDropCalls(false);
+    },
+    [setPhoneNumber, formatPhoneNumber]
+  );
+
+  if (Object.entries(groupedCalls).length === 0) {
     return (
-      <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-        <p className="text-center text-gray-500 dark:text-gray-400">No missed calls</p>
+      <div className="p-3">
+        <p className="text-gray-500">No missed calls available.</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="p-4">
-        <div className="space-y-4">
-          {usermissedCalls.map((call, index) => (
-            <div key={index} className={`${index !== 0 ? 'border-t border-gray-200 dark:border-gray-700 pt-4' : ''}`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
-                    <BiPhoneOff className="h-6 w-6 text-red-600 dark:text-red-300" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{call.Caller}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {moment(parseInt(call.startTime)).format('MMMM Do YYYY, h:mm:ss a')}
-                    </p>
-                  </div>
-                </div>
-                <div className="px-3 py-1 rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                  Missed
-                </div>
-              </div>
-            </div>
-          ))}
+    <div className="p-3 space-y-4">
+      {Object.entries(groupedCalls).map(([caller, data]) => (
+        <div
+          key={caller}
+          className="flex justify-between items-center border-b border-gray-200 pb-3 mb-3 last:border-b-0 last:mb-0"
+        >
+          <div className="flex-grow">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              {caller}
+              <span className="text-sm font-normal text-gray-600">
+                ({data.count} missed {data.count === 1 ? 'call' : 'calls'})
+              </span>
+            </h3>
+            <p className="text-sm text-gray-500">Recent call: {new Date(data.latestTime).toLocaleString()}</p>
+          </div>
+          <button
+            onClick={() => initiateCall(caller)}
+            className="bg-green-500 hover:bg-green-600 text-white rounded-full p-2 transition-colors duration-200"
+            aria-label={`Call ${caller}`}
+          >
+            <FiPhone className="w-5 h-5" />
+          </button>
         </div>
-      </div>
+      ))}
     </div>
   );
 };

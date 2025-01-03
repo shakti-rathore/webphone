@@ -3,16 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
 import { RiMoonLine, RiSunLine } from 'react-icons/ri';
 import BreakDropdown from '../BreakDropdown';
-import CallerInfo from '../CallerInfo';
-import Modal from '../table/Modal';
 import HistoryContext from '../../context/HistoryContext';
 import axios from 'axios';
 
 const TopBar = () => {
   const toggleTheme = useTheme();
   const location = useLocation();
-  const [userCallOpen, setUserCallOpen] = useState(false);
-  const { username } = useContext(HistoryContext);
+  const { username, setDropCalls } = useContext(HistoryContext);
   const [usermissedCalls, setUsermissedCalls] = useState([]);
 
   useEffect(() => {
@@ -28,6 +25,8 @@ const TopBar = () => {
       setUsermissedCalls([]);
     }
   };
+  const length = Object.keys(usermissedCalls).length;
+
   const navLinks = useMemo(
     () => [
       // { path: '/webphone/dashboard', label: 'Dashboard' },
@@ -56,19 +55,12 @@ const TopBar = () => {
         ))}
       </ul>
       <div className="flex items-center md:gap-x-6 gap-x-3">
-        <Modal
-          isOpen={userCallOpen}
-          onClose={() => setUserCallOpen(false)}
-          title={`User Missed Calls (${usermissedCalls.length})`}
-        >
-          <CallerInfo usermissedCalls={usermissedCalls} />
-        </Modal>
         <div className="relative">
-          <button onClick={() => setUserCallOpen(true)} className="primary-btn">
+          <button onClick={() => setDropCalls(true)} className="primary-btn">
             Drop Calls
           </button>
-          <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center absolute -top-2 -left-1 text-white">
-            {usermissedCalls.length}
+          <div className="px-1.5 py-1 rounded-full bg-red-500 flex text-sm items-center justify-center absolute -top-2 -left-1 text-white">
+            {length}
           </div>
         </div>
         <BreakDropdown />
