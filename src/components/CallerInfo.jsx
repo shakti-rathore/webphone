@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { FiPhone } from 'react-icons/fi';
 import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 
-const CallerInfo = ({ usermissedCalls, setDropCalls, setPhoneNumber, handleCall }) => {
+const CallerInfo = ({ usermissedCalls, setDropCalls, setPhoneNumber, handleCall, phoneNumber }) => {
   const formatPhoneNumber = useFormatPhoneNumber();
 
   const groupedCalls = useMemo(() => {
@@ -33,11 +33,20 @@ const CallerInfo = ({ usermissedCalls, setDropCalls, setPhoneNumber, handleCall 
     (caller) => {
       const sanitizedCaller = removeCountryCode(caller);
       setPhoneNumber(formatPhoneNumber(sanitizedCaller));
-      handleCall();
-      setDropCalls(false);
     },
     [setPhoneNumber, formatPhoneNumber]
   );
+
+  useEffect(() => {
+    if (phoneNumber) {
+      const timer = setTimeout(() => {
+        handleCall();
+        setDropCalls(false);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [phoneNumber]);
 
   if (Object.entries(groupedCalls).length === 0) {
     return (

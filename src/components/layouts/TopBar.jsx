@@ -5,27 +5,12 @@ import { RiMoonLine, RiSunLine } from 'react-icons/ri';
 import BreakDropdown from '../BreakDropdown';
 import HistoryContext from '../../context/HistoryContext';
 import axios from 'axios';
+import { FiLogOut } from 'react-icons/fi';
 
 const TopBar = () => {
   const toggleTheme = useTheme();
   const location = useLocation();
   const { username, setDropCalls } = useContext(HistoryContext);
-  const [usermissedCalls, setUsermissedCalls] = useState([]);
-
-  useEffect(() => {
-    fetchUserMissedCalls();
-  }, [username]);
-
-  const fetchUserMissedCalls = async () => {
-    try {
-      const response = await axios.post(`https://callapp.iotcom.io/usermissedCalls/${username}`);
-      setUsermissedCalls(response.data.result || []);
-    } catch (error) {
-      console.error('Error fetching missed calls:', error);
-      setUsermissedCalls([]);
-    }
-  };
-  const length = Object.keys(usermissedCalls).length;
 
   const navLinks = useMemo(
     () => [
@@ -55,18 +40,21 @@ const TopBar = () => {
         ))}
       </ul>
       <div className="flex items-center md:gap-x-6 gap-x-3">
+        <BreakDropdown />
         <div className="relative">
           <button onClick={() => setDropCalls(true)} className="primary-btn">
             Drop Calls
           </button>
-          <div className="px-1.5 py-1 rounded-full bg-red-500 flex text-sm items-center justify-center absolute -top-2 -left-1 text-white">
-            {length}
-          </div>
         </div>
-        <BreakDropdown />
-        <button className="primary-btn" onClick={handleLogout}>
+
+        <button className="primary-btn sm:block hidden" onClick={handleLogout}>
           Logout
         </button>
+
+        <button className="block sm:hidden" onClick={handleLogout}>
+          <FiLogOut />
+        </button>
+
         <DarkModeToggle toggleTheme={toggleTheme} />
       </div>
     </header>

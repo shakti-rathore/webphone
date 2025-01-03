@@ -50,6 +50,7 @@ function App() {
   const [callConference, setCallConference] = useState(false);
   const { username, dropCalls, setDropCalls } = useContext(HistoryContext);
   const [usermissedCalls, setUsermissedCalls] = useState([]);
+  const length = Object.keys(usermissedCalls).length;
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -67,7 +68,10 @@ function App() {
 
   useEffect(() => {
     fetchUserMissedCalls();
-  }, [username]);
+    if (ringtone.length > 0) {
+      fetchUserMissedCalls();
+    }
+  }, [username, ringtone]);
 
   const fetchUserMissedCalls = async () => {
     try {
@@ -140,108 +144,114 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen w-full">
-      {dispositionModal && (
-        <Disposition
-          bridgeID={bridgeID}
-          setDispositionModal={setDispositionModal}
-          userCall={userCall}
-          handleContact={handleContact}
-          setFormData={setFormData}
-          formData={formData}
-        />
-      )}
-      {status == 'start' && (
-        <Modal isOpen={dropCalls} onClose={() => setDropCalls(false)} title={`User Missed Calls (${length})`}>
-          <CallerInfo
-            usermissedCalls={usermissedCalls}
-            setDropCalls={setDropCalls}
-            setPhoneNumber={setPhoneNumber}
-            handleCall={handleCall}
-          />
-        </Modal>
-      )}
-
-      {ringtone.length > 0 && (
-        <audio controls autoPlay hidden>
-          <source src={ringtoneMp3} type="audio/mp3" />
-        </audio>
-      )}
-
-      {ringtone.length > 0 && (
-        <marquee>
-          <div className="text-sm">
-            Call Queue: ({ringtone.length})
-            <div className="p-1 bg-white border border-gray-200 rounded-md shadow-sm">
-              <p className="text-gray-800">{ringtone.map((call) => call.Caller).join(', ')}</p>
-            </div>
-          </div>
-        </marquee>
-      )}
-
-      <div className="w-full mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-3">
-        <div className="flex flex-col lg:flex-row items-center gap-5">
-          {(status !== 'start' && userCall && (
-            <div className="w-full lg:w-2/5">
-              <UserCall userCall={userCall} username={username} formData={formData} setFormData={setFormData} />
-            </div>
-          )) || (
-            <div className="w-full lg:w-2/5">
-              <AutoDial setPhoneNumber={setPhoneNumber} dispositionModal={dispositionModal} />
-            </div>
-          )}
-
-          <div className={`w-full ${status !== 'start' ? 'lg:w-2/3' : ''}`}>
-            {seeLogs ? (
-              <HistoryScreen setSeeLogs={setSeeLogs} />
-            ) : status === 'start' ? (
-              <Home
-                phoneNumber={phoneNumber}
-                setPhoneNumber={setPhoneNumber}
-                handleCall={handleCall}
-                setSeeLogs={setSeeLogs}
-              />
-            ) : status === 'calling' || status === 'conference' ? (
-              callConference ? (
-                <CallConference
-                  conferenceNumber={conferenceNumber}
-                  setCallConference={setCallConference}
-                  setConferenceNumber={setConferenceNumber}
-                  handleCall={handleCalls}
-                  setSeeLogs={setSeeLogs}
-                  phoneNumber={phoneNumber}
-                />
-              ) : (
-                <CallScreen
-                  conferenceNumber={conferenceNumber}
-                  userCall={userCall}
-                  reqUnHold={reqUnHold}
-                  setCallConference={setCallConference}
-                  toggleHold={toggleHold}
-                  isHeld={isHeld}
-                  isRecording={isRecording}
-                  startRecording={startRecording}
-                  stopRecording={stopRecording}
-                  phoneNumber={phoneNumber}
-                  session={session}
-                  seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
-                  minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
-                  isRunning={isRunning}
-                  devices={devices}
-                  selectedDeviceId={selectedDeviceId}
-                  changeAudioDevice={changeAudioDevice}
-                  conferenceStatus={conferenceStatus}
-                />
-              )
-            ) : (
-              <div className="text-center p-4">No content available</div>
-            )}
-          </div>
-        </div>
-
-        <audio ref={audioRef} autoPlay hidden />
+    <>
+      <div className="px-1.5 py-1 rounded-full bg-red-500 flex text-sm items-center justify-center fixed -translate-x-48 sm:-translate-x-[22rem] top-2 z-50 right-0 text-white">
+        {length}
       </div>
-    </div>
+
+      <div className="min-h-screen w-full">
+        {dispositionModal && (
+          <Disposition
+            bridgeID={bridgeID}
+            setDispositionModal={setDispositionModal}
+            userCall={userCall}
+            handleContact={handleContact}
+            setFormData={setFormData}
+            formData={formData}
+          />
+        )}
+        {dropCalls && (
+          <Modal isOpen={dropCalls} onClose={() => setDropCalls(false)} title={`User Missed Calls (${length})`}>
+            <CallerInfo
+              usermissedCalls={usermissedCalls}
+              setDropCalls={setDropCalls}
+              setPhoneNumber={setPhoneNumber}
+              handleCall={handleCall}
+              phoneNumber={phoneNumber}
+            />
+          </Modal>
+        )}
+        {ringtone.length > 0 && (
+          <audio controls autoPlay hidden>
+            <source src={ringtoneMp3} type="audio/mp3" />
+          </audio>
+        )}
+
+        {ringtone.length > 0 && (
+          <marquee>
+            <div className="text-sm">
+              Call Queue: ({ringtone.length})
+              <div className="p-1 bg-white border border-gray-200 rounded-md shadow-sm">
+                <p className="text-gray-800">{ringtone.map((call) => call.Caller).join(', ')}</p>
+              </div>
+            </div>
+          </marquee>
+        )}
+
+        <div className="w-full mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-3">
+          <div className="flex flex-col lg:flex-row items-center gap-5">
+            {(status !== 'start' && userCall && (
+              <div className="w-full lg:w-2/5">
+                <UserCall userCall={userCall} username={username} formData={formData} setFormData={setFormData} />
+              </div>
+            )) || (
+              <div className="w-full lg:w-2/5">
+                <AutoDial setPhoneNumber={setPhoneNumber} dispositionModal={dispositionModal} />
+              </div>
+            )}
+
+            <div className={`w-full ${status !== 'start' ? 'lg:w-2/3' : ''}`}>
+              {seeLogs ? (
+                <HistoryScreen setSeeLogs={setSeeLogs} />
+              ) : status === 'start' ? (
+                <Home
+                  phoneNumber={phoneNumber}
+                  setPhoneNumber={setPhoneNumber}
+                  handleCall={handleCall}
+                  setSeeLogs={setSeeLogs}
+                />
+              ) : status === 'calling' || status === 'conference' ? (
+                callConference ? (
+                  <CallConference
+                    conferenceNumber={conferenceNumber}
+                    setCallConference={setCallConference}
+                    setConferenceNumber={setConferenceNumber}
+                    handleCall={handleCalls}
+                    setSeeLogs={setSeeLogs}
+                    phoneNumber={phoneNumber}
+                  />
+                ) : (
+                  <CallScreen
+                    conferenceNumber={conferenceNumber}
+                    userCall={userCall}
+                    reqUnHold={reqUnHold}
+                    setCallConference={setCallConference}
+                    toggleHold={toggleHold}
+                    isHeld={isHeld}
+                    isRecording={isRecording}
+                    startRecording={startRecording}
+                    stopRecording={stopRecording}
+                    phoneNumber={phoneNumber}
+                    session={session}
+                    seconds={seconds < 10 ? `0${seconds}` : `${seconds}`}
+                    minutes={minutes < 10 ? `0${minutes}` : `${minutes}`}
+                    isRunning={isRunning}
+                    devices={devices}
+                    selectedDeviceId={selectedDeviceId}
+                    changeAudioDevice={changeAudioDevice}
+                    conferenceStatus={conferenceStatus}
+                  />
+                )
+              ) : (
+                <div className="text-center p-4">No content available</div>
+              )}
+            </div>
+          </div>
+
+          <audio ref={audioRef} autoPlay hidden />
+        </div>
+      </div>
+    </>
   );
 }
 
