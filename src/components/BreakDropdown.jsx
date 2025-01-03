@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import axios from 'axios';
 import HistoryContext from '../context/HistoryContext';
+import { BsClock } from 'react-icons/bs';
 
 const BreakDropdown = () => {
   const { username, selectedBreak, setSelectedBreak } = useContext(HistoryContext);
   const [isOpen, setIsOpen] = useState(false);
+  const [timer, setTimer] = useState(0);
   const dropdownRef = useRef(null);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -19,6 +22,35 @@ const BreakDropdown = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (selectedBreak !== 'Break') {
+      // Start timer when break is selected
+      setTimer(0);
+      timerRef.current = setInterval(() => {
+        setTimer((prev) => prev + 1);
+      }, 1000);
+    } else {
+      // Clear timer when break is removed
+      clearInterval(timerRef.current);
+      setTimer(0);
+    }
+
+    return () => {
+      clearInterval(timerRef.current);
+    };
+  }, [selectedBreak]);
+
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   const removeBreak = async () => {
     try {
@@ -71,12 +103,18 @@ const BreakDropdown = () => {
       ? 'primary-btn'
       : `px-4 py-2 text-white bg-${
           breakTypes.find((b) => b.type === selectedBreak)?.color
-        } rounded-md focus:outline-none`;
+        } rounded-md focus:outline-none flex items-center space-x-2`;
 
   return (
     <div className="relative inline-block text-left">
       <button onClick={handleButtonClick} className={buttonClassName}>
-        {selectedBreak === 'Break' ? 'Break' : `${selectedBreak.replace('Break', '')} Break`}
+        <span>{selectedBreak === 'Break' ? 'Break' : `${selectedBreak.replace('Break', '')} Break`}</span>
+        {selectedBreak !== 'Break' && (
+          <div className="flex items-center space-x-1">
+            <BsClock className="w-4 h-4" />
+            <span>{formatTime(timer)}</span>
+          </div>
+        )}
       </button>
 
       {isOpen && selectedBreak === 'Break' && (

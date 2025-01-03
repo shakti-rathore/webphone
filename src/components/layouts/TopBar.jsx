@@ -4,8 +4,8 @@ import { useTheme } from '../../hooks/useTheme';
 import { RiMoonLine, RiSunLine } from 'react-icons/ri';
 import BreakDropdown from '../BreakDropdown';
 import HistoryContext from '../../context/HistoryContext';
-import axios from 'axios';
 import { FiLogOut } from 'react-icons/fi';
+import { FaPhoneSlash } from 'react-icons/fa';
 
 const TopBar = () => {
   const toggleTheme = useTheme();
@@ -39,22 +39,36 @@ const TopBar = () => {
           <NavLink key={path} path={path} label={label} />
         ))}
       </ul>
-      <div className="flex items-center md:gap-x-6 gap-x-3">
+      <div className="flex items-center gap-x-3 md:gap-x-6 flex-wrap md:flex-nowrap">
+        {/* Username Display */}
+        <div className="flex items-center gap-x-2 px-3 py-2 rounded-md bg-gray-100 dark:bg-[#333]">
+          <span className="font-semibold text-primary dark:text-[#00498e] text-sm md:text-base">
+            {username || 'Guest'}
+          </span>
+        </div>
+
+        {/* Break Dropdown */}
         <BreakDropdown />
+
+        {/* Drop Calls Button */}
         <div className="relative">
-          <button onClick={() => setDropCalls(true)} className="primary-btn">
+          <button onClick={() => setDropCalls(true)} className="hidden sm:block primary-btn text-sm md:text-base">
             Drop Calls
+          </button>
+          <button onClick={() => setDropCalls(true)} className="block sm:hidden text-sm md:text-base">
+            <FaPhoneSlash className="text-primary dark:text-[#00498e]" />
           </button>
         </div>
 
-        <button className="primary-btn sm:block hidden" onClick={handleLogout}>
+        {/* Logout Buttons */}
+        <button className="primary-btn sm:block hidden text-sm md:text-base" onClick={handleLogout}>
           Logout
         </button>
-
-        <button className="block sm:hidden" onClick={handleLogout}>
+        <button className="block sm:hidden text-sm md:text-base" onClick={handleLogout}>
           <FiLogOut />
         </button>
 
+        {/* Dark Mode Toggle */}
         <DarkModeToggle toggleTheme={toggleTheme} />
       </div>
     </header>

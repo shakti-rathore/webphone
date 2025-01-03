@@ -23,6 +23,7 @@ const useJssip = () => {
   const [isHeld, setIsHeld] = useState(false);
   const [conferenceStatus, setConferenceStatus] = useState(false);
   const [dispositionModal, setDispositionModal] = useState(false);
+  const [requestTime, setRequestTime] = useState(null);
   const [timeoutArray, setTimeoutArray] = useState([]);
   const agentSocketRef = useRef(null);
   const customerSocketRef = useRef(null);
@@ -69,6 +70,7 @@ const useJssip = () => {
   };
 
   const connectioncheck = async () => {
+    const start = performance.now();
     try {
       const response = await Promise.race([
         axios.post(
@@ -82,6 +84,7 @@ const useJssip = () => {
           setTimeout(() => reject(new Error('Request Timeout')), 3000);
         }),
       ]);
+      setRequestTime(performance.now() - start);
 
       if (response.status === 401 || !response.data.isUserLogin) {
         window.location.href = '/webphone/login';
@@ -97,11 +100,13 @@ const useJssip = () => {
       } else if (data.message === 'poor connection problem ,please login again') {
         localStorage.clear();
         window.location.href = '/webphone/login';
+        setRequestTime(3000);
         toast.error('Connection lost. Please log in again to continue');
       }
     } catch (err) {
       if (err.message === 'Request Timeout') {
         console.error('Request timed out.');
+        setRequestTime(3000);
       } else if (err.message.includes('Network')) {
         console.error('Network error detected:', err.message);
       } else {
@@ -627,7 +632,7 @@ const useJssip = () => {
         setStatus('start');
         setPhoneNumber('');
         setDispositionModal(true);
-        setConferenceNumber('')
+        setConferenceNumber('');
       });
 
       // Handle call failure
@@ -688,7 +693,7 @@ const useJssip = () => {
       setStatus('start');
       setPhoneNumber('');
       setDispositionModal(true);
-      setConferenceNumber('')
+      setConferenceNumber('');
     };
 
     const enumerateDevices = async () => {
@@ -794,6 +799,7 @@ const useJssip = () => {
     dispositionModal,
     setDispositionModal,
     userCall,
+    requestTime
   ];
 };
 

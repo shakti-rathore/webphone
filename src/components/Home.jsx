@@ -4,8 +4,9 @@ import { VscHistory } from 'react-icons/vsc';
 import { TiBackspaceOutline, TiBackspace } from 'react-icons/ti';
 import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 import KeyPad from './KeyPad';
+import NetworkMonitor from './NetworkMonitor';
 
-const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs }) => {
+const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, requestTime }) => {
   const [isHovered, setIsHovered] = useState(false);
   const formatPhoneNumber = useFormatPhoneNumber();
 
@@ -20,13 +21,16 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs }) => {
       <div className="w-full max-w-72 p-4 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className="flex justify-between items-center mb-4">
           <div className="text-xl font-bold text-primary">WebPhone</div>
-          <div
-            className="cursor-pointer text-primary"
-            onClick={() => {
-              setSeeLogs(true);
-            }}
-          >
-            <VscHistory size={24} />
+          <div className='flex items-center gap-4'>
+            <NetworkMonitor requestTime={requestTime} />
+            <div
+              className="cursor-pointer text-primary"
+              onClick={() => {
+                setSeeLogs(true);
+              }}
+            >
+              <VscHistory size={24} />
+            </div>
           </div>
         </div>
         <div className="relative mb-4">

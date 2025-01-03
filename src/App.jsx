@@ -44,12 +44,14 @@ function App() {
     dispositionModal,
     setDispositionModal,
     userCall,
+    requestTime
   ] = useJssip();
 
   const [seeLogs, setSeeLogs] = useState(false);
   const [callConference, setCallConference] = useState(false);
-  const { username, dropCalls, setDropCalls } = useContext(HistoryContext);
+  const { username, dropCalls, setDropCalls, setSelectedBreak } = useContext(HistoryContext);
   const [usermissedCalls, setUsermissedCalls] = useState([]);
+  const [phoneShow, setPhoneShow] = useState(false);
   const length = Object.keys(usermissedCalls).length;
 
   const [formData, setFormData] = useState({
@@ -195,12 +197,26 @@ function App() {
                 <UserCall userCall={userCall} username={username} formData={formData} setFormData={setFormData} />
               </div>
             )) || (
-              <div className="w-full lg:w-2/5">
+              <div className="w-full lg:w-2/5 relative">
                 <AutoDial setPhoneNumber={setPhoneNumber} dispositionModal={dispositionModal} />
+                <div className="bottom-3 left-64 whitespace-nowrap absolute">
+                  <button
+                    className="primary-btn"
+                    onClick={() => {
+                      setPhoneShow(!phoneShow);
+                      setSelectedBreak((!phoneShow && 'TeaBreak') || 'Break');
+                    }}
+                  >
+                    {!phoneShow ? 'Hide Phone' : 'Show Phone'}
+                  </button>
+                </div>
               </div>
             )}
-
-            <div className={`w-full ${status !== 'start' ? 'lg:w-2/3' : ''}`}>
+            <div
+              className={`w-full ${(phoneShow && 'opacity- hidden') || 'opacity-100'} ${
+                status !== 'start' ? 'lg:w-2/3' : ''
+              }`}
+            >
               {seeLogs ? (
                 <HistoryScreen setSeeLogs={setSeeLogs} />
               ) : status === 'start' ? (
@@ -209,6 +225,7 @@ function App() {
                   setPhoneNumber={setPhoneNumber}
                   handleCall={handleCall}
                   setSeeLogs={setSeeLogs}
+                  requestTime={requestTime}
                 />
               ) : status === 'calling' || status === 'conference' ? (
                 callConference ? (

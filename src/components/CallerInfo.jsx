@@ -42,7 +42,7 @@ const CallerInfo = ({ usermissedCalls, setDropCalls, setPhoneNumber, handleCall,
       const timer = setTimeout(() => {
         handleCall();
         setDropCalls(false);
-      }, 300);
+      }, 100);
 
       return () => clearTimeout(timer);
     }
