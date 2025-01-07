@@ -38,7 +38,7 @@ const useJssip = () => {
 
   const createConferenceCall = async () => {
     try {
-      const response = await fetch(`https://callapp.iotcom.io/reqConf/${username}`, {
+      const response = await fetch(`${window.location.origin}/reqConf/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ const useJssip = () => {
     try {
       const response = await Promise.race([
         axios.post(
-          'https://callapp.iotcom.io/userconnection',
+          `${window.location.origin}/userconnection`,
           { user: username },
           {
             headers: { 'Content-Type': 'application/json' },
@@ -134,7 +134,7 @@ const useJssip = () => {
 
   useEffect(() => {
     if (username) {
-      const url = `https://callapp.iotcom.io/userready/${username}`;
+      const url = `${window.location.origin}/userready/${username}`;
       axios
         .post(url, {}, { headers: { 'Content-Type': 'application/json' } })
         .then((response) => {
@@ -241,7 +241,7 @@ const useJssip = () => {
   const answercall = async () => {
     try {
       const response = await axios.post(
-        `https://callapp.iotcom.io/useroncall/${username}`,
+        `${window.location.origin}/useroncall/${username}`,
         {},
         {
           headers: {
@@ -268,7 +268,7 @@ const useJssip = () => {
     if (!session) return;
 
     try {
-      const response = await fetch(`https://callapp.iotcom.io/reqUnHold/${username}`, {
+      const response = await fetch(`${window.location.origin}/reqUnHold/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -296,7 +296,7 @@ const useJssip = () => {
 
     try {
       if (!isHeld) {
-        await fetch(`https://callapp.iotcom.io/reqHold/${username}`, {
+        await fetch(`${window.location.origin}/reqHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -312,7 +312,7 @@ const useJssip = () => {
 
         setIsHeld(true);
       } else {
-        await fetch(`https://callapp.iotcom.io/reqUnHold/${username}`, {
+        await fetch(`${window.location.origin}/reqUnHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -736,7 +736,7 @@ const useJssip = () => {
         },
       ]);
       localStorage.setItem('dialing', true);
-      fetch(`https://callapp.iotcom.io/dialnumber`, {
+      fetch(`${window.location.origin}/dialnumber`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -753,7 +753,7 @@ const useJssip = () => {
       if (dispositionModal) {
         try {
           await axios.post(
-            `https://callapp.iotcom.io/user/callended${username}`,
+            `${window.location.origin}/user/callended${username}`,
             {},
             {
               headers: {

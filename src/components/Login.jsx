@@ -64,7 +64,7 @@ function Login() {
           'Content-Type': 'application/json',
         };
 
-        const response = await fetch(`https://callapp.iotcom.io/userlogin/${username}`, {
+        const response = await fetch(`${window.location.origin}/userlogin/${username}`, {
           method: 'POST',
           headers,
           body: JSON.stringify({ username, password }),

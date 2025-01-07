@@ -38,7 +38,7 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
       };
 
       const dispositionResponse = await axios.post(
-        `https://callapp.iotcom.io/user/disposition${username}`,
+        `${window.location.origin}/user/disposition${username}`,
         dispositionData,
         {
           headers: {

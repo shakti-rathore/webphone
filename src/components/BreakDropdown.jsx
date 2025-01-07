@@ -54,7 +54,7 @@ const BreakDropdown = () => {
 
   const removeBreak = async () => {
     try {
-      const response = await axios.post(`https://callapp.iotcom.io/user/removebreakuser:${username}`);
+      const response = await axios.post(`${window.location.origin}/user/removebreakuser:${username}`);
       if (response.status === 200) {
         setSelectedBreak('Break');
         setIsOpen(false);
@@ -71,7 +71,7 @@ const BreakDropdown = () => {
     }
 
     try {
-      const response = await axios.post(`https://callapp.iotcom.io/user/breakuser:${username}`, {
+      const response = await axios.post(`${window.location.origin}/user/breakuser:${username}`, {
         breakType,
       });
 
