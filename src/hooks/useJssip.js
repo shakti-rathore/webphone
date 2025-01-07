@@ -35,6 +35,7 @@ const useJssip = () => {
     autoStart: false,
   });
   const navigate = useNavigate();
+  const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
 
   const createConferenceCall = async () => {
     try {
@@ -149,8 +150,8 @@ const useJssip = () => {
   const initializeWebSocketTranscription = () => {
     const createWebSocket = (isAgent = true) => {
       const socketRef = isAgent ? agentSocketRef : customerSocketRef;
+      const socket = new WebSocket(`wss://${originWithoutProtocol}/socket`);
 
-      const socket = new WebSocket('wss://callapp.iotcom.io/socket');
       socketRef.current = socket;
 
       socket.onopen = () => {
@@ -549,11 +550,11 @@ const useJssip = () => {
   useEffect(() => {
     const initializeJsSIP = () => {
       try {
-        var socket = new JsSIP.WebSocketInterface('wss://callapp.iotcom.io:8089/ws');
+        var socket = new JsSIP.WebSocketInterface(`wss://${originWithoutProtocol}:8089/ws`);
         var configuration = {
           sockets: [socket],
           session_timers: false,
-          uri: `${username.replace('@', '-')}@callapp.iotcom.io:8089`,
+          uri: `${username.replace('@', '-')}@${originWithoutProtocol}:8089`,
           password: password,
         };
 
@@ -799,7 +800,7 @@ const useJssip = () => {
     dispositionModal,
     setDispositionModal,
     userCall,
-    requestTime
+    requestTime,
   ];
 };
 
