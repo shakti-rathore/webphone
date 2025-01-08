@@ -23,8 +23,8 @@ const useJssip = () => {
   const [isHeld, setIsHeld] = useState(false);
   const [conferenceStatus, setConferenceStatus] = useState(false);
   const [dispositionModal, setDispositionModal] = useState(false);
-  const [requestTime, setRequestTime] = useState(null);
   const [timeoutArray, setTimeoutArray] = useState([]);
+  const offlineToastIdRef = useRef(null);
   const agentSocketRef = useRef(null);
   const customerSocketRef = useRef(null);
   const agentMediaRecorderRef = useRef(null);
@@ -36,10 +36,9 @@ const useJssip = () => {
   });
   const navigate = useNavigate();
   const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
-
   const createConferenceCall = async () => {
     try {
-      const response = await fetch(`${window.location.origin}/reqConf/${username}`, {
+      const response = await fetch(`https://${window.location.origin}/reqConf/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,26 +69,23 @@ const useJssip = () => {
     }
   };
 
+  const withTimeout = (promise, timeoutMs) =>
+    Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeoutMs))]);
+
   const connectioncheck = async () => {
-    const start = performance.now();
     try {
-      const response = await Promise.race([
+      const response = await withTimeout(
         axios.post(
-          `${window.location.origin}/userconnection`,
+          `https://${window.location.origin}/userconnection`,
           { user: username },
-          {
-            headers: { 'Content-Type': 'application/json' },
-          }
+          { headers: { 'Content-Type': 'application/json' } }
         ),
-        new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Request Timeout')), 3000);
-        }),
-      ]);
-      setRequestTime(performance.now() - start);
+        3000
+      );
 
       if (response.status === 401 || !response.data.isUserLogin) {
-        window.location.href = '/webphone/login';
         localStorage.clear();
+        window.location.href = '/webphone/login';
         return;
       }
 
@@ -101,41 +97,23 @@ const useJssip = () => {
       } else if (data.message === 'poor connection problem ,please login again') {
         localStorage.clear();
         window.location.href = '/webphone/login';
-        setRequestTime(3000);
         toast.error('Connection lost. Please log in again to continue');
+        addTimeout('poor-connection');
       }
     } catch (err) {
-      if (err.message === 'Request Timeout') {
-        console.error('Request timed out.');
-        setRequestTime(3000);
+      if (err.message === 'Timeout') {
+        addTimeout('timeout');
       } else if (err.message.includes('Network')) {
-        console.error('Network error detected:', err.message);
+        addTimeout('network');
       } else {
         console.error('Error during connection check:', err);
       }
-
-      handleConnectionError(err);
-    }
-  };
-
-  window.addEventListener('offline', () => {
-    window.location.href = '/webphone/login';
-    toast.error('Network connection lost. Please check your internet.');
-  });
-
-  const handleConnectionError = (err) => {
-    if (err.message === 'Timeout') {
-      const timeout = { timeout: true };
-      const newTimeoutArray = [...timeoutArray, timeout];
-      setTimeoutArray(newTimeoutArray);
-    } else {
-      console.error('Error during connection check:', err);
     }
   };
 
   useEffect(() => {
     if (username) {
-      const url = `${window.location.origin}/userready/${username}`;
+      const url = `https://${window.location.origin}/userready/${username}`;
       axios
         .post(url, {}, { headers: { 'Content-Type': 'application/json' } })
         .then((response) => {
@@ -146,6 +124,33 @@ const useJssip = () => {
         });
     }
   }, [username]);
+
+  useEffect(() => {
+    const handleOffline = () => {
+      if (offlineToastIdRef.current) {
+        toast.dismiss(offlineToastIdRef.current);
+      }
+
+      offlineToastIdRef.current = toast.error('Network connection lost. Please check your internet.', {
+        duration: 5000,
+        onClose: () => {
+          offlineToastIdRef.current = null;
+        },
+      });
+
+      window.location.href = '/webphone/login';
+    };
+
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+
+      if (offlineToastIdRef.current) {
+        toast.dismiss(offlineToastIdRef.current);
+      }
+    };
+  }, []);
 
   const initializeWebSocketTranscription = () => {
     const createWebSocket = (isAgent = true) => {
@@ -242,7 +247,7 @@ const useJssip = () => {
   const answercall = async () => {
     try {
       const response = await axios.post(
-        `${window.location.origin}/useroncall/${username}`,
+        `https://${window.location.origin}/useroncall/${username}`,
         {},
         {
           headers: {
@@ -269,7 +274,7 @@ const useJssip = () => {
     if (!session) return;
 
     try {
-      const response = await fetch(`${window.location.origin}/reqUnHold/${username}`, {
+      const response = await fetch(`https://${window.location.origin}/reqUnHold/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -297,7 +302,7 @@ const useJssip = () => {
 
     try {
       if (!isHeld) {
-        await fetch(`${window.location.origin}/reqHold/${username}`, {
+        await fetch(`https://${window.location.origin}/reqHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -313,7 +318,7 @@ const useJssip = () => {
 
         setIsHeld(true);
       } else {
-        await fetch(`${window.location.origin}/reqUnHold/${username}`, {
+        await fetch(`https://${window.location.origin}/reqUnHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -737,7 +742,7 @@ const useJssip = () => {
         },
       ]);
       localStorage.setItem('dialing', true);
-      fetch(`${window.location.origin}/dialnumber`, {
+      fetch(`https://${window.location.origin}/dialnumber`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -754,7 +759,7 @@ const useJssip = () => {
       if (dispositionModal) {
         try {
           await axios.post(
-            `${window.location.origin}/user/callended${username}`,
+            `https://${window.location.origin}/user/callended${username}`,
             {},
             {
               headers: {
@@ -800,7 +805,7 @@ const useJssip = () => {
     dispositionModal,
     setDispositionModal,
     userCall,
-    requestTime,
+    timeoutArray,
   ];
 };
 

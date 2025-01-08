@@ -25,13 +25,11 @@ const BreakDropdown = () => {
 
   useEffect(() => {
     if (selectedBreak !== 'Break') {
-      // Start timer when break is selected
       setTimer(0);
       timerRef.current = setInterval(() => {
         setTimer((prev) => prev + 1);
       }, 1000);
     } else {
-      // Clear timer when break is removed
       clearInterval(timerRef.current);
       setTimer(0);
     }
@@ -54,7 +52,7 @@ const BreakDropdown = () => {
 
   const removeBreak = async () => {
     try {
-      const response = await axios.post(`${window.location.origin}/user/removebreakuser:${username}`);
+      const response = await axios.post(`https://${window.location.origin}/user/removebreakuser:${username}`);
       if (response.status === 200) {
         setSelectedBreak('Break');
         setIsOpen(false);
@@ -71,7 +69,7 @@ const BreakDropdown = () => {
     }
 
     try {
-      const response = await axios.post(`${window.location.origin}/user/breakuser:${username}`, {
+      const response = await axios.post(`https://${window.location.origin}/user/breakuser:${username}`, {
         breakType,
       });
 

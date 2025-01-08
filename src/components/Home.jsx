@@ -6,7 +6,7 @@ import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 import KeyPad from './KeyPad';
 import NetworkMonitor from './NetworkMonitor';
 
-const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, requestTime }) => {
+const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArray }) => {
   const [isHovered, setIsHovered] = useState(false);
   const formatPhoneNumber = useFormatPhoneNumber();
 
@@ -22,7 +22,7 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, requestTime
         <div className="flex justify-between items-center mb-4">
           <div className="text-xl font-bold text-primary">WebPhone</div>
           <div className='flex items-center gap-4'>
-            <NetworkMonitor requestTime={requestTime} />
+            <NetworkMonitor timeoutArray={timeoutArray} />
             <div
               className="cursor-pointer text-primary"
               onClick={() => {
