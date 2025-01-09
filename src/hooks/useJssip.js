@@ -38,7 +38,7 @@ const useJssip = () => {
   const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
   const createConferenceCall = async () => {
     try {
-      const response = await fetch(`https://${window.location.origin}/reqConf/${username}`, {
+      const response = await fetch(`${window.location.origin}/reqConf/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ const useJssip = () => {
     try {
       const response = await withTimeout(
         axios.post(
-          `https://${window.location.origin}/userconnection`,
+          `${window.location.origin}/userconnection`,
           { user: username },
           { headers: { 'Content-Type': 'application/json' } }
         ),
@@ -113,7 +113,7 @@ const useJssip = () => {
 
   useEffect(() => {
     if (username) {
-      const url = `https://${window.location.origin}/userready/${username}`;
+      const url = `${window.location.origin}/userready/${username}`;
       axios
         .post(url, {}, { headers: { 'Content-Type': 'application/json' } })
         .then((response) => {
@@ -247,7 +247,7 @@ const useJssip = () => {
   const answercall = async () => {
     try {
       const response = await axios.post(
-        `https://${window.location.origin}/useroncall/${username}`,
+        `${window.location.origin}/useroncall/${username}`,
         {},
         {
           headers: {
@@ -274,7 +274,7 @@ const useJssip = () => {
     if (!session) return;
 
     try {
-      const response = await fetch(`https://${window.location.origin}/reqUnHold/${username}`, {
+      const response = await fetch(`${window.location.origin}/reqUnHold/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -302,7 +302,7 @@ const useJssip = () => {
 
     try {
       if (!isHeld) {
-        await fetch(`https://${window.location.origin}/reqHold/${username}`, {
+        await fetch(`${window.location.origin}/reqHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -318,7 +318,7 @@ const useJssip = () => {
 
         setIsHeld(true);
       } else {
-        await fetch(`https://${window.location.origin}/reqUnHold/${username}`, {
+        await fetch(`${window.location.origin}/reqUnHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -742,7 +742,7 @@ const useJssip = () => {
         },
       ]);
       localStorage.setItem('dialing', true);
-      fetch(`https://${window.location.origin}/dialnumber`, {
+      fetch(`${window.location.origin}/dialnumber`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -759,7 +759,7 @@ const useJssip = () => {
       if (dispositionModal) {
         try {
           await axios.post(
-            `https://${window.location.origin}/user/callended${username}`,
+            `${window.location.origin}/user/callended${username}`,
             {},
             {
               headers: {

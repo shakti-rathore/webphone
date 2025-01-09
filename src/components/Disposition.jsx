@@ -7,7 +7,7 @@ import UserCall from './UserCall';
 import BreakDropdown from './BreakDropdown';
 
 const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData, formData }) => {
-  const { username, selectedBreak, setSelectedBreak } = useContext(HistoryContext);
+  const { username } = useContext(HistoryContext);
   const [selectedAction, setSelectedAction] = useState(null);
   const [isAutoLeadDialDisabled, setIsAutoLeadDialDisabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,6 +46,7 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
           },
         }
       );
+
       if (dispositionResponse.data.success) {
         handleContact();
         toast.success('Disposition submitted successfully');
@@ -59,7 +60,7 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedAction, bridgeID, username, handleContact, setDispositionModal, selectedBreak, setSelectedBreak]);
+  }, [selectedAction, bridgeID, username, handleContact, setDispositionModal]);
 
   useEffect(() => {
     let isMounted = true;
@@ -110,7 +111,7 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
           </div>
 
           <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
-            <BreakDropdown />
+            <BreakDropdown bridgeID={bridgeID} dispoWithBreak={true} />
             <button
               type="button"
               onClick={() => setUserCallOpen(true)}

@@ -40,17 +40,14 @@ const TopBar = () => {
         ))}
       </ul>
       <div className="flex items-center gap-x-3 md:gap-x-6 flex-wrap md:flex-nowrap">
-        {/* Username Display */}
         <div className="flex items-center gap-x-2 px-3 py-2 rounded-md bg-gray-100 dark:bg-[#333]">
           <span className="font-semibold text-primary dark:text-[#00498e] text-sm md:text-base">
             {username || 'Guest'}
           </span>
         </div>
 
-        {/* Break Dropdown */}
-        <BreakDropdown />
+        <BreakDropdown dispoWithBreak={false} />
 
-        {/* Drop Calls Button */}
         <div className="relative">
           <button onClick={() => setDropCalls(true)} className="hidden sm:block primary-btn text-sm md:text-base">
             Drop Calls
@@ -60,7 +57,6 @@ const TopBar = () => {
           </button>
         </div>
 
-        {/* Logout Buttons */}
         <button className="primary-btn sm:block hidden text-sm md:text-base" onClick={handleLogout}>
           Logout
         </button>
@@ -68,7 +64,6 @@ const TopBar = () => {
           <FiLogOut />
         </button>
 
-        {/* Dark Mode Toggle */}
         <DarkModeToggle toggleTheme={toggleTheme} />
       </div>
     </header>

@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import axios from 'axios';
 import HistoryContext from '../context/HistoryContext';
 import { BsClock } from 'react-icons/bs';
+import toast from 'react-hot-toast';
 
-const BreakDropdown = () => {
+const BreakDropdown = ({ bridgeID, dispoWithBreak }) => {
   const { username, selectedBreak, setSelectedBreak } = useContext(HistoryContext);
   const [isOpen, setIsOpen] = useState(false);
   const [timer, setTimer] = useState(0);
@@ -52,7 +53,7 @@ const BreakDropdown = () => {
 
   const removeBreak = async () => {
     try {
-      const response = await axios.post(`https://${window.location.origin}/user/removebreakuser:${username}`);
+      const response = await axios.post(`${window.location.origin}/user/removebreakuser:${username}`);
       if (response.status === 200) {
         setSelectedBreak('Break');
         setIsOpen(false);
@@ -69,16 +70,39 @@ const BreakDropdown = () => {
     }
 
     try {
-      const response = await axios.post(`https://${window.location.origin}/user/breakuser:${username}`, {
+      if (dispoWithBreak && breakType !== 'Break') {
+        const dispositionData = {
+          bridgeID: bridgeID,
+          Disposition: `dispoWithBreak`,
+        };
+
+        const dispositionResponse = await axios.post(
+          `${window.location.origin}/user/disposition${username}`,
+          dispositionData,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (!dispositionResponse.data.success) {
+          throw new Error('Disposition failed');
+        }
+      }
+
+      const response = await axios.post(`${window.location.origin}/user/breakuser:${username}`, {
         breakType,
       });
 
       if (response.status === 200) {
         setSelectedBreak(breakType);
         setIsOpen(false);
+        toast.success('Break applied successfully');
       }
     } catch (error) {
       console.error('Error selecting break:', error);
+      toast.error('Error applying break');
     }
   };
 
@@ -120,7 +144,7 @@ const BreakDropdown = () => {
           ref={dropdownRef}
           className="absolute z-10 mt-2 w-48 bg-white border dark:bg-black/50 dark:text-white dark:border-[#999] border-gray-200 rounded-md shadow-lg"
         >
-          {breakTypes.map(({ type, label, color }) => (
+          {breakTypes.map(({ type, label }) => (
             <li
               key={type}
               onClick={() => sendBreakSelection(type)}
