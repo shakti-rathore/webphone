@@ -42,7 +42,7 @@ const CallScreen = ({
 
   const handleTransfer = async () => {
     try {
-      const response = await axios.post(`${window.location.origin}//reqTransfer/${username}`, {});
+      const response = await axios.post(`${window.location.origin}//dialmissedcall/${username}`, {});
       console.log('Response:', response.data);
       toast.success('Request successful!');
     } catch (error) {
@@ -71,7 +71,7 @@ const CallScreen = ({
             <BsPersonFill className="text-white text-2xl" />
           </div>
           <marquee className="text-2xl font-bold text-primary mb-2">
-            {(phoneNumber && formatPhoneNumber(phoneNumber)) || (userCall && userCall.contactNumber)}
+            {( conferenceNumber || phoneNumber && formatPhoneNumber(phoneNumber)) || (userCall && userCall.contactNumber)}
             {(isMerged && conferenceNumber) && ' Conference with ' + conferenceNumber}
           </marquee>
           {!isRunning ? (

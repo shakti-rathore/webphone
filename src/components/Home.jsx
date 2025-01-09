@@ -11,7 +11,7 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArra
   const formatPhoneNumber = useFormatPhoneNumber();
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && phoneNumber.length === 12) {
       handleCall();
     }
   };
@@ -21,7 +21,7 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArra
       <div className="w-full max-w-72 p-4 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
         <div className="flex justify-between items-center mb-4">
           <div className="text-xl font-bold text-primary">WebPhone</div>
-          <div className='flex items-center gap-4'>
+          <div className="flex items-center gap-4">
             <NetworkMonitor timeoutArray={timeoutArray} />
             <div
               className="cursor-pointer text-primary"
@@ -38,7 +38,10 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArra
             type="text"
             value={formatPhoneNumber(phoneNumber)}
             onChange={(e) => {
-              setPhoneNumber(e.target.value);
+              const input = e.target.value;
+              if (input.length <= 12) {
+                setPhoneNumber(input);
+              }
             }}
             onKeyDown={handleKeyDown}
             autoFocus
@@ -60,8 +63,9 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArra
         <KeyPad setPhoneNumber={setPhoneNumber} />
         <div className="text-center">
           <button
-            className="p-4 mt-4 bg-green-500 text-white rounded-full hover:bg-green-600 focus:outline-none focus:bg-green-500"
+            className="p-4 mt-4 bg-green-500 text-white rounded-full hover:bg-green-600 focus:outline-none focus:bg-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
             onClick={handleCall}
+            disabled={phoneNumber.length !== 12}
           >
             <FiPhone size={20} />
           </button>

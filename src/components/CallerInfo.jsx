@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { FiPhone } from 'react-icons/fi';
-import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
-const CallerInfo = ({ usermissedCalls, setDropCalls, setPhoneNumber, handleCall, phoneNumber }) => {
-  const formatPhoneNumber = useFormatPhoneNumber();
-
+const CallerInfo = ({ usermissedCalls, setDropCalls, username }) => {
   const groupedCalls = useMemo(() => {
     return Object.values(usermissedCalls || {}).reduce((acc, call) => {
       if (!call?.Caller) return acc;
@@ -30,23 +29,21 @@ const CallerInfo = ({ usermissedCalls, setDropCalls, setPhoneNumber, handleCall,
   };
 
   const initiateCall = useCallback(
-    (caller) => {
-      const sanitizedCaller = removeCountryCode(caller);
-      setPhoneNumber(formatPhoneNumber(sanitizedCaller));
-    },
-    [setPhoneNumber, formatPhoneNumber]
-  );
-
-  useEffect(() => {
-    if (phoneNumber) {
-      const timer = setTimeout(() => {
-        handleCall();
+    async (caller) => {
+      try {
+        const sanitizedCaller = removeCountryCode(caller);
+        const response = await axios.post(`${window.location.origin}/dialmissedcall`, {
+          caller: username,
+          receiver: sanitizedCaller,
+        });
         setDropCalls(false);
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [phoneNumber]);
+      } catch (error) {
+        console.error('Error:', error);
+        toast.error('Request failed. Please try again.');
+      }
+    },
+    [username]
+  );
 
   if (Object.entries(groupedCalls).length === 0) {
     return (

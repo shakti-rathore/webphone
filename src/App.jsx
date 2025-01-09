@@ -49,7 +49,7 @@ function App() {
 
   const [seeLogs, setSeeLogs] = useState(false);
   const [callConference, setCallConference] = useState(false);
-  const { username, dropCalls, setDropCalls, setSelectedBreak } = useContext(HistoryContext);
+  const { username, dropCalls, setDropCalls } = useContext(HistoryContext);
   const [usermissedCalls, setUsermissedCalls] = useState([]);
   const [phoneShow, setPhoneShow] = useState(false);
   const length = Object.keys(usermissedCalls).length;
@@ -73,7 +73,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (ringtone.length != 0) {
+    if (ringtone.length >= 0) {
       fetchUserMissedCalls();
     }
   }, [ringtone]);
@@ -148,9 +148,15 @@ function App() {
     setCallConference(false);
   }
 
+  useEffect(() => {
+    if (status == 'calling') {
+      setPhoneShow(false);
+    }
+  }, [status, phoneShow]);
+
   return (
     <>
-      <div className="px-1.5 py-1 rounded-full bg-red-500 flex text-sm items-center justify-center fixed -translate-x-48 sm:-translate-x-[22rem] top-2 z-50 right-0 text-white">
+      <div className="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center fixed -translate-x-48 sm:-translate-x-[22rem] top-2 z-50 right-0 text-white text-sm">
         {length}
       </div>
 
@@ -167,13 +173,7 @@ function App() {
         )}
         {dropCalls && (
           <Modal isOpen={dropCalls} onClose={() => setDropCalls(false)} title={`User Missed Calls (${length})`}>
-            <CallerInfo
-              usermissedCalls={usermissedCalls}
-              setDropCalls={setDropCalls}
-              setPhoneNumber={setPhoneNumber}
-              handleCall={handleCall}
-              phoneNumber={phoneNumber}
-            />
+            <CallerInfo usermissedCalls={usermissedCalls} setDropCalls={setDropCalls} username={username} />
           </Modal>
         )}
         {ringtone.length > 0 && (
@@ -207,7 +207,6 @@ function App() {
                     className="primary-btn"
                     onClick={() => {
                       setPhoneShow(!phoneShow);
-                      setSelectedBreak((!phoneShow && 'TeaBreak') || 'Break');
                     }}
                   >
                     {!phoneShow ? 'Hide Phone' : 'Show Phone'}
@@ -216,7 +215,7 @@ function App() {
               </div>
             )}
             <div
-              className={`w-full ${(phoneShow && 'opacity- hidden') || 'opacity-100'} ${
+              className={`w-full ${(phoneShow && 'opacity-0') || 'opacity-100'} ${
                 status !== 'start' ? 'lg:w-2/3' : ''
               }`}
             >

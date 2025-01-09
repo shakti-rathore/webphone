@@ -1,5 +1,5 @@
 import React, { useContext, useState, useCallback, useEffect } from 'react';
-import { FaArrowRight, FaUser, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaArrowRight } from 'react-icons/fa';
 import { FiPhone } from 'react-icons/fi';
 import axios from 'axios';
 import HistoryContext from '../context/HistoryContext';
