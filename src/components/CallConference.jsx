@@ -3,15 +3,26 @@ import { FiPhone } from 'react-icons/fi';
 import { TiBackspaceOutline, TiBackspace } from 'react-icons/ti';
 import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 import KeyPad from './KeyPad';
+import toast from 'react-hot-toast';
 
 const CallConference = ({ conferenceNumber, handleCall, setCallConference, phoneNumber, setConferenceNumber }) => {
   const [isHovered, setIsHovered] = useState(false);
   const formatPhoneNumber = useFormatPhoneNumber();
+
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && conferenceNumber.length === 12) {
+    if (e.key === 'Enter') {
       handleCall();
     }
   };
+
+  const handleCallClick = () => {
+    if (!conferenceNumber || conferenceNumber.length < 12) {
+      toast.error('Conference number must be 10 digits');
+      return;
+    }
+    handleCall();
+  };
+
   return (
     <div className="flex flex-col items-center md:justify-center min-h-screen">
       <div className="w-full max-w-72 p-4 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)]">
@@ -53,8 +64,7 @@ const CallConference = ({ conferenceNumber, handleCall, setCallConference, phone
         <div className="text-center">
           <button
             className="p-4 mt-4 bg-green-500 text-white rounded-full hover:bg-green-600 focus:outline-none focus:bg-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
-            onClick={handleCall}
-            disabled={conferenceNumber.length !== 12}
+            onClick={handleCallClick}
           >
             <FiPhone size={20} />
           </button>

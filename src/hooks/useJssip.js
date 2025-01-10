@@ -36,6 +36,7 @@ const useJssip = () => {
   });
   const navigate = useNavigate();
   const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
+
   const createConferenceCall = async () => {
     try {
       const response = await fetch(`${window.location.origin}/reqConf/${username}`, {
@@ -44,27 +45,26 @@ const useJssip = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          confNumber: conferenceNumber,
-        }).replace(/\s+/g, ''),
+          confNumber: conferenceNumber.replace(/\s+/g, ''),
+        }),
       });
 
       const data = await response.json();
-      if (data.message === 'conferance call dialed') {
+
+      if (data.message === 'conference call dialed') {
         if (data.result) {
           setBridgeID(data.result);
         }
         setConferenceStatus(true);
         setStatus('conference');
-      } else if (data.message === 'error dialing conferance call') {
+      } else if (data.message === 'error dialing conference call') {
         console.error('Conference call dialing failed');
-
         setStatus('calling');
       } else {
         console.log('Unexpected response:', data.message);
       }
     } catch (error) {
       console.error('Error creating conference call:', error);
-
       setStatus('calling');
     }
   };
@@ -725,7 +725,6 @@ const useJssip = () => {
     return () => {
       navigator.mediaDevices.removeEventListener('devicechange', enumerateDevices);
 
-      // Clean up the "newMessage" event listener
       if (ua) {
         ua.off('newMessage');
       }
@@ -733,25 +732,35 @@ const useJssip = () => {
   }, [username, password, navigate]);
 
   const handleCall = () => {
-    if (phoneNumber) {
-      setHistory((prev) => [
-        ...prev,
-        {
-          startTime: new Date(),
-          phoneNumber,
-        },
-      ]);
-      localStorage.setItem('dialing', true);
-      fetch(`${window.location.origin}/dialnumber`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ caller: username, receiver: phoneNumber }),
-      }).then(() => {
-        answercall();
-      });
+    console.log(phoneNumber, 'ssss')
+    if (!phoneNumber || phoneNumber.length < 12) {
+      toast.error('Phone number must be 10 digit');
+      return;
     }
+
+    setHistory((prev) => [
+      ...prev,
+      {
+        startTime: new Date(),
+        phoneNumber,
+      },
+    ]);
+    localStorage.setItem('dialing', true);
+
+    fetch(`${window.location.origin}/dialnumber`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ caller: username, receiver: phoneNumber }),
+    })
+      .then(() => {
+        answercall();
+      })
+      .catch((error) => {
+        console.error('Error dialing:', error);
+        toast.error('Failed to initiate the call');
+      });
   };
 
   useEffect(() => {

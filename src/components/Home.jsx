@@ -11,7 +11,7 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArra
   const formatPhoneNumber = useFormatPhoneNumber();
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && phoneNumber.length === 12) {
+    if (e.key === 'Enter') {
       handleCall();
     }
   };
@@ -65,7 +65,6 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArra
           <button
             className="p-4 mt-4 bg-green-500 text-white rounded-full hover:bg-green-600 focus:outline-none focus:bg-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
             onClick={handleCall}
-            disabled={phoneNumber.length !== 12}
           >
             <FiPhone size={20} />
           </button>

@@ -4,8 +4,9 @@ import { FiPhone } from 'react-icons/fi';
 import axios from 'axios';
 import HistoryContext from '../context/HistoryContext';
 import { InputField } from './table/InputField';
+import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 
-const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
+const AutoDial = ({ setPhoneNumber, dispositionModal, handleCall }) => {
   const { username } = useContext(HistoryContext);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -20,12 +21,14 @@ const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [currentLeadId, setCurrentLeadId] = useState(null);
+  const [isManualPhone, setIsManualPhone] = useState(false);
+  const formatPhoneNumber = useFormatPhoneNumber();
 
   const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [id.replace('lead', '').charAt(0).toLowerCase() + id.replace('lead', '').slice(1)]: value,
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
     }));
   };
 
@@ -50,7 +53,6 @@ const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
 
       if (response.data.result) {
         const result = response.data.result;
-
         setFormData({
           fullName: result.name || '',
           emailAddress: result.emailAddress || '',
@@ -62,11 +64,18 @@ const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
           postalCode: result.postalCode || '',
           state: result.state || '',
         });
-
         setCurrentLeadId(result.leadId);
+        setIsManualPhone(false);
+      } else {
+        setIsManualPhone(true);
+        setFormData({
+          ...formData,
+          phoneNumber: '',
+        });
       }
     } catch (err) {
       console.error('Error submitting lead:', err);
+      setIsManualPhone(true);
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +94,6 @@ const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
 
       if (response.data.result) {
         const result = response.data.result;
-
         setFormData({
           fullName: result.name || '',
           emailAddress: result.emailAddress || '',
@@ -97,17 +105,31 @@ const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
           postalCode: result.postalCode || '',
           state: result.state || '',
         });
-
         setCurrentLeadId(result.leadId);
+        setIsManualPhone(false);
+      } else {
+        setIsManualPhone(true);
+        setFormData({
+          ...formData,
+          phoneNumber: '',
+        });
       }
     } catch (err) {
       console.error('Error fetching next lead:', err);
+      setIsManualPhone(true);
     } finally {
       setIsLoading(false);
     }
   }, [currentLeadId]);
 
   const handleLeadCall = async () => {
+    if (isManualPhone) {
+      const formattedNumber = formatPhoneNumber(formData.phoneNumber);
+      setPhoneNumber(formattedNumber);
+      handleCall(formattedNumber);
+      return;
+    }
+
     const payload = {
       caller: username,
       leaddata: {
@@ -120,7 +142,7 @@ const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
     setIsLoading(true);
     try {
       const response = await axios.post(`${window.location.origin}/leaddialnumber`, payload);
-      if (response.data && response.data) {
+      if (response.data) {
         localStorage.setItem('dialing', true);
         setPhoneNumber(formData.phoneNumber);
       } else {
@@ -132,7 +154,6 @@ const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="max-w-lg p-3 bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] dark:bg-[#333]">
       <form>
@@ -167,9 +188,8 @@ const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
             placeholder="Enter phone number"
             value={formData.phoneNumber}
             onChange={handleInputChange}
-            disabled
+            disabled={!isManualPhone}
           />
-
           <InputField
             label="Alternate Number"
             type="text"
@@ -201,6 +221,7 @@ const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
           />
 
           <InputField label="District" type="text" name="district" disabled placeholder="Enter District" />
+
           <InputField
             id="leadstate"
             label="State"
@@ -246,9 +267,9 @@ const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
               e.preventDefault();
               handleLeadCall();
             }}
-            disabled={isLoading}
+            disabled={isLoading || !formData.phoneNumber}
             className={`primary-btn flex items-center
-      ${isLoading ? 'bg-blue-300 cursor-not-allowed' : ''}`}
+              ${isLoading || !formData.phoneNumber ? 'bg-blue-300 cursor-not-allowed' : ''}`}
             aria-label={isLoading ? 'Dialing...' : 'Dial Lead'}
           >
             {isLoading ? (
@@ -265,7 +286,7 @@ const AutoDial = ({ setPhoneNumber, dispositionModal }) => {
             onClick={handleNextLead}
             disabled={isLoading}
             className={`sm:w-auto flex items-center justify-center text-white px-4 py-2 rounded transition-colors text-sm sm:text-base
-      ${isLoading ? 'bg-green-300 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
+              ${isLoading ? 'bg-green-300 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
             aria-label={isLoading ? 'Loading next lead...' : 'Next Lead'}
           >
             {isLoading ? (

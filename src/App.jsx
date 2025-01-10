@@ -148,12 +148,6 @@ function App() {
     setCallConference(false);
   }
 
-  useEffect(() => {
-    if (status == 'calling') {
-      setPhoneShow(false);
-    }
-  }, [status, phoneShow]);
-
   return (
     <>
       <div className="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center fixed -translate-x-48 sm:-translate-x-[22rem] top-2 z-50 right-0 text-white text-sm">
@@ -201,7 +195,7 @@ function App() {
               </div>
             )) || (
               <div className="w-full lg:w-2/5 relative">
-                <AutoDial setPhoneNumber={setPhoneNumber} dispositionModal={dispositionModal} />
+                <AutoDial setPhoneNumber={setPhoneNumber} dispositionModal={dispositionModal} handleCall={handleCall} phoneNumber={phoneNumber} />
                 <div className="bottom-3 left-64 whitespace-nowrap absolute">
                   <button
                     className="primary-btn"
@@ -214,21 +208,19 @@ function App() {
                 </div>
               </div>
             )}
-            <div
-              className={`w-full ${(phoneShow && 'opacity-0') || 'opacity-100'} ${
-                status !== 'start' ? 'lg:w-2/3' : ''
-              }`}
-            >
+            <div className={`w-full ${status !== 'start' ? 'lg:w-2/3' : ''}`}>
               {seeLogs ? (
                 <HistoryScreen setSeeLogs={setSeeLogs} />
               ) : status === 'start' ? (
-                <Home
-                  phoneNumber={phoneNumber}
-                  setPhoneNumber={setPhoneNumber}
-                  handleCall={handleCall}
-                  setSeeLogs={setSeeLogs}
-                  timeoutArray={timeoutArray}
-                />
+                <div className={`${(phoneShow && 'opacity-0') || 'opacity-100'}`}>
+                  <Home
+                    phoneNumber={phoneNumber}
+                    setPhoneNumber={setPhoneNumber}
+                    handleCall={handleCall}
+                    setSeeLogs={setSeeLogs}
+                    timeoutArray={timeoutArray}
+                  />
+                </div>
               ) : status === 'calling' || status === 'conference' ? (
                 callConference ? (
                   <CallConference
