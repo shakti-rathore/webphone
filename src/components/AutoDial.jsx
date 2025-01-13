@@ -5,6 +5,7 @@ import axios from 'axios';
 import HistoryContext from '../context/HistoryContext';
 import { InputField } from './table/InputField';
 import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
+import toast from 'react-hot-toast';
 
 const AutoDial = ({ setPhoneNumber, dispositionModal, handleCall }) => {
   const { username } = useContext(HistoryContext);
@@ -87,7 +88,10 @@ const AutoDial = ({ setPhoneNumber, dispositionModal, handleCall }) => {
       preleadid: currentLeadId,
       dialstatus: false,
     };
-
+    if (formData.phoneNumber.length === 0) {
+      toast.error('No more leads for this campaign!');
+      return;
+    }
     setIsLoading(true);
     try {
       const response = await axios.post(`${window.location.origin}/nextleadforautocall`, payload);
@@ -123,6 +127,10 @@ const AutoDial = ({ setPhoneNumber, dispositionModal, handleCall }) => {
   }, [currentLeadId]);
 
   const handleLeadCall = async () => {
+    if (formData.phoneNumber.length === 0) {
+      toast.error('No more leads for this campaign!');
+      return;
+    }
     if (isManualPhone) {
       const formattedNumber = formatPhoneNumber(formData.phoneNumber);
       setPhoneNumber(formattedNumber);
@@ -267,9 +275,9 @@ const AutoDial = ({ setPhoneNumber, dispositionModal, handleCall }) => {
               e.preventDefault();
               handleLeadCall();
             }}
-            disabled={isLoading || !formData.phoneNumber}
+            disabled={isLoading}
             className={`primary-btn flex items-center
-              ${isLoading || !formData.phoneNumber ? 'bg-blue-300 cursor-not-allowed' : ''}`}
+              ${isLoading ? 'bg-blue-300 cursor-not-allowed' : ''}`}
             aria-label={isLoading ? 'Dialing...' : 'Dial Lead'}
           >
             {isLoading ? (

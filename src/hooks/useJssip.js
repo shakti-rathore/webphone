@@ -35,6 +35,7 @@ const useJssip = () => {
     autoStart: false,
   });
   const navigate = useNavigate();
+  // const originWithoutProtocol = 'esamwad.iotcom.io';
   const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
 
   const createConferenceCall = async () => {
