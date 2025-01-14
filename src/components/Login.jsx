@@ -3,12 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import HistoryContext from '../context/HistoryContext';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import CircularLoader from './CircularLoader';
 
 function Login() {
   const [validationErrors, setValidationErrors] = useState({});
   const { username, setUsername, password, setPassword } = useContext(HistoryContext);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loaderMessage, setLoaderMessage] = useState('');
+  const [timer, setTimer] = useState(0);
 
   const checkMicrophoneAccess = async () => {
     try {
@@ -33,6 +37,19 @@ function Login() {
     if (!values.password) errors.password = 'Please enter password';
     else if (values.password.length < 6) errors.password = 'Password length should be at least 6 characters';
     return errors;
+  };
+
+  const delay = async (ms, message) => {
+    setTimer(ms / 1000);
+    setLoaderMessage(message);
+    setIsLoading(true);
+
+    for (let i = ms / 1000; i > 0; i--) {
+      setTimer(i);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    setIsLoading(false);
   };
 
   const handleSubmit = useCallback(
@@ -76,29 +93,33 @@ function Login() {
 
         if (differenceInDays < 3 && differenceInDays > 0) {
           toast.error('Your subscription is about to expire. Please renew soon!');
+          localStorage.setItem('token', JSON.stringify(data));
         } else if (differenceInDays < 0) {
           const daysExpired = Math.abs(differenceInDays);
-          if (daysExpired <= 1) {
-            toast.error('Subscription expired yesterday');
-            await delay(10000);
-          } else if (daysExpired <= 3) {
-            toast.error('Subscription expired over 2 days ago');
-            await delay(20000);
-          } else if (daysExpired <= 4) {
-            toast.error('Subscription expired over 3 days ago');
-            await delay(30000);
-          } else if (daysExpired <= 5) {
-            toast.error('Subscription expired over 4 days ago');
-            await delay(60000);
-          } else {
-            toast.error('Subscription expired more than 5 days ago. Please renew to continue.');
+
+          if (daysExpired > 5) {
+            navigate('/webphone/subscription-expired');
             return;
           }
-        }
 
-        localStorage.setItem('token', JSON.stringify(data));
-        toast.success('Login successfully');
-        navigate('/webphone/dashboard');
+          if (daysExpired <= 1) {
+            await delay(10000, 'Subscription expired yesterday...');
+          } else if (daysExpired <= 3) {
+            await delay(20000, 'Subscription expired over 2 days ago...');
+          } else if (daysExpired <= 4) {
+            await delay(30000, 'Subscription expired over 3 days ago...');
+          } else if (daysExpired <= 5) {
+            await delay(60000, 'Subscription expired over 4 days ago...');
+          }
+
+          localStorage.setItem('token', JSON.stringify(data));
+          toast.success('Login successfully');
+          navigate('/webphone/dashboard');
+        } else {
+          localStorage.setItem('token', JSON.stringify(data));
+          toast.success('Login successfully');
+          navigate('/webphone/dashboard');
+        }
       } catch (err) {
         toast.error(err.message || 'Login failed. Please try again.');
       }
@@ -113,6 +134,7 @@ function Login() {
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
+      <CircularLoader isVisible={isLoading} timer={timer} message={loaderMessage} />
       <div className="flex justify-center items-center min-h-screen">
         <div className="w-full max-w-xs sm:max-w-xl lg:max-w-4xl bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -162,7 +184,5 @@ function Login() {
     </>
   );
 }
-
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default Login;

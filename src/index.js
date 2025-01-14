@@ -1,16 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { HistoryProvider } from './context/HistoryContext';
 import App from './App';
-import Campaign from './components/Campaign';
 import Login from './components/Login';
 import Layout from './components/layouts/Layout';
-import CampaignDetails from './components/CampaignDetails';
 import './index.css';
-import AutoDial from './components/AutoDial';
-import BreakDropdown from './components/BreakDropdown';
+import SubscriptionExpired from './components/SubscriptionExpired';
 
 const AppRoutes = () => {
   const CommonLayout = ({ children }) => (
@@ -28,6 +25,14 @@ const AppRoutes = () => {
           element={
             <HistoryProvider>
               <Login />
+            </HistoryProvider>
+          }
+        />
+        <Route
+          path="/webphone/subscription-expired"
+          element={
+            <HistoryProvider>
+              <SubscriptionExpired />
             </HistoryProvider>
           }
         />
@@ -61,7 +66,7 @@ const AppRoutes = () => {
             </HistoryProvider>
           }
         /> */}
-        <Route path="*" element={<Navigate to="/webphone/dashboard" replace />} />
+        {/* <Route path="*" element={<Navigate to="/webphone/dashboard" replace />} /> */}
       </Routes>
     </Router>
   );
