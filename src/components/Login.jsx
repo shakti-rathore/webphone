@@ -139,7 +139,11 @@ function Login() {
         <div className="w-full max-w-xs sm:max-w-xl lg:max-w-4xl bg-white rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2">
             <div className="hidden lg:block">
-              <img src="/images/calling.svg" alt="Login Image" className="object-cover w-full h-full" />
+              <img
+                src={`${window.location.origin}/webphone/images/calling.svg`}
+                alt="Login Image"
+                className="object-cover w-full h-full"
+              />
             </div>
             <div className="p-8 space-y-8">
               <h2 className="text-3xl font-semibold text-center text-primary">Login</h2>
