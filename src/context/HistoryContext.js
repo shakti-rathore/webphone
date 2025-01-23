@@ -17,6 +17,7 @@ export const HistoryProvider = ({ children }) => {
   const [password, setPassword] = useState('');
   const [selectedBreak, setSelectedBreak] = useState('Break');
   const [dropCalls, setDropCalls] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState('');
 
   useEffect(() => {
     localStorage.setItem('call-history', JSON.stringify(history));
@@ -35,6 +36,8 @@ export const HistoryProvider = ({ children }) => {
         setSelectedBreak,
         dropCalls,
         setDropCalls,
+        setSelectedStatus,
+        selectedStatus,
       }}
     >
       {children}

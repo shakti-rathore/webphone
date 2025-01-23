@@ -10,7 +10,7 @@ import { FaPhoneSlash } from 'react-icons/fa';
 const TopBar = () => {
   const toggleTheme = useTheme();
   const location = useLocation();
-  const { username, setDropCalls } = useContext(HistoryContext);
+  const { username, setDropCalls, selectedStatus } = useContext(HistoryContext);
 
   const navLinks = useMemo(
     () => [
@@ -46,10 +46,14 @@ const TopBar = () => {
           </span>
         </div>
 
-        <BreakDropdown dispoWithBreak={false} />
+        <BreakDropdown dispoWithBreak={false} selectedStatus={selectedStatus} />
 
         <div className="relative">
-          <button onClick={() => setDropCalls(true)} className="hidden sm:block primary-btn text-sm md:text-base">
+          <button
+            onClick={() => setDropCalls(true)}
+            className="hidden sm:block primary-btn text-sm md:text-base"
+            disabled={selectedStatus !== 'start'}
+          >
             Drop Calls
           </button>
           <button onClick={() => setDropCalls(true)} className="block sm:hidden text-sm md:text-base">
@@ -57,10 +61,18 @@ const TopBar = () => {
           </button>
         </div>
 
-        <button className="primary-btn sm:block hidden text-sm md:text-base" onClick={handleLogout}>
+        <button
+          className="primary-btn sm:block hidden text-sm md:text-base"
+          disabled={selectedStatus !== 'start'}
+          onClick={handleLogout}
+        >
           Logout
         </button>
-        <button className="block sm:hidden text-sm md:text-base" onClick={handleLogout}>
+        <button
+          className="block sm:hidden text-sm md:text-base"
+          disabled={selectedStatus !== 'start'}
+          onClick={handleLogout}
+        >
           <FiLogOut />
         </button>
 

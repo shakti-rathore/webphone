@@ -4,7 +4,7 @@ import HistoryContext from '../context/HistoryContext';
 import { BsClock } from 'react-icons/bs';
 import toast from 'react-hot-toast';
 
-const BreakDropdown = ({ bridgeID, dispoWithBreak }) => {
+const BreakDropdown = ({ bridgeID, dispoWithBreak, selectedStatus }) => {
   const { username, selectedBreak, setSelectedBreak } = useContext(HistoryContext);
   const [isOpen, setIsOpen] = useState(false);
   const [timer, setTimer] = useState(0);
@@ -129,7 +129,7 @@ const BreakDropdown = ({ bridgeID, dispoWithBreak }) => {
 
   return (
     <div className="relative inline-block text-left">
-      <button onClick={handleButtonClick} className={buttonClassName}>
+      <button onClick={handleButtonClick} className={buttonClassName} disabled={selectedStatus !== 'start'}>
         <span>{selectedBreak === 'Break' ? 'Break' : `${selectedBreak.replace('Break', '')} Break`}</span>
         {selectedBreak !== 'Break' && (
           <div className="flex items-center space-x-1">

@@ -49,7 +49,8 @@ function App() {
 
   const [seeLogs, setSeeLogs] = useState(false);
   const [callConference, setCallConference] = useState(false);
-  const { username, dropCalls, setDropCalls, selectedBreak } = useContext(HistoryContext);
+  const { username, dropCalls, setDropCalls, selectedBreak, setSelectedStatus, selectedStatus } =
+    useContext(HistoryContext);
   const [usermissedCalls, setUsermissedCalls] = useState([]);
   const [phoneShow, setPhoneShow] = useState(false);
   const length = Object.keys(usermissedCalls).length;
@@ -68,9 +69,9 @@ function App() {
     comment: '',
   });
 
-  // useEffect(() => {
-  //   fetchUserMissedCalls();
-  // }, []);
+  useEffect(() => {
+    fetchUserMissedCalls();
+  }, []);
 
   useEffect(() => {
     if (selectedBreak != 'Break' && ringtone.length >= 0) {
@@ -91,6 +92,12 @@ function App() {
   useEffect(() => {
     if (status === 'start') {
       stopRecording();
+    }
+  }, [status]);
+
+  useEffect(() => {
+    if (status) {
+      setSelectedStatus(status);
     }
   }, [status]);
 
