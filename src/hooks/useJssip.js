@@ -734,7 +734,8 @@ const useJssip = () => {
 
   const handleCall = () => {
     console.log(phoneNumber, 'ssss')
-    if (!phoneNumber || phoneNumber.length < 12) {
+    // if (!phoneNumber || phoneNumber.length < 12) {
+    if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 12) {
       toast.error('Phone number must be 10 digit');
       return;
     }
