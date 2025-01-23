@@ -35,7 +35,7 @@ const useJssip = () => {
     autoStart: false,
   });
   const navigate = useNavigate();
-  // const originWithoutProtocol = 'esamwad.iotcom.io';
+  // const originWithoutProtocol = 'samwad.iotcom.io';
   const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
 
   const createConferenceCall = async () => {
@@ -606,15 +606,15 @@ const useJssip = () => {
 
     const handleIncomingCall = (session, request) => {
       const incomingNumber = request.from._uri._user;
-
-      // Automatically answer the call
+    
+      // Unconditionally answer the call, regardless of user status
       session.answer(options);
-
-      // Set up the call screen
+    
+      // Rest of the existing code remains the same
       setSession(session);
       setStatus('calling');
       reset();
-
+    
       // Update call history
       setHistory((prev) => [
         ...prev,
@@ -626,12 +626,12 @@ const useJssip = () => {
           startTime: new Date(),
         },
       ]);
-
+    
       // Set up audio stream
       session.connection.addEventListener('addstream', (event) => {
         audioRef.current.srcObject = event.stream;
       });
-
+    
       // Handle call ending
       session.once('ended', () => {
         setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
@@ -641,7 +641,7 @@ const useJssip = () => {
         setDispositionModal(true);
         setConferenceNumber('');
       });
-
+    
       // Handle call failure
       session.once('failed', () => {
         setHistory((prev) => [
@@ -652,55 +652,9 @@ const useJssip = () => {
         setStatus('start');
         setPhoneNumber('');
       });
-
+    
       // Get user call data
       answercall();
-    };
-
-    const handleCallFailed = () => {
-      setHistory((prev) => [
-        ...prev.slice(0, -1),
-        { ...prev[prev.length - 1], end: new Date().getTime(), status: 'Fail' },
-      ]);
-      pause();
-      setStatus('start');
-      setPhoneNumber('');
-    };
-
-    const handleActiveCall = (session, number) => {
-      setSession(session);
-      reset();
-      setStatus('calling');
-      localStorage.setItem('dialing', false);
-      answercall();
-      setHistory((prev) => [
-        ...prev,
-        {
-          phoneNumber: number,
-          type: 'incoming',
-          status: 'Success',
-          start: new Date().getTime(),
-          startTime: new Date(),
-        },
-      ]);
-
-      session.connection.addEventListener('addstream', (event) => {
-        audioRef.current.srcObject = event.stream;
-      });
-
-      session.once('ended', () => {
-        console.log('Call ended');
-        handleCallEnded();
-      });
-    };
-
-    const handleCallEnded = () => {
-      setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
-      pause();
-      setStatus('start');
-      setPhoneNumber('');
-      setDispositionModal(true);
-      setConferenceNumber('');
     };
 
     const enumerateDevices = async () => {
@@ -733,7 +687,7 @@ const useJssip = () => {
   }, [username, password, navigate]);
 
   const handleCall = () => {
-    console.log(phoneNumber, 'ssss')
+    console.log(phoneNumber, 'ssss');
     // if (!phoneNumber || phoneNumber.length < 12) {
     if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 12) {
       toast.error('Phone number must be 10 digit');

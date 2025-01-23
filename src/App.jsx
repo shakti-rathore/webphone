@@ -49,7 +49,7 @@ function App() {
 
   const [seeLogs, setSeeLogs] = useState(false);
   const [callConference, setCallConference] = useState(false);
-  const { username, dropCalls, setDropCalls } = useContext(HistoryContext);
+  const { username, dropCalls, setDropCalls, selectedBreak } = useContext(HistoryContext);
   const [usermissedCalls, setUsermissedCalls] = useState([]);
   const [phoneShow, setPhoneShow] = useState(false);
   const length = Object.keys(usermissedCalls).length;
@@ -68,12 +68,12 @@ function App() {
     comment: '',
   });
 
-  useEffect(() => {
-    fetchUserMissedCalls();
-  }, []);
+  // useEffect(() => {
+  //   fetchUserMissedCalls();
+  // }, []);
 
   useEffect(() => {
-    if (ringtone.length >= 0) {
+    if (selectedBreak != 'Break' && ringtone.length >= 0) {
       fetchUserMissedCalls();
     }
   }, [ringtone]);
@@ -194,20 +194,25 @@ function App() {
                 <UserCall userCall={userCall} username={username} formData={formData} setFormData={setFormData} />
               </div>
             )) || (
-                <div className="w-full lg:w-2/5 relative">
-                  <AutoDial setPhoneNumber={setPhoneNumber} dispositionModal={dispositionModal} handleCall={handleCall} phoneNumber={phoneNumber} />
-                  <div className="bottom-3 left-64 whitespace-nowrap absolute">
-                    <button
-                      className="primary-btn"
-                      onClick={() => {
-                        setPhoneShow(!phoneShow);
-                      }}
-                    >
-                      {!phoneShow ? 'Hide Phone' : 'Show Phone'}
-                    </button>
-                  </div>
+              <div className="w-full lg:w-2/5 relative">
+                <AutoDial
+                  setPhoneNumber={setPhoneNumber}
+                  dispositionModal={dispositionModal}
+                  handleCall={handleCall}
+                  phoneNumber={phoneNumber}
+                />
+                <div className="bottom-3 left-64 whitespace-nowrap absolute">
+                  <button
+                    className="primary-btn"
+                    onClick={() => {
+                      setPhoneShow(!phoneShow);
+                    }}
+                  >
+                    {!phoneShow ? 'Hide Phone' : 'Show Phone'}
+                  </button>
                 </div>
-              )}
+              </div>
+            )}
             <div className={`w-full ${status !== 'start' ? 'lg:w-2/3' : ''}`}>
               {seeLogs ? (
                 <HistoryScreen setSeeLogs={setSeeLogs} />

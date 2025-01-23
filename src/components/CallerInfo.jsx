@@ -53,9 +53,11 @@ const CallerInfo = ({ usermissedCalls, setDropCalls, username }) => {
     );
   }
 
+  const sortedEntries = Object.entries(groupedCalls).sort((a, b) => b[1].latestTime - a[1].latestTime);
+
   return (
-    <div className="p-3 space-y-4">
-      {Object.entries(groupedCalls).map(([caller, data]) => (
+    <div className="p-3 space-y-4 h-96 overflow-y-auto">
+      {sortedEntries.map(([caller, data]) => (
         <div
           key={caller}
           className="flex justify-between items-center border-b border-gray-200 pb-3 mb-3 last:border-b-0 last:mb-0"
