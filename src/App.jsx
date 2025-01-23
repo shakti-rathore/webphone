@@ -170,11 +170,11 @@ function App() {
             <CallerInfo usermissedCalls={usermissedCalls} setDropCalls={setDropCalls} username={username} />
           </Modal>
         )}
-        {(ringtone.length > 0 && status !== 'calling') && (
+        {/* {(ringtone.length > 0 && status !== 'calling') && (
           <audio controls autoPlay hidden>
             <source src={ringtoneMp3} type="audio/mp3" />
           </audio>
-        )}
+        )} */}
 
         {ringtone.length > 0 && (
           <marquee>
