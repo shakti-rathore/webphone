@@ -21,6 +21,8 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
     { action: 'Not Answered', label: 'N - Not Answered', color: '#64748B' },
     { action: 'Test Call', label: 'TEST - Test Call', color: '#9333EA' },
     { action: 'Connected', label: 'CO - Connected', color: '#0D9488' },
+    { action: 'Wrong Number', label: 'WN - Wrong Number', color: '#c20606' },
+    { action: 'Not Interested', label: 'NI - Not Interested', color: '#ed67b6' },
   ];
 
   const submitForm = useCallback(async () => {
