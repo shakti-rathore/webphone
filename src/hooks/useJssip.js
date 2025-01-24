@@ -245,32 +245,6 @@ const useJssip = () => {
     };
   }, []);
 
-  const answercall = async () => {
-    try {
-      const response = await axios.post(
-        `${window.location.origin}/useroncall/${username}`,
-        {},
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        setBridgeID(response.data.currentcalldata.bridgeID);
-        if (response.data.contactData) {
-          setUserCall(response.data.contactData);
-        }
-        setConferenceStatus(false);
-      } else {
-        console.error('Failed to unhold call');
-      }
-    } catch (error) {
-      console.error('Error unholding call:', error);
-    }
-  };
-
   const reqUnHold = async () => {
     if (!session) return;
 
@@ -553,6 +527,45 @@ const useJssip = () => {
     }
   };
 
+  const answercall = async (incomingNumber = null) => {
+    try {
+      const response = await axios.post(
+        `${window.location.origin}/useroncall/${username}`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setBridgeID(response.data.currentcalldata.bridgeID);
+        if (response.data.contactData) {
+          setUserCall(response.data.contactData);
+        }
+        setConferenceStatus(false);
+
+        if (incomingNumber) {
+          setHistory((prev) => [
+            ...prev,
+            {
+              phoneNumber: incomingNumber,
+              type: 'incoming',
+              status: 'Success',
+              start: new Date().getTime(),
+              startTime: new Date(),
+            },
+          ]);
+        }
+      } else {
+        console.error('Failed to process call');
+      }
+    } catch (error) {
+      console.error('Error processing call:', error);
+    }
+  };
+
   useEffect(() => {
     const initializeJsSIP = () => {
       try {
@@ -610,22 +623,12 @@ const useJssip = () => {
       // Unconditionally answer the call, regardless of user status
       session.answer(options);
     
-      // Rest of the existing code remains the same
       setSession(session);
       setStatus('calling');
       reset();
     
-      // Update call history
-      setHistory((prev) => [
-        ...prev,
-        {
-          phoneNumber: incomingNumber,
-          type: 'incoming',
-          status: 'Success',
-          start: new Date().getTime(),
-          startTime: new Date(),
-        },
-      ]);
+      // Call answercall with the incoming number
+      answercall(incomingNumber);
     
       // Set up audio stream
       session.connection.addEventListener('addstream', (event) => {
@@ -652,9 +655,6 @@ const useJssip = () => {
         setStatus('start');
         setPhoneNumber('');
       });
-    
-      // Get user call data
-      answercall();
     };
 
     const enumerateDevices = async () => {
@@ -687,8 +687,6 @@ const useJssip = () => {
   }, [username, password, navigate]);
 
   const handleCall = () => {
-    console.log(phoneNumber, 'ssss');
-    // if (!phoneNumber || phoneNumber.length < 12) {
     if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 12) {
       toast.error('Phone number must be 10 digit');
       return;
@@ -711,14 +709,14 @@ const useJssip = () => {
       body: JSON.stringify({ caller: username, receiver: phoneNumber }),
     })
       .then(() => {
-        answercall();
+        // Remove this line to prevent duplicate call to answercall
+        // answercall();
       })
       .catch((error) => {
         console.error('Error dialing:', error);
         toast.error('Failed to initiate the call');
       });
   };
-
   useEffect(() => {
     const callApi = async () => {
       if (dispositionModal) {
