@@ -50,7 +50,7 @@ const AutoDial = ({ setPhoneNumber, dispositionModal, handleCall }) => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post(`${window.location.origin}/leadforautocall`, payload);
+      const response = await axios.post(`https://samwad.iotcom.io/leadforautocall`, payload);
 
       if (response.data.result) {
         const result = response.data.result;
@@ -89,12 +89,12 @@ const AutoDial = ({ setPhoneNumber, dispositionModal, handleCall }) => {
       dialstatus: false,
     };
     if (formData.phoneNumber.length === 0) {
-      toast.error('No more leads for this campaign!');
+      // toast.error('No more leads for this campaign!');
       return;
     }
     setIsLoading(true);
     try {
-      const response = await axios.post(`${window.location.origin}/nextleadforautocall`, payload);
+      const response = await axios.post(`https://samwad.iotcom.io/nextleadforautocall`, payload);
 
       if (response.data.result) {
         const result = response.data.result;
@@ -149,7 +149,7 @@ const AutoDial = ({ setPhoneNumber, dispositionModal, handleCall }) => {
     };
     setIsLoading(true);
     try {
-      const response = await axios.post(`${window.location.origin}/leaddialnumber`, payload);
+      const response = await axios.post(`https://samwad.iotcom.io/leaddialnumber`, payload);
       if (response.data) {
         localStorage.setItem('dialing', true);
         setPhoneNumber(formData.phoneNumber);

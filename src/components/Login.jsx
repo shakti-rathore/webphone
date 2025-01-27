@@ -64,7 +64,7 @@ function Login() {
 
       try {
         const headers = { 'Content-Type': 'application/json' };
-        const response = await fetch(`${window.location.origin}/userlogin/${username}`, {
+        const response = await fetch(`https://samwad.iotcom.io/userlogin/${username}`, {
           method: 'POST',
           headers,
           body: JSON.stringify({ username, password }),
@@ -140,7 +140,7 @@ function Login() {
           <div className="grid grid-cols-1 lg:grid-cols-2">
             <div className="hidden lg:block">
               <img
-                src={`${window.location.origin}/webphone/images/calling.svg`}
+                src={`https://samwad.iotcom.io/webphone/images/calling.svg`}
                 alt="Login Image"
                 className="object-cover w-full h-full"
               />

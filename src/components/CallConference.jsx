@@ -60,7 +60,7 @@ const CallConference = ({ conferenceNumber, handleCall, setCallConference, phone
           )}
         </div>
 
-        <KeyPad setConferenceNumber={setConferenceNumber} />
+        <KeyPad setPhoneNumber={setConferenceNumber} />
         <div className="text-center">
           <button
             className="p-4 mt-4 bg-green-500 text-white rounded-full hover:bg-green-600 focus:outline-none focus:bg-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
