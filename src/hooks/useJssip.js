@@ -51,7 +51,7 @@ const useJssip = () => {
       });
 
       const data = await response.json();
-      if (data.message === "conferance call dialed") {
+      if (data.message === 'conferance call dialed') {
         if (data.result) {
           setBridgeID(data.result);
           setConferenceStatus(true);
@@ -90,10 +90,27 @@ const useJssip = () => {
       }
 
       const data = response.data;
+      const tokenData = JSON.parse(localStorage.getItem('token'));
+
+      if (!tokenData?.userData?.campaign) {
+        console.error('Campaign information missing in token data');
+        return;
+      }
+
+      const campaign = tokenData.userData.campaign;
 
       if (data.message === 'ok connection for user') {
-        setTimeoutArray([]);
-        setRingtone(data.currentCallqueue);
+        if (data.currentCallqueue?.length > 0) {
+          if (campaign === data.currentCallqueue[0].campaign) {
+            setTimeoutArray([]);
+            setRingtone(data.currentCallqueue);
+          } else {
+            console.log('Campaign mismatch:', campaign, data.currentCallqueue[0].campaign);
+          }
+        } else {
+          setRingtone([])
+          console.log('No current call queue data available');
+        }
       } else if (data.message === 'poor connection problem ,please login again') {
         localStorage.clear();
         window.location.href = '/webphone/login';
@@ -107,6 +124,10 @@ const useJssip = () => {
         addTimeout('network');
       } else {
         console.error('Error during connection check:', err);
+        if (err.response) {
+          console.error('Response data:', err.response.data);
+          console.error('Response status:', err.response.status);
+        }
       }
     }
   };
@@ -525,7 +546,7 @@ const useJssip = () => {
       }
     }
   };
-  console.log(conferenceStatus);
+
   const answercall = async (incomingNumber = null) => {
     try {
       const response = await axios.post(
