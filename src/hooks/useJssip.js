@@ -36,8 +36,8 @@ const useJssip = () => {
     autoStart: false,
   });
   const navigate = useNavigate();
-  // const originWithoutProtocol = 'samwad.iotcom.io';
-  const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
+  const originWithoutProtocol = 'samwad.iotcom.io';
+  // const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
 
   function notifyMe() {
     if (!('Notification' in window)) {
@@ -55,14 +55,13 @@ const useJssip = () => {
       });
     }
   }
-  console.log(inNotification);
 
   function createNotification() {
     const options = {
       body: `Incoming call from ${inNotification}`,
-      icon: '/images/badge.png',
-      badge: '/images/badge.png',
-      vibrate: [200, 100, 200],
+      icon: '/badge.png',
+      badge: '/badge.png',
+      vibrate: [5000, 4000, 5000],
       tag: 'notification-tag',
       renotify: true,
       requireInteraction: true,
@@ -83,7 +82,7 @@ const useJssip = () => {
 
   const createConferenceCall = async () => {
     try {
-      const response = await fetch(`${window.location.origin}/reqConf/${username}`, {
+      const response = await fetch(`https://samwad.iotcom.io/reqConf/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,7 +118,7 @@ const useJssip = () => {
     try {
       const response = await withTimeout(
         axios.post(
-          `${window.location.origin}/userconnection`,
+          `https://samwad.iotcom.io/userconnection`,
           { user: username },
           { headers: { 'Content-Type': 'application/json' } }
         ),
@@ -178,7 +177,7 @@ const useJssip = () => {
 
   useEffect(() => {
     if (username) {
-      const url = `${window.location.origin}/userready/${username}`;
+      const url = `https://samwad.iotcom.io/userready/${username}`;
       axios
         .post(url, {}, { headers: { 'Content-Type': 'application/json' } })
         .then((response) => {
@@ -313,7 +312,7 @@ const useJssip = () => {
     if (!session) return;
 
     try {
-      const response = await fetch(`${window.location.origin}/reqUnHold/${username}`, {
+      const response = await fetch(`https://samwad.iotcom.io/reqUnHold/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -341,7 +340,7 @@ const useJssip = () => {
 
     try {
       if (!isHeld) {
-        await fetch(`${window.location.origin}/reqHold/${username}`, {
+        await fetch(`https://samwad.iotcom.io/reqHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -357,7 +356,7 @@ const useJssip = () => {
 
         setIsHeld(true);
       } else {
-        await fetch(`${window.location.origin}/reqUnHold/${username}`, {
+        await fetch(`https://samwad.iotcom.io/reqUnHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -594,7 +593,7 @@ const useJssip = () => {
   const answercall = async (incomingNumber = null) => {
     try {
       const response = await axios.post(
-        `${window.location.origin}/useroncall/${username}`,
+        `https://samwad.iotcom.io/useroncall/${username}`,
         {},
         {
           headers: {
@@ -690,7 +689,7 @@ const useJssip = () => {
 
     const handleIncomingCall = (session, request) => {
       const incomingNumber = request.from._uri._user;
-      setInNotification(incomingNumber);
+      // setInNotification(incomingNumber);
       session.answer(options);
       setSession(session);
       setStatus('calling');
@@ -765,7 +764,7 @@ const useJssip = () => {
     ]);
     localStorage.setItem('dialing', true);
 
-    fetch(`${window.location.origin}/dialnumber`, {
+    fetch(`https://samwad.iotcom.io/dialnumber`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -786,7 +785,7 @@ const useJssip = () => {
       if (dispositionModal) {
         try {
           await axios.post(
-            `${window.location.origin}/user/callended${username}`,
+            `https://samwad.iotcom.io/user/callended${username}`,
             {},
             {
               headers: {
