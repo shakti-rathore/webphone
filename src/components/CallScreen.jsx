@@ -42,7 +42,7 @@ const CallScreen = ({
 
   const handleTransfer = async () => {
     try {
-      const response = await axios.post(`https://samwad.iotcom.io//dialmissedcall/${username}`, {});
+      const response = await axios.post(`https://samwad.iotcom.io/reqTransfer/${username}`, {});
       console.log('Response:', response.data);
       toast.success('Request successful!');
     } catch (error) {

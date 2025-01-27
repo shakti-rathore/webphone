@@ -20,6 +20,7 @@ const useJssip = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [userCall, setUserCall] = useState('');
   const [ringtone, setRingtone] = useState('');
+  const [inNotification, setInNotification] = useState('');
   const [isHeld, setIsHeld] = useState(false);
   const [conferenceStatus, setConferenceStatus] = useState(false);
   const [dispositionModal, setDispositionModal] = useState(false);
@@ -54,10 +55,11 @@ const useJssip = () => {
       });
     }
   }
+  console.log(inNotification);
 
-  function createNotification(incomingNumber) {
+  function createNotification() {
     const options = {
-      body: `Incoming call from ${incomingNumber || ringtone.map((call) => call.Caller)}`,
+      body: `Incoming call from ${inNotification}`,
       icon: '/images/badge.png',
       badge: '/images/badge.png',
       vibrate: [200, 100, 200],
@@ -73,7 +75,9 @@ const useJssip = () => {
       window.focus();
       notification.close();
     };
-
+    // notification.onclose = function () {
+    //   console.log('Call notification closed');
+    // };
     return notification;
   }
 
@@ -143,6 +147,7 @@ const useJssip = () => {
           if (campaign === data.currentCallqueue[0].campaign) {
             setTimeoutArray([]);
             setRingtone(data.currentCallqueue);
+            setInNotification(data.currentCallqueue.map((call) => call.Caller));
           } else {
             console.log('Campaign mismatch:', campaign, data.currentCallqueue[0].campaign);
           }
@@ -626,10 +631,11 @@ const useJssip = () => {
   };
 
   useEffect(() => {
-    if (ringtone.length > 0 || status === 'calling' || status === 'conference') {
+    if (inNotification != '') {
       notifyMe();
+      setInNotification('');
     }
-  }, [status, ringtone]);
+  }, [inNotification]);
 
   useEffect(() => {
     const initializeJsSIP = () => {
@@ -684,12 +690,7 @@ const useJssip = () => {
 
     const handleIncomingCall = (session, request) => {
       const incomingNumber = request.from._uri._user;
-      let callNotification = null;
-
-      if (document.hidden && Notification.permission === 'granted') {
-        callNotification = createNotification(incomingNumber);
-      }
-
+      setInNotification(incomingNumber);
       session.answer(options);
       setSession(session);
       setStatus('calling');
@@ -698,15 +699,9 @@ const useJssip = () => {
 
       session.connection.addEventListener('addstream', (event) => {
         audioRef.current.srcObject = event.stream;
-        if (callNotification) {
-          callNotification.close();
-        }
       });
 
       session.once('ended', () => {
-        if (callNotification) {
-          callNotification.close();
-        }
         setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
         pause();
         setStatus('start');
@@ -716,9 +711,6 @@ const useJssip = () => {
       });
 
       session.once('failed', () => {
-        if (callNotification) {
-          callNotification.close();
-        }
         setHistory((prev) => [
           ...prev.slice(0, -1),
           { ...prev[prev.length - 1], end: new Date().getTime(), status: 'Fail' },
