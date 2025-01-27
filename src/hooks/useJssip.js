@@ -38,6 +38,45 @@ const useJssip = () => {
   const originWithoutProtocol = 'samwad.iotcom.io';
   // const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
 
+  function notifyMe() {
+    if (!('Notification' in window)) {
+      alert('This browser does not support desktop notifications');
+      return;
+    }
+
+    if (Notification.permission === 'granted') {
+      createNotification();
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(function (permission) {
+        if (permission === 'granted') {
+          createNotification();
+        }
+      });
+    }
+  }
+
+  function createNotification(incomingNumber) {
+    const options = {
+      body: `Incoming call from ${incomingNumber || ringtone.map((call) => call.Caller)}`,
+      icon: '/images/badge.png',
+      badge: '/images/badge.png',
+      vibrate: [200, 100, 200],
+      tag: 'notification-tag',
+      renotify: true,
+      requireInteraction: true,
+    };
+
+    const notification = new Notification('Incoming Call', options);
+
+    notification.onclick = function (event) {
+      event.preventDefault();
+      window.focus();
+      notification.close();
+    };
+
+    return notification;
+  }
+
   const createConferenceCall = async () => {
     try {
       const response = await fetch(`https://samwad.iotcom.io/reqConf/${username}`, {
@@ -108,7 +147,7 @@ const useJssip = () => {
             console.log('Campaign mismatch:', campaign, data.currentCallqueue[0].campaign);
           }
         } else {
-          setRingtone([])
+          setRingtone([]);
           console.log('No current call queue data available');
         }
       } else if (data.message === 'poor connection problem ,please login again') {
@@ -587,6 +626,12 @@ const useJssip = () => {
   };
 
   useEffect(() => {
+    if (ringtone.length > 0 || status === 'calling' || status === 'conference') {
+      notifyMe();
+    }
+  }, [status, ringtone]);
+
+  useEffect(() => {
     const initializeJsSIP = () => {
       try {
         var socket = new JsSIP.WebSocketInterface(`wss://${originWithoutProtocol}:8089/ws`);
@@ -639,24 +684,29 @@ const useJssip = () => {
 
     const handleIncomingCall = (session, request) => {
       const incomingNumber = request.from._uri._user;
+      let callNotification = null;
 
-      // Unconditionally answer the call, regardless of user status
+      if (document.hidden && Notification.permission === 'granted') {
+        callNotification = createNotification(incomingNumber);
+      }
+
       session.answer(options);
-
       setSession(session);
       setStatus('calling');
       reset();
-
-      // Call answercall with the incoming number
       answercall(incomingNumber);
 
-      // Set up audio stream
       session.connection.addEventListener('addstream', (event) => {
         audioRef.current.srcObject = event.stream;
+        if (callNotification) {
+          callNotification.close();
+        }
       });
 
-      // Handle call ending
       session.once('ended', () => {
+        if (callNotification) {
+          callNotification.close();
+        }
         setHistory((prev) => [...prev.slice(0, -1), { ...prev[prev.length - 1], end: new Date().getTime() }]);
         pause();
         setStatus('start');
@@ -665,8 +715,10 @@ const useJssip = () => {
         setConferenceNumber('');
       });
 
-      // Handle call failure
       session.once('failed', () => {
+        if (callNotification) {
+          callNotification.close();
+        }
         setHistory((prev) => [
           ...prev.slice(0, -1),
           { ...prev[prev.length - 1], end: new Date().getTime(), status: 'Fail' },
