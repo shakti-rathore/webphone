@@ -30,7 +30,7 @@ const TopBar = () => {
     <header className="bg-white h-16 flex items-center p-4 justify-between dark:bg-[#1a1a1a] border-b dark:border-[#333] border-[#ddd] sticky top-0 z-50">
       <div className="flex gap-x-12 items-center">
         <Link to="/webphone/dashboard">
-          <img src={`https://samwad.iotcom.io/webphone/images/logo.png`} alt="Logo" width={48} height={48} />
+          <img src={`${window.location.origin}/webphone/images/logo.png`} alt="Logo" width={48} height={48} />
         </Link>
       </div>
 

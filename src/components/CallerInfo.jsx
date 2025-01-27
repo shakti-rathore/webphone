@@ -32,7 +32,7 @@ const CallerInfo = ({ usermissedCalls, setDropCalls, username }) => {
     async (caller) => {
       try {
         const sanitizedCaller = removeCountryCode(caller);
-        const response = await axios.post(`https://samwad.iotcom.io/dialmissedcall`, {
+        const response = await axios.post(`${window.location.origin}/dialmissedcall`, {
           caller: username,
           receiver: sanitizedCaller,
         });

@@ -36,8 +36,8 @@ const useJssip = () => {
     autoStart: false,
   });
   const navigate = useNavigate();
-  const originWithoutProtocol = 'samwad.iotcom.io';
-  // const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
+  // const originWithoutProtocol = 'samwad.iotcom.io';
+  const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
 
   function notifyMe() {
     if (!('Notification' in window)) {
@@ -83,7 +83,7 @@ const useJssip = () => {
 
   const createConferenceCall = async () => {
     try {
-      const response = await fetch(`https://samwad.iotcom.io/reqConf/${username}`, {
+      const response = await fetch(`${window.location.origin}/reqConf/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ const useJssip = () => {
     try {
       const response = await withTimeout(
         axios.post(
-          `https://samwad.iotcom.io/userconnection`,
+          `${window.location.origin}/userconnection`,
           { user: username },
           { headers: { 'Content-Type': 'application/json' } }
         ),
@@ -178,7 +178,7 @@ const useJssip = () => {
 
   useEffect(() => {
     if (username) {
-      const url = `https://samwad.iotcom.io/userready/${username}`;
+      const url = `${window.location.origin}/userready/${username}`;
       axios
         .post(url, {}, { headers: { 'Content-Type': 'application/json' } })
         .then((response) => {
@@ -313,7 +313,7 @@ const useJssip = () => {
     if (!session) return;
 
     try {
-      const response = await fetch(`https://samwad.iotcom.io/reqUnHold/${username}`, {
+      const response = await fetch(`${window.location.origin}/reqUnHold/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -341,7 +341,7 @@ const useJssip = () => {
 
     try {
       if (!isHeld) {
-        await fetch(`https://samwad.iotcom.io/reqHold/${username}`, {
+        await fetch(`${window.location.origin}/reqHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -357,7 +357,7 @@ const useJssip = () => {
 
         setIsHeld(true);
       } else {
-        await fetch(`https://samwad.iotcom.io/reqUnHold/${username}`, {
+        await fetch(`${window.location.origin}/reqUnHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -594,7 +594,7 @@ const useJssip = () => {
   const answercall = async (incomingNumber = null) => {
     try {
       const response = await axios.post(
-        `https://samwad.iotcom.io/useroncall/${username}`,
+        `${window.location.origin}/useroncall/${username}`,
         {},
         {
           headers: {
@@ -765,7 +765,7 @@ const useJssip = () => {
     ]);
     localStorage.setItem('dialing', true);
 
-    fetch(`https://samwad.iotcom.io/dialnumber`, {
+    fetch(`${window.location.origin}/dialnumber`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -786,7 +786,7 @@ const useJssip = () => {
       if (dispositionModal) {
         try {
           await axios.post(
-            `https://samwad.iotcom.io/user/callended${username}`,
+            `${window.location.origin}/user/callended${username}`,
             {},
             {
               headers: {
