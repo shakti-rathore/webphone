@@ -4,8 +4,16 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
 const CallerInfo = ({ usermissedCalls, setDropCalls, username }) => {
+  const tokenData = localStorage.getItem('token');
+  const parsedData = JSON.parse(tokenData);
+  const userCampaign = parsedData?.userData?.campaign;
+
   const groupedCalls = useMemo(() => {
-    return Object.values(usermissedCalls || {}).reduce((acc, call) => {
+    const filteredCalls = Object.values(usermissedCalls || {}).filter((call) => {
+      return call?.campaign === userCampaign;
+    });
+
+    return filteredCalls.reduce((acc, call) => {
       if (!call?.Caller) return acc;
 
       if (!acc[call.Caller]) {
@@ -13,6 +21,7 @@ const CallerInfo = ({ usermissedCalls, setDropCalls, username }) => {
           count: 0,
           calls: [],
           latestTime: 0,
+          campaign: call.campaign,
         };
       }
 
@@ -22,7 +31,7 @@ const CallerInfo = ({ usermissedCalls, setDropCalls, username }) => {
 
       return acc;
     }, {});
-  }, [usermissedCalls]);
+  }, [usermissedCalls, userCampaign]);
 
   const removeCountryCode = (phoneNumber, countryCode = '+91') => {
     return phoneNumber.startsWith(countryCode) ? phoneNumber.slice(countryCode.length) : phoneNumber;
@@ -42,13 +51,13 @@ const CallerInfo = ({ usermissedCalls, setDropCalls, username }) => {
         toast.error('Request failed. Please try again.');
       }
     },
-    [username]
+    [username, userCampaign]
   );
 
   if (Object.entries(groupedCalls).length === 0) {
     return (
       <div className="p-3">
-        <p className="text-gray-500">No missed calls available.</p>
+        <p className="text-gray-500">No missed calls available for campaign: {userCampaign}</p>
       </div>
     );
   }
@@ -56,7 +65,7 @@ const CallerInfo = ({ usermissedCalls, setDropCalls, username }) => {
   const sortedEntries = Object.entries(groupedCalls).sort((a, b) => b[1].latestTime - a[1].latestTime);
 
   return (
-    <div className="p-3 space-y-4 h-96 overflow-y-auto">
+    <div className="p-3 space-y-4 max-h-96 overflow-y-auto">
       {sortedEntries.map(([caller, data]) => (
         <div
           key={caller}

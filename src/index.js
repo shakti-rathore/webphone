@@ -8,6 +8,7 @@ import Login from './components/Login';
 import Layout from './components/layouts/Layout';
 import './index.css';
 import SubscriptionExpired from './components/SubscriptionExpired';
+import AgentDashboard from './components/AgentDashboard';
 
 const AppRoutes = () => {
   const CommonLayout = ({ children }) => (
@@ -36,12 +37,23 @@ const AppRoutes = () => {
             </HistoryProvider>
           }
         />
+
         <Route
           path="/webphone/dashboard"
           element={
             <HistoryProvider>
               <CommonLayout>
                 <App />
+              </CommonLayout>
+            </HistoryProvider>
+          }
+        />
+        <Route
+          path="/webphone/agent-dashboard"
+          element={
+            <HistoryProvider>
+              <CommonLayout>
+                <AgentDashboard />
               </CommonLayout>
             </HistoryProvider>
           }

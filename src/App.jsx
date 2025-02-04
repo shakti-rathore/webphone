@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useMemo } from 'react';
 import Home from './components/Home';
 import CallScreen from './components/CallScreen';
 import HistoryScreen from './components/HistoryScreen';
@@ -49,11 +49,16 @@ function App() {
 
   const [seeLogs, setSeeLogs] = useState(false);
   const [callConference, setCallConference] = useState(false);
-  const { username, dropCalls, setDropCalls, selectedBreak, setSelectedStatus, selectedStatus } =
-    useContext(HistoryContext);
+  const { username, dropCalls, setDropCalls, selectedBreak, setSelectedStatus } = useContext(HistoryContext);
   const [usermissedCalls, setUsermissedCalls] = useState([]);
   const [phoneShow, setPhoneShow] = useState(false);
-  const length = Object.keys(usermissedCalls).length;
+  const tokenData = localStorage.getItem('token');
+  const parsedData = JSON.parse(tokenData);
+  const userCampaign = parsedData?.userData?.campaign;
+
+  const campaignMissedCallsLength = useMemo(() => {
+    return Object.values(usermissedCalls || {}).filter((call) => call?.campaign === userCampaign).length;
+  }, [usermissedCalls, userCampaign]);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -160,7 +165,7 @@ function App() {
   return (
     <>
       <div className="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center fixed -translate-x-48 sm:-translate-x-[22rem] top-2 z-50 right-0 text-white text-sm">
-        {length}
+        {campaignMissedCallsLength}
       </div>
 
       <div className="min-h-screen w-full">
@@ -175,7 +180,7 @@ function App() {
           />
         )}
         {dropCalls && (
-          <Modal isOpen={dropCalls} onClose={() => setDropCalls(false)} title={`User Missed Calls (${length})`}>
+          <Modal isOpen={dropCalls} onClose={() => setDropCalls(false)} title={`User Missed Calls (${campaignMissedCallsLength})`}>
             <CallerInfo usermissedCalls={usermissedCalls} setDropCalls={setDropCalls} username={username} />
           </Modal>
         )}

@@ -16,10 +16,6 @@ const CallConference = ({ conferenceNumber, handleCall, setCallConference, phone
   };
 
   const handleCallClick = () => {
-    if (!conferenceNumber || conferenceNumber.length < 12) {
-      toast.error('Conference number must be 10 digits');
-      return;
-    }
     handleCall();
   };
 

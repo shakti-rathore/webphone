@@ -6,16 +6,21 @@ import BreakDropdown from '../BreakDropdown';
 import HistoryContext from '../../context/HistoryContext';
 import { FiLogOut } from 'react-icons/fi';
 import { FaPhoneSlash } from 'react-icons/fa';
+import DynamicForm from '../DynamicForm';
 
 const TopBar = () => {
   const toggleTheme = useTheme();
   const location = useLocation();
-  const { username, setDropCalls, selectedStatus } = useContext(HistoryContext);
+  const { setDropCalls, selectedStatus } = useContext(HistoryContext);
+  const [campaign, setCampaign] = useState(false);
+  const tokenData = localStorage.getItem('token');
+  const parsedData = JSON.parse(tokenData);
+  const username = parsedData?.userData?.userid;
 
   const navLinks = useMemo(
     () => [
-      // { path: '/webphone/dashboard', label: 'Dashboard' },
-      // { path: '/webphone/campaign', label: 'Campaign' },
+      { path: '/webphone/dashboard', label: 'Dashboard' },
+      { path: '/webphone/agent-dashboard', label: 'Agent Dashboard' },
       // { path: '/webphone/campaign-details', label: 'Campaign' },
     ],
     []
@@ -27,68 +32,92 @@ const TopBar = () => {
   }
 
   return (
-    <header className="bg-white h-16 flex items-center p-4 justify-between dark:bg-[#1a1a1a] border-b dark:border-[#333] border-[#ddd] sticky top-0 z-50">
-      <div className="flex gap-x-12 items-center">
-        <Link to="/webphone/dashboard">
-          <img src={`${window.location.origin}/webphone/images/logo.png`} alt="Logo" width={48} height={48} />
-        </Link>
-      </div>
+    <>
+      {campaign && <DynamicForm campaign={campaign} onClose={() => setCampaign(false)} />}
 
-      <ul className="flex gap-x-6">
-        {navLinks.map(({ path, label }) => (
-          <NavLink key={path} path={path} label={label} />
-        ))}
-      </ul>
-      <div className="flex items-center gap-x-3 md:gap-x-6 flex-wrap md:flex-nowrap">
-        <div className="flex items-center gap-x-2 px-3 py-2 rounded-md bg-gray-100 dark:bg-[#333]">
-          <span className="font-semibold text-primary dark:text-[#00498e] text-sm md:text-base">
-            {username || 'Guest'}
-          </span>
+      <header className="bg-white h-16 flex items-center p-4 justify-between dark:bg-[#1a1a1a] border-b dark:border-[#333] border-[#ddd] sticky top-0 z-50">
+        <div className="flex gap-x-12 items-center">
+          <Link to="/webphone/dashboard">
+            <img src={`${window.location.origin}/webphone/images/logo.png`} alt="Logo" width={48} height={48} />
+          </Link>
         </div>
 
-        <BreakDropdown dispoWithBreak={false} selectedStatus={selectedStatus} />
+        <div className="flex items-center gap-x-3 md:gap-x-6 flex-wrap md:flex-nowrap">
+          <div className="flex items-center gap-x-2 px-3 py-2 rounded-md bg-gray-100 dark:bg-[#918c8c38]">
+            <span className="font-semibold text-primary dark:text-[#00498e] text-sm md:text-base">
+              {username || 'Guest'}
+            </span>
+          </div>
+          {(location.pathname != '/webphone/agent-dashboard' && (
+            <>
+              {/* <Link
+                to="/webphone/agent-dashboard"
+                className="primary-btn text-sm md:text-base hover:no-underline hover:outline-none focus:outline-none focus:text-white focus:no-underline"
+              >
+                Agent Dashboard
+              </Link> */}
+              {/* <button
+                onClick={() => setCampaign(!campaign)}
+                className="primary-btn text-sm md:text-base"
+                disabled={selectedStatus !== 'start'}
+              >
+                Campaign
+              </button> */}
+              <BreakDropdown dispoWithBreak={false} selectedStatus={selectedStatus} />
 
-        <div className="relative">
+              <div className="relative">
+                <button
+                  onClick={() => setDropCalls(true)}
+                  className="hidden sm:block primary-btn text-sm md:text-base"
+                  disabled={selectedStatus !== 'start'}
+                >
+                  Drop Calls
+                </button>
+                <button onClick={() => setDropCalls(true)} className="block sm:hidden text-sm md:text-base">
+                  <FaPhoneSlash className="text-primary dark:text-[#00498e]" />
+                </button>
+              </div>
+            </>
+          )) || (
+            <ul className="flex gap-x-6 mb-0">
+              {/* {navLinks.map(({ path, label }) => (
+                <NavLink key={path} path={path} label={label} isActive={location.pathname === path} />
+              ))} */}
+            </ul>
+          )}
+
           <button
-            onClick={() => setDropCalls(true)}
-            className="hidden sm:block primary-btn text-sm md:text-base"
+            className="primary-btn sm:block hidden text-sm md:text-base"
             disabled={selectedStatus !== 'start'}
+            onClick={handleLogout}
           >
-            Drop Calls
+            Logout
           </button>
-          <button onClick={() => setDropCalls(true)} className="block sm:hidden text-sm md:text-base">
-            <FaPhoneSlash className="text-primary dark:text-[#00498e]" />
+          <button
+            className="block sm:hidden text-sm md:text-base"
+            disabled={selectedStatus !== 'start'}
+            onClick={handleLogout}
+          >
+            <FiLogOut />
           </button>
+
+          <DarkModeToggle toggleTheme={toggleTheme} />
         </div>
-
-        <button
-          className="primary-btn sm:block hidden text-sm md:text-base"
-          disabled={selectedStatus !== 'start'}
-          onClick={handleLogout}
-        >
-          Logout
-        </button>
-        <button
-          className="block sm:hidden text-sm md:text-base"
-          disabled={selectedStatus !== 'start'}
-          onClick={handleLogout}
-        >
-          <FiLogOut />
-        </button>
-
-        <DarkModeToggle toggleTheme={toggleTheme} />
-      </div>
-    </header>
+      </header>
+    </>
   );
 };
 
-const NavLink = ({ path, label }) => (
-  <li
-    className={`hover:text-primary transition-colors dark:hover:text-[#00498e] ${
-      location.pathname === path ? 'text-primary dark:text-[#00498e]' : 'text-black dark:text-white'
-    }`}
-  >
-    <Link to={path}>{label}</Link>
+const NavLink = ({ path, label, isActive }) => (
+  <li>
+    <Link
+      to={path}
+      className={`text-sm md:text-base !py-3 focus:no-underline hover:no-underline hover:outline-none focus:outline-none ${
+        isActive ? 'primary-btn-outline' : 'primary-btn'
+      }`}
+    >
+      {label}
+    </Link>
   </li>
 );
 
