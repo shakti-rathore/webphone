@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Pagination from './Pagination';
 import { BiSearchAlt2, BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
 import TableLoader from './TableLoader';
+import DatePicker from '../date/DatePicker';
 
 const ALIGNMENT_CLASSES = {
   right: 'text-end',
@@ -9,7 +10,7 @@ const ALIGNMENT_CLASSES = {
   start: 'text-start',
 };
 
-const CommonTable = ({ button, data, columns, align = 'start', loading }) => {
+const CommonTable = ({ setStartDate, setEndDate, data, columns, align = 'start', loading }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
@@ -92,8 +93,12 @@ const CommonTable = ({ button, data, columns, align = 'start', loading }) => {
   // Render sorting icon
   const renderSortIcon = useCallback(
     (accessor) => {
-      if (sortConfig.key !== accessor) return BiSortAlt2;
-      return sortConfig.direction === 'ascending' ? BiSortDown : BiSortUp;
+      if (sortConfig.key !== accessor) return <BiSortAlt2 className="h-5 w-5" />;
+      return sortConfig.direction === 'ascending' ? (
+        <BiSortDown className="h-5 w-5" />
+      ) : (
+        <BiSortUp className="h-5 w-5" />
+      );
     },
     [sortConfig]
   );
@@ -113,7 +118,7 @@ const CommonTable = ({ button, data, columns, align = 'start', loading }) => {
           onClick={() => requestSort(accessor, sorting)}
         >
           {label}
-          <>{sorting !== false && <span className="ml-1">{renderSortIcon(accessor)}</span>}</>
+          <> {sorting !== false && <span className="ml-1">{renderSortIcon(accessor)}</span>}</>
         </div>
       </th>
     ));
@@ -153,7 +158,7 @@ const CommonTable = ({ button, data, columns, align = 'start', loading }) => {
     <>
       <div className="space-y-4 bg-white shadow-md md:p-3 p-2 rounded-md dark:bg-[#1F1F1F]">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center md:gap-4">
-
+          <DatePicker setStartDate={setStartDate} setEndDate={setEndDate} />
           <div className="relative">
             <BiSearchAlt2 className="absolute top-[50%] left-2 transform -translate-y-1/2 text-xl text-gray-500 dark:text-white" />
             <input
@@ -163,10 +168,9 @@ const CommonTable = ({ button, data, columns, align = 'start', loading }) => {
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search..."
               aria-label="Search"
-              className="input-box !pl-8"
-              />
+              className="input-box !pl-8 !py-2"
+            />
           </div>
-              {button}
         </div>
         <div className="overflow-x-auto">
           {loading ? (

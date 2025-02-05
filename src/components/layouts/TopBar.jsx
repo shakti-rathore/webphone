@@ -17,15 +17,6 @@ const TopBar = () => {
   const parsedData = JSON.parse(tokenData);
   const username = parsedData?.userData?.userid;
 
-  const navLinks = useMemo(
-    () => [
-      { path: '/webphone/dashboard', label: 'Dashboard' },
-      { path: '/webphone/agent-dashboard', label: 'Agent Dashboard' },
-      // { path: '/webphone/campaign-details', label: 'Campaign' },
-    ],
-    []
-  );
-
   function handleLogout() {
     localStorage.clear();
     window.location.href = '/webphone/login';
@@ -38,24 +29,32 @@ const TopBar = () => {
       <header className="bg-white h-16 flex items-center p-4 justify-between dark:bg-[#1a1a1a] border-b dark:border-[#333] border-[#ddd] sticky top-0 z-50">
         <div className="flex gap-x-12 items-center">
           <Link to="/webphone/dashboard">
-            <img src={`${window.location.origin}/webphone/images/logo.png`} alt="Logo" width={48} height={48} />
+            <img src={`https://samwad.iotcom.io/webphone/images/logo.png`} alt="Logo" width={48} height={48} />
           </Link>
         </div>
 
-        <div className="flex items-center gap-x-3 md:gap-x-6 flex-wrap md:flex-nowrap">
-          <div className="flex items-center gap-x-2 px-3 py-2 rounded-md bg-gray-100 dark:bg-[#918c8c38]">
+        <div className="flex items-center gap-x-3 lg:gap-x-6 flex-wrap md:flex-nowrap">
+          <div className="items-center gap-x-2 px-3 py-2 rounded-md bg-gray-100 sm:flex hidden dark:bg-[#918c8c38]">
             <span className="font-semibold text-primary dark:text-[#00498e] text-sm md:text-base">
               {username || 'Guest'}
             </span>
           </div>
           {(location.pathname != '/webphone/agent-dashboard' && (
             <>
-              {/* <Link
+              <Link
                 to="/webphone/agent-dashboard"
-                className="primary-btn text-sm md:text-base hover:no-underline hover:outline-none focus:outline-none focus:text-white focus:no-underline"
+                className="primary-btn text-sm md:text-base hover:no-underline hover:outline-none focus:outline-none focus:no-underline lg:block hidden"
               >
                 Agent Dashboard
-              </Link> */}
+              </Link>
+
+              <Link
+                to="/webphone/agent-dashboard"
+                className="primary-btn text-sm md:text-base hover:no-underline hover:outline-none focus:outline-none focus:no-underline block lg:hidden"
+              >
+                Agent
+              </Link>
+
               {/* <button
                 onClick={() => setCampaign(!campaign)}
                 className="primary-btn text-sm md:text-base"
@@ -68,36 +67,53 @@ const TopBar = () => {
               <div className="relative">
                 <button
                   onClick={() => setDropCalls(true)}
-                  className="hidden sm:block primary-btn text-sm md:text-base"
+                  className="hidden md:block primary-btn text-sm md:text-base whitespace-nowrap"
                   disabled={selectedStatus !== 'start'}
                 >
                   Drop Calls
                 </button>
-                <button onClick={() => setDropCalls(true)} className="block sm:hidden text-sm md:text-base">
+                <button onClick={() => setDropCalls(true)} className="block md:hidden text-sm md:text-base">
                   <FaPhoneSlash className="text-primary dark:text-[#00498e]" />
                 </button>
               </div>
             </>
           )) || (
-            <ul className="flex gap-x-6 mb-0">
-              {/* {navLinks.map(({ path, label }) => (
-                <NavLink key={path} path={path} label={label} isActive={location.pathname === path} />
-              ))} */}
+            <ul className="flex gap-x-3 md:gap-x-6 mb-0">
+              <Link
+                to={'/webphone/dashboard'}
+                className={`text-sm md:text-base focus:no-underline hover:no-underline hover:outline-none focus:outline-none ${
+                  location.pathname === '/webphone/dashboard' ? 'primary-btn-outline' : 'primary-btn'
+                }`}
+              >
+                Dashboard
+              </Link>
+              <Link
+                to={'/webphone/agent-dashboard'}
+                className={`text-sm md:text-base focus:no-underline sm:block hidden hover:no-underline hover:outline-none focus:outline-none ${
+                  location.pathname === '/webphone/agent-dashboard' ? 'primary-btn-outline' : 'primary-btn'
+                }`}
+              >
+                Agent Dashboard
+              </Link>
+              <Link
+                to={'/webphone/agent-dashboard'}
+                className={`text-sm md:text-base focus:no-underline block sm:hidden hover:no-underline hover:outline-none focus:outline-none ${
+                  location.pathname === '/webphone/agent-dashboard' ? 'primary-btn-outline' : 'primary-btn'
+                }`}
+              >
+                Agent
+              </Link>
             </ul>
           )}
 
           <button
-            className="primary-btn sm:block hidden text-sm md:text-base"
+            className="primary-btn md:block hidden text-sm md:text-base"
             disabled={selectedStatus !== 'start'}
             onClick={handleLogout}
           >
             Logout
           </button>
-          <button
-            className="block sm:hidden text-sm md:text-base"
-            disabled={selectedStatus !== 'start'}
-            onClick={handleLogout}
-          >
+          <button className="block md:hidden text-sm" disabled={selectedStatus !== 'start'} onClick={handleLogout}>
             <FiLogOut />
           </button>
 
@@ -107,19 +123,6 @@ const TopBar = () => {
     </>
   );
 };
-
-const NavLink = ({ path, label, isActive }) => (
-  <li>
-    <Link
-      to={path}
-      className={`text-sm md:text-base !py-3 focus:no-underline hover:no-underline hover:outline-none focus:outline-none ${
-        isActive ? 'primary-btn-outline' : 'primary-btn'
-      }`}
-    >
-      {label}
-    </Link>
-  </li>
-);
 
 const DarkModeToggle = ({ toggleTheme }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);

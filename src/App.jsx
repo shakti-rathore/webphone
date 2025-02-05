@@ -88,7 +88,7 @@ function App() {
 
   const fetchUserMissedCalls = async () => {
     try {
-      const response = await axios.post(`${window.location.origin}/usermissedCalls/${username}`);
+      const response = await axios.post(`https://samwad.iotcom.io/usermissedCalls/${username}`);
       setUsermissedCalls(response.data.result || []);
     } catch (error) {
       console.error('Error fetching missed calls:', error);
@@ -146,7 +146,7 @@ function App() {
     };
 
     try {
-      const response = await axios.post(`${window.location.origin}/addModifyContact`, payload);
+      const response = await axios.post(`https://samwad.iotcom.io/addModifyContact`, payload);
       if (response.data) {
         toast.success(response.data.message || 'Contact saved successfully.');
       } else {
@@ -164,7 +164,7 @@ function App() {
 
   return (
     <>
-      <div className="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center fixed -translate-x-48 sm:-translate-x-[22rem] top-2 z-50 right-0 text-white text-sm">
+      <div className="w-7 h-7 md:flex hidden rounded-full bg-red-500 items-center z-50 justify-center fixed top-2  right-[20rem] lg:right-[22rem] text-white text-sm">
         {campaignMissedCallsLength}
       </div>
 
@@ -180,7 +180,11 @@ function App() {
           />
         )}
         {dropCalls && (
-          <Modal isOpen={dropCalls} onClose={() => setDropCalls(false)} title={`User Missed Calls (${campaignMissedCallsLength})`}>
+          <Modal
+            isOpen={dropCalls}
+            onClose={() => setDropCalls(false)}
+            title={`User Missed Calls (${campaignMissedCallsLength})`}
+          >
             <CallerInfo usermissedCalls={usermissedCalls} setDropCalls={setDropCalls} username={username} />
           </Modal>
         )}
@@ -204,18 +208,18 @@ function App() {
         <div className="w-full mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-3">
           <div className="flex flex-col lg:flex-row items-center gap-5">
             {(status !== 'start' && userCall && (
-              <div className="w-full lg:w-2/5">
+              <div className="w-full lg:w-2/3">
                 <UserCall userCall={userCall} username={username} formData={formData} setFormData={setFormData} />
               </div>
             )) || (
-              <div className="w-full lg:w-2/5 relative">
+              <div className="w-full lg:w-2/3 relative">
                 <AutoDial
                   setPhoneNumber={setPhoneNumber}
                   dispositionModal={dispositionModal}
                   handleCall={handleCall}
                   phoneNumber={phoneNumber}
                 />
-                <div className="bottom-3 left-64 whitespace-nowrap absolute">
+                <div className="bottom-3 sm:left-64 left-[15rem] whitespace-nowrap absolute">
                   <button
                     className="primary-btn"
                     onClick={() => {

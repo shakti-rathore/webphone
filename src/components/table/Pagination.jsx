@@ -116,7 +116,7 @@ const renderPaginationItems = (paginationRange, currentPage, onPageChange) =>
     return (
       <li
         key={key}
-        className={`md:text-base text-xs cursor-pointer font-semibold md:w-[38px] w-8 h-8 md:h-[38px] flex py-1 px-3 items-center justify-center ${
+        className={`md:text-base text-xs cursor-pointer font-medium md:w-[38px] w-8 h-8 md:h-[38px] flex py-1 px-3 items-center justify-center ${
           pageNumber === currentPage
             ? 'bg-[#ECF5FE] dark:bg-[#080E1C] rounded text-[#4399EB] dark:text-[#1d5ab5]'
             : 'text-[#333333] transition duration-200 ease-in dark:hover:text-[#1d5ab5] dark:text-white hover:bg-[#ECF5FE] dark:hover:bg-[#080E1C] hover:rounded hover:text-[#4399EB]'

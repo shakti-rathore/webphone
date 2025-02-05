@@ -1,209 +1,425 @@
 import React, { useEffect, useState } from 'react';
-import { Loader } from 'rsuite';
+import axios from 'axios';
+import moment from 'moment';
+import { FiDownload, FiFileText, FiHeadphones } from 'react-icons/fi';
+import CommonTable from './table/CommonTable';
+import AudioPlayer from './AudioPlayer';
 import 'rsuite/dist/rsuite.min.css';
-import DatePicker from './date/DatePicker';
+import toast from 'react-hot-toast';
 
 const AgentCallData = () => {
   const [callDetails, setCallDetails] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [campaignList, setCampaignList] = useState([]);
+  const [startDate, setStartDate] = useState(moment().subtract(24, 'hours').format('YYYY-MM-DD'));
+  const [endDate, setEndDate] = useState(moment().format('YYYY-MM-DD'));
+  const [currentAudioUrl, setCurrentAudioUrl] = useState('');
+  const [currentBridgeId, setCurrentBridgeId] = useState('');
+  const [isAudioPlayerOpen, setIsAudioPlayerOpen] = useState(false);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
 
   useEffect(() => {
-    const fetchCampaignData = async () => {
-      try {
-        const tokenData = JSON.parse(localStorage.getItem('token'));
-        console.log(tokenData)
-        const response = await fetch('${window.location.origin}/agentcampaigndetails', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: JSON.stringify({ admin: tokenData.adminuser }),
-        });
-
-        if (!response.ok) throw new Error('Failed to fetch campaign data');
-
-        const data = await response.json();
-        const campaigns = data.result.map((campaign) => ({
-          campaignID: campaign.campaignID,
-          campaignName: campaign.campaignname,
-        }));
-        setCampaignList(campaigns);
-      } catch (error) {
-        console.error('Error fetching campaign details:', error);
-      }
-    };
-
-    const fetchCallData = async () => {
-      try {
-        const tokenData = JSON.parse(localStorage.getItem('token'));
-        const currentDate = new Date();
-        const pastDate = new Date();
-        pastDate.setDate(currentDate.getDate() - 1);
-
-        const response = await fetch('${window.location.origin}/agentcallData', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: JSON.stringify({
-            admin: tokenData.adminuser,
-            // startdate: currentDate.toISOString().substring(0, 10),
-            // enddate: pastDate.toISOString().substring(0, 10),
-            startdate: '2025-03-03',
-            enddate: '2025-03-03',
-          }),
-        });
-
-        // if (response.status === 401) {
-        //   window.location.href = '/login.html';
-        //   return;
-        // }
-
-        if (!response.ok) throw new Error('Failed to fetch call data');
-
-        const data = await response.json();
-        const username = tokenData.userid;
-
-        let processedCallDetails = data.result
-          .filter((x) => x.agent === username || x.agent === `transferBy-${username}`)
-          .map((entry) => {
-            return {
-              ...entry,
-              duration: Math.floor((entry.hanguptime - entry.startTime) / 1000),
-              hanguptime: formatDateTime(entry.hanguptime),
-              anstime: formatDateTime(entry.anstime),
-              startTime: formatDateTime(entry.startTime),
-              campaign: campaignList.find((a) => a.campaignID === entry.campaign)?.campaignName || 'Unknown',
-              Type: entry.agent.startsWith(`transferBy-${username}`) ? `transfer-${entry.Type}` : entry.Type,
-            };
-          });
-
-        const uniqueCallDetails = Array.from(
-          new Map(processedCallDetails.map((item) => [item.bridgeID, item])).values()
-        );
-
-        setCallDetails(uniqueCallDetails);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching call details:', error);
-        setLoading(false);
-      }
-    };
-
-    function formatDateTime(dateTimeString) {
-      if (!dateTimeString) return 'NA';
-      const istDate = new Date(dateTimeString);
-      const day = String(istDate.getDate()).padStart(2, '0');
-      const month = String(istDate.getMonth() + 1).padStart(2, '0');
-      const year = istDate.getFullYear();
-      const formattedDate = `${day}/${month}/${year}`;
-
-      const formattedTime = istDate.toLocaleString('en-US', {
-        timeZone: 'Asia/Kolkata',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric',
-        hour12: true,
-      });
-
-      return `${formattedDate}\n\n\n${formattedTime}`;
+    if (startDate && endDate) {
+      fetchCallData();
     }
+  }, [startDate, endDate]);
 
-    fetchCampaignData();
-    fetchCallData();
-  }, []);
-
-  const handlePlayAudio = (bridgeID) => {
-    const audioSource = `/recording${bridgeID}.wav`;
-    console.log('Playing audio:', audioSource);
-    // Implement audio playback logic
+  const getTokenDetails = () => {
+    try {
+      const tokenData = localStorage.getItem('token');
+      const parsedData = JSON.parse(tokenData);
+      return {
+        token: parsedData.token,
+        adminUser: parsedData.userData.adminuser,
+      };
+    } catch (error) {
+      console.error('Error parsing token:', error);
+      return null;
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader size="lg" />
-      </div>
-    );
-  }
+  const fetchCallData = async () => {
+    try {
+      const tokenDetails = getTokenDetails();
+      if (!tokenDetails) return;
+
+      const payload = {
+        admin: tokenDetails.adminUser,
+        startdate: startDate,
+        enddate: endDate,
+      };
+
+      const { data } = await axios.post('https://samwad.iotcom.io/agentcallData', payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${tokenDetails.token}`,
+        },
+      });
+
+      setCallDetails(data.result);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching call details:', error);
+      setLoading(false);
+    }
+  };
+
+  const handleDownloadCSV = () => {
+    if (callDetails.length === 0) {
+      toast.error('No data available to download.');
+      return;
+    }
+
+    const escapeCsvField = (field) => {
+      if (field === null || field === undefined) return '""';
+      const stringField = String(field);
+      if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
+        return `"${stringField.replace(/"/g, '""')}"`;
+      }
+      return stringField;
+    };
+
+    const headers = [
+      'Caller',
+      'Campaign',
+      'Call Received',
+      'Call Answered',
+      'Call Disconnected',
+      'Duration',
+      'Type',
+      'Disposition',
+    ];
+
+    const csvRows = callDetails.map((row) => [
+      escapeCsvField(row.Caller),
+      escapeCsvField(row.campaign),
+      escapeCsvField(moment(row.startTime).format('DD-MMM-YYYY HH:mm:ss A')),
+      escapeCsvField(row.anstime ? moment(row.anstime).format('DD-MMM-YYYY HH:mm:ss A') : '-'),
+      escapeCsvField(row.hanguptime ? moment(row.hanguptime).format('DD-MMM-YYYY HH:mm:ss A') : '-'),
+      escapeCsvField(
+        row.hanguptime && row.startTime
+          ? moment.utc((row.hanguptime - row.startTime) * 1000).format('HH:mm:ss')
+          : '00:00:00'
+      ),
+      escapeCsvField(row.Type),
+      escapeCsvField(row.Disposition || 'No Disposition'),
+    ]);
+
+    const BOM = '\uFEFF';
+    const csvContent = BOM + [headers, ...csvRows].map((row) => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `call_data_${moment().format('YYYYMMDD_HHmmss')}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadPDF = async () => {
+    try {
+      if (callDetails.length === 0) {
+        toast.error('No data available to download.');
+        return;
+      }
+
+      setIsPdfLoading(true);
+
+      const sanitizeHtml = (str) => {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      };
+
+      const generateFirstTable = (data) => {
+        const rows = data
+          .map(
+            (row) => `
+          <tr>
+            <td>${sanitizeHtml(row.Caller)}</td>
+            <td>${sanitizeHtml(row.campaign)}</td>
+            <td>${moment(row.startTime).format('DD-MMM-YYYY HH:mm:ss A')}</td>
+            <td>${row.anstime ? moment(row.anstime).format('DD-MMM-YYYY HH:mm:ss A') : '-'}</td>
+          </tr>
+        `
+          )
+          .join('');
+
+        return `
+          <table>
+            <thead>
+              <tr>
+                <th>Caller</th>
+                <th>Campaign</th>
+                <th>Call Received</th>
+                <th>Call Answered</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+      };
+
+      const generateSecondTable = (data) => {
+        const rows = data
+          .map(
+            (row) => `
+          <tr>
+            <td>${row.hanguptime ? moment(row.hanguptime).format('DD-MMM-YYYY HH:mm:ss A') : '-'}</td>
+            <td>${
+              row.hanguptime && row.startTime
+                ? moment.utc((row.hanguptime - row.startTime) * 1000).format('HH:mm:ss')
+                : '00:00:00'
+            }</td>
+            <td>${sanitizeHtml(row.Type)}</td>
+            <td>${sanitizeHtml(row.Disposition || 'No Disposition')}</td>
+          </tr>
+        `
+          )
+          .join('');
+
+        return `
+          <table>
+            <thead>
+              <tr>
+                <th>Call Disconnected</th>
+                <th>Duration</th>
+                <th>Type</th>
+                <th>Disposition</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+      };
+
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                font-size: 10px;
+                padding: 20px;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+                font-size: 10px;
+              }
+              th, td {
+                border: 1px solid #ddd;
+                padding: 4px;
+                text-align: left;
+                width: 25%;
+              }
+              th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+              }
+              .header {
+                text-align: center;
+                margin-bottom: 20px;
+              }
+              .header h1 {
+                font-size: 12px;
+                margin: 0;
+                padding: 0;
+              }
+              .date-range {
+                text-align: right;
+                margin-bottom: 10px;
+                font-size: 10px;
+              }
+              .table-divider {
+                margin: 20px 0;
+                border-top: 1px solid #ddd;
+              }
+              .table-label {
+                font-size: 10px;
+                font-weight: bold;
+                margin-bottom: 5px;
+              }
+              .footer {
+                font-size: 10px;
+                margin-top: 20px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>Call Data Report</h1>
+            </div>
+            <div class="date-range">
+              <p>From: ${startDate} To: ${endDate}</p>
+            </div>
+            <div class="table-label">Basic Call Information</div>
+            ${generateFirstTable(callDetails)}
+            <div class="table-divider"></div>
+            <div class="table-label">Call Details</div>
+            ${generateSecondTable(callDetails)}
+            <div class="footer">
+              <p>Generated on: ${moment().format('DD-MMM-YYYY HH:mm:ss A')}</p>
+            </div>
+          </body>
+        </html>
+      `;
+
+      const response = await axios.post(
+        'https://pacsdev.iotcom.io/pdfgen/generate-pdf',
+        { htmlContent },
+        {
+          responseType: 'blob',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `call_report_${moment().format('YYYYMMDD_HHmmss')}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      if (error.response?.status === 401) {
+        toast.error('Authentication failed. Please login again.');
+      } else if (error.response?.status === 413) {
+        toast.error('Report too large. Please try a smaller date range.');
+      } else {
+        toast.error('Error generating PDF. Please try again.');
+      }
+    } finally {
+      setIsPdfLoading(false);
+    }
+  };
+
+  const columns = [
+    {
+      label: 'Caller',
+      accessor: 'Caller',
+    },
+    {
+      label: 'Campaign',
+      accessor: 'campaign',
+    },
+    {
+      label: 'Call Received',
+      accessor: 'startTime',
+      render: (value) => moment(value).format('DD-MMM-YYYY HH:mm:ss A'),
+    },
+    {
+      label: 'Call Answered',
+      accessor: 'anstime',
+      render: (value) => (value ? moment(value).format('DD-MMM-YYYY HH:mm:ss A') : '-'),
+    },
+    {
+      label: 'Call Disconnected',
+      accessor: 'hanguptime',
+      render: (value) => (value ? moment(value).format('DD-MMM-YYYY HH:mm:ss A') : '-'),
+    },
+    {
+      label: 'Duration',
+      accessor: 'duration',
+      render: (value, row) => {
+        if (!row?.hanguptime || !row?.startTime) return '-';
+        const duration = Math.floor((row.hanguptime - row.startTime) / 1000);
+        return duration > 0 ? moment.utc(duration * 1000).format('HH:mm:ss') : '00:00:00';
+      },
+    },
+    {
+      label: 'Type',
+      accessor: 'Type',
+      render: (value) => {
+        if (value === 'incoming') {
+          return <span className="bg-primary text-white px-3 py-1 rounded-full text-sm">Incoming</span>;
+        } else if (value === 'manualoutgoing') {
+          return (
+            <div className="flex space-x-2">
+              <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm">Manual Outgoing</span>
+            </div>
+          );
+        } else {
+          return '-';
+        }
+      },
+    },
+
+    {
+      label: 'Disposition',
+      accessor: 'Disposition',
+      render: (value) => value || 'No Disposition',
+    },
+    {
+      label: 'Listen',
+      accessor: 'bridgeID',
+      render: (value) => (
+        <button
+          onClick={() => handlePlayAudio(value)}
+          disabled={!value}
+          className={`p-2 rounded transition-colors ${
+            value ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+          }`}
+        >
+          <FiHeadphones />
+        </button>
+      ),
+    },
+  ];
+
+  const handlePlayAudio = (bridgeID) => {
+    const audioSource = `https://samwad.iotcom.io/recording${bridgeID}.wav`;
+    setCurrentAudioUrl(audioSource);
+    setCurrentBridgeId(bridgeID);
+    setIsAudioPlayerOpen(true);
+  };
 
   return (
-    <>
-      <div className="overflow-x-auto mt-4">
-        <DatePicker />
-        <table className="min-w-full divide-y divide-[#DDDDDD] dark:divide-[#3B3B3B]">
-          <thead className="bg-[#ecf3f9] dark:bg-[#00498E]">
-            <tr>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                Caller
-              </th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                Campaign
-              </th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                Call Received
-              </th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                Call Answered
-              </th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                Call Disconnected
-              </th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                Duration
-              </th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                Type
-              </th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                Disposition
-              </th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                Listen
-              </th>
-            </tr>
-          </thead>
-
-          <tbody className="bg-white dark:bg-[#080E1C] divide-y divide-[#DDDDDD] dark:divide-[#3B3B3B]">
-            {(callDetails.length > 0 &&
-              callDetails.map(
-                (call, index) =>
-                  (
-                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                      <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">{call.Caller}</td>
-                      <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">{call.campaign}</td>
-                      <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">{call.startTime}</td>
-                      <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">{call.anstime}</td>
-                      <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">{call.hanguptime}</td>
-                      <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">{call.duration}</td>
-                      <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">{call.Type}</td>
-                      <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">
-                        {call.Disposition || 'No Disposition'}
-                      </td>
-                      <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">
-                        <button
-                          onClick={() => handlePlayAudio(call.bridgeID)}
-                          className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-colors"
-                        >
-                          <i className="bi bi-headphones"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  ) || ''
-              )) || (
-              <tr className="text-center">
-                <td colSpan={9} className="dark:text-white pt-4">
-                  No Incoming Call Data Found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+    <div className="overflow-x-auto mt-4">
+      <div className="flex justify-end gap-4 mb-2">
+        <button
+          onClick={handleDownloadCSV}
+          className="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-2"
+        >
+          <FiDownload /> Download CSV
+        </button>
+        <button
+          onClick={handleDownloadPDF}
+          disabled={isPdfLoading}
+          className="bg-red-500 text-white px-4 py-2 rounded flex items-center gap-2"
+        >
+          <FiFileText /> {isPdfLoading ? 'Generating...' : 'Download PDF'}
+        </button>
       </div>
-    </>
+
+      <AudioPlayer
+        audioUrl={currentAudioUrl}
+        bridgeId={currentBridgeId}
+        isOpen={isAudioPlayerOpen}
+        onClose={() => setIsAudioPlayerOpen(false)}
+      />
+      <CommonTable
+        data={callDetails}
+        columns={columns}
+        loading={loading}
+        setStartDate={setStartDate}
+        setEndDate={setEndDate}
+      />
+    </div>
   );
 };
 

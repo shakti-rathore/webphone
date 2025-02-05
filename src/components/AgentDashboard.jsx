@@ -7,9 +7,10 @@ import {
   ActivityChart,
   CallTrendsChart,
 } from '../hooks/agent-dashboard-utils';
-import { FiClock, FiPhone, FiPhoneOff, FiUser, FiX } from 'react-icons/fi';
+import { FiClock, FiPhone, FiPhoneOff, FiUser } from 'react-icons/fi';
 import HistoryContext from '../context/HistoryContext';
 import AgentCallData from './AgentCallData';
+import { Modal } from 'rsuite';
 
 // Status Badge Component
 const StatusBadge = ({ status }) => {
@@ -92,12 +93,6 @@ const AgentDashboard = () => {
     },
   ];
 
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      setShowActivityModal(false);
-    }
-  };
-
   useEffect(() => {
     if (showActivityModal) {
       document.body.classList.add('overflow-hidden');
@@ -118,7 +113,7 @@ const AgentDashboard = () => {
     const fetchData = async () => {
       try {
         const tokenData = JSON.parse(localStorage.getItem('token'));
-        const response = await fetch('${window.location.origin}/agentDashboardData', {
+        const response = await fetch('https://samwad.iotcom.io/agentDashboardData', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -171,139 +166,156 @@ const AgentDashboard = () => {
   return (
     <>
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4 px-2">
         {metrics.map((metric, index) => (
           <div
-            className="bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow duration-300 p-5 rounded-lg"
+            className="bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow duration-300 p-4 rounded-lg"
             key={index}
           >
             <div className="flex items-center justify-between">
-              <div>
-                <span className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{metric.title}</span>
-                <div className={`font-semibold text-xl ${metric.color}`}>{metric.value}</div>
+              <div className="flex-grow">
+                <span className="text-sm font-semibold text-gray-900 dark:text-white mb-1 block truncate">
+                  {metric.title}
+                </span>
+                <div className={`font-semibold text-base ${metric.color} truncate`}>{metric.value}</div>
               </div>
               {metric.icon}
             </div>
           </div>
         ))}
       </div>
-
       {/* Activity Stats Table */}
-      <div className="bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] p-6 dark:text-white text-gray-800 mb-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold dark:text-white">
+      <div className="bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] p-2 sm:p-4 dark:text-white text-gray-800 mb-4 w-full mx-auto">
+        <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
+          <h3 className="text-base sm:text-lg font-semibold dark:text-white mb-2 sm:mb-0">
             {(incomingCallData && 'Incoming Call Data') || 'Activity Statistics'}
           </h3>
-          <div>
-            <button className="primary-btn" onClick={() => setIncomingCallData(!incomingCallData)}>
-              {(!incomingCallData && 'Incoming Call Data') || 'Activity Statistics'}
-            </button>
-          </div>
+          <button
+            className="primary-btn text-xs sm:text-sm px-2 py-1"
+            onClick={() => setIncomingCallData(!incomingCallData)}
+          >
+            {(!incomingCallData && 'Incoming Call Data') || 'Activity Statistics'}
+          </button>
         </div>
-        {(incomingCallData && <AgentCallData />) || (
-          <div className="overflow-x-auto mt-4">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-[#ddd] dark:border-[#333]">
-                  <th className="text-left p-2">Waiting For Call</th>
-                  <th className="text-left p-2">On Call</th>
-                  <th className="text-left p-2">Break</th>
-                  <th className="text-left p-2">Disposition</th>
-                  <th className="text-left p-2">Total Login Time</th>
-                  <th className="text-left p-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="p-2">{dashboardData.timeStats.waitingForCall}</td>
-                  <td className="p-2">{dashboardData.timeStats.onCall}</td>
-                  <td className="p-2">{dashboardData.timeStats.break}</td>
-                  <td className="p-2">{dashboardData.timeStats.disposition}</td>
-                  <td className="p-2">{dashboardData.timeStats.totalLoginTime}</td>
-                  <td className="p-2">
-                    <button onClick={() => setShowActivityModal(true)} className="primary-btn">
-                      View Details
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        {incomingCallData ? (
+          <AgentCallData />
+        ) : (
+          <>
+            <div className="w-full overflow-x-auto border border-b-0 border-gray-200 dark:border-gray-700 rounded-lg">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                    <th className="text-left p-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                      Waiting For Call
+                    </th>
+                    <th className="text-left p-2 text-xs sm:text-sm md:text-base whitespace-nowrap">On Call</th>
+                    <th className="text-left p-2 text-xs sm:text-sm md:text-base whitespace-nowrap">Break</th>
+                    <th className="text-left p-2 text-xs sm:text-sm md:text-base whitespace-nowrap">Disposition</th>
+                    <th className="text-left p-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                      Total Login Time
+                    </th>
+                    <th className="text-left p-2 text-xs sm:text-sm md:text-base whitespace-nowrap">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <td className="p-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                      {dashboardData.timeStats.waitingForCall}
+                    </td>
+                    <td className="p-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                      {dashboardData.timeStats.onCall}
+                    </td>
+                    <td className="p-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                      {dashboardData.timeStats.break}
+                    </td>
+                    <td className="p-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                      {dashboardData.timeStats.disposition}
+                    </td>
+                    <td className="p-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                      {dashboardData.timeStats.totalLoginTime}
+                    </td>
+                    <td className="p-2 whitespace-nowrap">
+                      <button
+                        onClick={() => setShowActivityModal(true)}
+                        className="primary-btn text-xs sm:text-sm md:text-base px-2 py-1 sm:px-3 sm:py-2"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] p-6 dark:text-white text-gray-800">
-          <h3 className="text-lg font-semibold">Activity Distribution</h3>
-          <div className="mt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 px-2">
+        <div className="bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] p-2 sm:p-4 dark:text-white text-gray-800">
+          <h3 className="text-base sm:text-lg font-semibold">Activity Distribution</h3>
+          <div className="mt-2 sm:mt-4">
             <ActivityChart data={dashboardData.chartData} />
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] p-6 dark:text-white text-gray-800">
-          <h3 className="text-lg font-semibold">Call Trends</h3>
-          <div className="mt-4">
+        <div className="bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] p-2 sm:p-4 dark:text-white text-gray-800">
+          <h3 className="text-base sm:text-lg font-semibold">Call Trends</h3>
+          <div className="mt-2 sm:mt-4">
             <CallTrendsChart data={dashboardData.chartData} />
           </div>
         </div>
       </div>
+      <Modal
+        open={showActivityModal}
+        onClose={() => setShowActivityModal(false)}
+        onBackdropClick={() => setShowActivityModal(false)}
+        size="md"
+      >
+        <Modal.Header>
+          <Modal.Title className="dark:text-white">Detailed Activity Log</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="h-[50vh]">
+          <table className="min-w-full divide-y divide-[#DDDDDD] dark:divide-[#3B3B3B]">
+            <thead className="bg-[#ecf3f9] dark:bg-[#00498E]">
+              <tr>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
+                  Action Type
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
+                  Time
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
+                  Status
+                </th>
+              </tr>
+            </thead>
 
-      {/* Activity Modal */}
-      {showActivityModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center dark:bg-gray-900/60 bg-black/60"
-          onClick={handleOverlayClick}
-        >
-          <div
-            className="max-w-4xl bg-white dark:bg-[#131212] w-full mx-4 rounded-lg shadow-lg max-h-[80vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between p-4 border-b border-[#ddd] dark:border-[#333]">
-              <h3 className="md:text-xl text-base font-semibold text-gray-900 dark:text-white">
-                Detailed Activity Log
-              </h3>
-              <button
-                onClick={() => setShowActivityModal(false)}
-                className="text-gray-500 hover:text-gray-700 dark:hover:text-white"
-              >
-                <FiX className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-[#DDDDDD] dark:divide-[#3B3B3B]">
-                <thead className="bg-[#ecf3f9] dark:bg-[#00498E]">
-                  <tr>
-                    <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                      Action Type
-                    </th>
-                    <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                      Time
-                    </th>
-                    <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">
-                      Status
-                    </th>
+            {/* Table Body */}
+            <tbody className="bg-white dark:bg-[#080E1C] divide-y divide-[#DDDDDD] dark:divide-[#3B3B3B]">
+              {dashboardData?.activityData?.length > 0 ? (
+                dashboardData.activityData.map((activity, index) => (
+                  <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                    <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">{activity.Type}</td>
+                    <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">
+                      {moment(activity.Time).format('DD-MMM-YYYY hh:mm:ss A')}
+                    </td>
+                    <td className="p-3 text-sm whitespace-nowrap">
+                      <StatusBadge status={activity.Status} />
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-[#080E1C] divide-y divide-[#DDDDDD] dark:divide-[#3B3B3B]">
-                  {dashboardData.activityData.map((activity, index) => (
-                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                      <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">{activity.Type}</td>
-                      <td className="p-3 text-sm text-gray-900 dark:text-white whitespace-nowrap">
-                        {moment(activity.Time).format('DD-MMM-YYYY hh:mm:ss A')}
-                      </td>
-                      <td className="p-3 text-sm whitespace-nowrap">
-                        <StatusBadge status={activity.Status} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="p-4 text-center text-gray-500 dark:text-gray-400">
+                    No activity data available.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };

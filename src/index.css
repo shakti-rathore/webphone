@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+.rs-input:focus,
+.rs-input-group:focus-within,
+.rs-input-group:not(.rs-input-group-disabled).rs-input-group-focus {
+  outline: unset !important;
+}
+
 .input-label {
   @apply block mb-2 font-medium leading-5 text-start capitalize text-gray-700 dark:text-white;
 }
@@ -90,4 +96,27 @@ select:-webkit-autofill:focus {
 .dark .form-wrap.form-builder .frmb-control li {
   background-color: #333;
   color: #ffffff;
+}
+
+.dark .rs-modal-content {
+  background-color: #1a1a1a;
+}
+.dark .rs-input-group.rs-input-group-inside,
+.dark .rs-input,
+.dark .rs-stack,
+.dark .rs-btn-subtle {
+  background-color: #1a1a1a;
+  border-color: #9999;
+  color: #ffffff;
+}
+
+.dark .rs-picker-popup .rs-calendar .rs-calendar-table-cell:hover .rs-calendar-table-cell-content {
+  background-color: var(--rs-listbox-option-hover-bg-dark, #444444); /* Dark background */
+  color: #ffffff; /* White text */
+  color: var(--rs-listbox-option-hover-text-dark, #ffffff); /* Dark mode text color */
+}
+
+.rs-modal-wrapper {
+  display: flex;
+  align-items: center;
 }
