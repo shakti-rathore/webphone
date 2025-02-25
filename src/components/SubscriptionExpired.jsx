@@ -1,6 +1,6 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { FaExclamationCircle, FaEnvelope } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { FaExclamationCircle } from 'react-icons/fa';
 
 const SubscriptionExpired = () => {
   const navigate = useNavigate();

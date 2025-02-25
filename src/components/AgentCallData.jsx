@@ -48,7 +48,7 @@ const AgentCallData = () => {
         enddate: endDate,
       };
 
-      const { data } = await axios.post('https://samwad.iotcom.io/agentcallData', payload, {
+      const { data } = await axios.post('https://${window.location.origin}.iotcom.io/agentcallData', payload, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${tokenDetails.token}`,
@@ -382,7 +382,7 @@ const AgentCallData = () => {
   ];
 
   const handlePlayAudio = (bridgeID) => {
-    const audioSource = `https://samwad.iotcom.io/recording${bridgeID}.wav`;
+    const audioSource = `https://${window.location.origin}.iotcom.io/recording${bridgeID}.wav`;
     setCurrentAudioUrl(audioSource);
     setCurrentBridgeId(bridgeID);
     setIsAudioPlayerOpen(true);

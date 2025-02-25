@@ -3,7 +3,7 @@ import { FiPhone } from 'react-icons/fi';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
-const CallerInfo = ({ usermissedCalls, setDropCalls, username }) => {
+const DropCallsModal = ({ usermissedCalls, setDropCalls, username }) => {
   const tokenData = localStorage.getItem('token');
   const parsedData = JSON.parse(tokenData);
   const userCampaign = parsedData?.userData?.campaign;
@@ -41,7 +41,7 @@ const CallerInfo = ({ usermissedCalls, setDropCalls, username }) => {
     async (caller) => {
       try {
         const sanitizedCaller = removeCountryCode(caller);
-        const response = await axios.post(`https://samwad.iotcom.io/dialmissedcall`, {
+        const response = await axios.post(`https://${window.location.origin}.iotcom.io/dialmissedcall`, {
           caller: username,
           receiver: sanitizedCaller,
         });
@@ -72,7 +72,7 @@ const CallerInfo = ({ usermissedCalls, setDropCalls, username }) => {
           className="flex justify-between items-center border-b border-gray-200 pb-3 mb-3 last:border-b-0 last:mb-0"
         >
           <div className="flex-grow">
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
               {caller}
               <span className="text-sm font-normal text-gray-600">
                 ({data.count} missed {data.count === 1 ? 'call' : 'calls'})
@@ -93,4 +93,4 @@ const CallerInfo = ({ usermissedCalls, setDropCalls, username }) => {
   );
 };
 
-export default CallerInfo;
+export default DropCallsModal;

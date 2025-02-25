@@ -42,7 +42,7 @@ const CallScreen = ({
 
   const handleTransfer = async () => {
     try {
-      const response = await axios.post(`https://samwad.iotcom.io/reqTransfer/${username}`, {});
+      const response = await axios.post(`https://${window.location.origin}.iotcom.io/reqTransfer/${username}`, {});
       toast.success('Request successful!');
     } catch (error) {
       console.error('Error:', error);
@@ -70,8 +70,8 @@ const CallScreen = ({
             <BsPersonFill className="text-white text-2xl" />
           </div>
           <marquee className="text-2xl font-bold text-primary mb-2">
-            {( conferenceNumber || phoneNumber && formatPhoneNumber(phoneNumber)) || (userCall && userCall.contactNumber)}
-            {(isMerged && conferenceNumber) && ' Conference with ' + conferenceNumber}
+            {conferenceNumber || (phoneNumber && phoneNumber) || (userCall && userCall.contactNumber)}
+            {isMerged && conferenceNumber && ' Conference with ' + conferenceNumber}
           </marquee>
           {!isRunning ? (
             <span className="text-gray-500">Calling...</span>
@@ -97,7 +97,7 @@ const CallScreen = ({
                 <button
                   disabled={!isMerged}
                   onClick={handleTransfer}
-                  className={`p-4 rounded-full dark:text-white ${(isMerged ? 'opacity-100' : 'opacity-45')}`}
+                  className={`p-4 rounded-full dark:text-white ${isMerged ? 'opacity-100' : 'opacity-45'}`}
                   title="Call Transfer"
                 >
                   <FcCallTransfer className="text-3xl" />

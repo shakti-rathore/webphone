@@ -53,7 +53,7 @@ const BreakDropdown = ({ bridgeID, dispoWithBreak, selectedStatus }) => {
 
   const removeBreak = async () => {
     try {
-      const response = await axios.post(`https://samwad.iotcom.io/user/removebreakuser:${username}`);
+      const response = await axios.post(`https://${window.location.origin}.iotcom.io/user/removebreakuser:${username}`);
       if (response.status === 200) {
         setSelectedBreak('Break');
         setIsOpen(false);
@@ -77,7 +77,7 @@ const BreakDropdown = ({ bridgeID, dispoWithBreak, selectedStatus }) => {
         };
 
         const dispositionResponse = await axios.post(
-          `https://samwad.iotcom.io/user/disposition${username}`,
+          `https://${window.location.origin}.iotcom.io/user/disposition${username}`,
           dispositionData,
           {
             headers: {
@@ -91,7 +91,7 @@ const BreakDropdown = ({ bridgeID, dispoWithBreak, selectedStatus }) => {
         }
       }
 
-      const response = await axios.post(`https://samwad.iotcom.io/user/breakuser:${username}`, {
+      const response = await axios.post(`https://${window.location.origin}.iotcom.io/user/breakuser:${username}`, {
         breakType,
       });
 

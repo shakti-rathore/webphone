@@ -17,6 +17,7 @@ export const HistoryProvider = ({ children }) => {
   const [password, setPassword] = useState('');
   const [selectedBreak, setSelectedBreak] = useState('Break');
   const [dropCalls, setDropCalls] = useState(false);
+  const [info, setInfo] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('');
 
   useEffect(() => {
@@ -36,6 +37,10 @@ export const HistoryProvider = ({ children }) => {
         setSelectedBreak,
         dropCalls,
         setDropCalls,
+        dropCalls,
+        setDropCalls,
+        setInfo,
+        info,
         setSelectedStatus,
         selectedStatus,
       }}

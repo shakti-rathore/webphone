@@ -21,11 +21,11 @@
 }
 
 .primary-btn {
-  @apply md:text-base text-sm bg-primary dark:bg-[#001750] dark:border-[#001750] dark:hover:text-white text-white px-5 py-2 rounded-md font-medium cursor-pointer hover:!bg-transparent hover:text-primary transition-all duration-500 border-primary border focus:outline-none outline-none;
+  @apply md:text-base focus:no-underline hover:no-underline text-sm bg-primary dark:bg-[#001750] dark:border-[#001750] dark:hover:text-white text-white px-5 py-2 rounded-md font-medium cursor-pointer hover:!bg-transparent hover:text-primary transition-all duration-500 border-primary border focus:outline-0 outline-0;
 }
 
 .primary-btn-outline {
-  @apply md:text-base text-sm bg-white dark:bg-transparent text-primary dark:border-[#001750] dark:text-white dark:hover:bg-[#001750] px-5 py-2 rounded-md font-medium cursor-pointer hover:bg-primary hover:text-white transition-all duration-500 border-primary border focus:outline-none;
+  @apply md:text-base focus:no-underline hover:no-underline text-sm bg-white dark:bg-transparent text-primary dark:border-[#001750] dark:text-white dark:hover:bg-[#001750] px-5 py-2 rounded-md font-medium cursor-pointer hover:bg-primary hover:text-white transition-all duration-500 border-primary border focus:outline-0;
 }
 
 .secondary-btn {

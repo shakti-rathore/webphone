@@ -5,13 +5,13 @@ import { RiMoonLine, RiSunLine } from 'react-icons/ri';
 import BreakDropdown from '../BreakDropdown';
 import HistoryContext from '../../context/HistoryContext';
 import { FiLogOut } from 'react-icons/fi';
-import { FaPhoneSlash } from 'react-icons/fa';
+import { FaPhoneSlash, FaPhoneSquareAlt } from 'react-icons/fa';
 import DynamicForm from '../DynamicForm';
 
 const TopBar = () => {
   const toggleTheme = useTheme();
   const location = useLocation();
-  const { setDropCalls, selectedStatus } = useContext(HistoryContext);
+  const { setDropCalls, selectedStatus, setInfo } = useContext(HistoryContext);
   const [campaign, setCampaign] = useState(false);
   const tokenData = localStorage.getItem('token');
   const parsedData = JSON.parse(tokenData);
@@ -24,16 +24,16 @@ const TopBar = () => {
 
   return (
     <>
-      {campaign && <DynamicForm campaign={campaign} onClose={() => setCampaign(false)} />}
+      {/* {campaign && <DynamicForm campaign={campaign} onClose={() => setCampaign(false)} />} */}
 
       <header className="bg-white h-16 flex items-center p-4 justify-between dark:bg-[#1a1a1a] border-b dark:border-[#333] border-[#ddd] sticky top-0 z-50">
         <div className="flex gap-x-12 items-center">
           <Link to="/webphone/dashboard">
-            <img src={`https://samwad.iotcom.io/webphone/images/logo.png`} alt="Logo" width={48} height={48} />
+            <img src={`https://${window.location.origin}.iotcom.io/webphone/images/logo.png`} alt="Logo" width={48} height={48} />
           </Link>
         </div>
 
-        <div className="flex items-center gap-x-3 lg:gap-x-6 flex-wrap md:flex-nowrap">
+        <div className="flex items-center gap-x-3 flex-wrap md:flex-nowrap">
           <div className="items-center gap-x-2 px-3 py-2 rounded-md bg-gray-100 sm:flex hidden dark:bg-[#918c8c38]">
             <span className="font-semibold text-primary dark:text-[#00498e] text-sm md:text-base">
               {username || 'Guest'}
@@ -43,26 +43,24 @@ const TopBar = () => {
             <>
               <Link
                 to="/webphone/agent-dashboard"
-                className="primary-btn text-sm md:text-base hover:no-underline hover:outline-none focus:outline-none focus:no-underline lg:block hidden"
-              >
-                Agent Dashboard
-              </Link>
-
-              <Link
-                to="/webphone/agent-dashboard"
-                className="primary-btn text-sm md:text-base hover:no-underline hover:outline-none focus:outline-none focus:no-underline block lg:hidden"
+                className="primary-btn text-sm md:text-base hover:no-underline hover:outline-0 focus:outline-0 focus:no-underline"
               >
                 Agent
               </Link>
 
-              {/* <button
-                onClick={() => setCampaign(!campaign)}
-                className="primary-btn text-sm md:text-base"
-                disabled={selectedStatus !== 'start'}
-              >
-                Campaign
-              </button> */}
               <BreakDropdown dispoWithBreak={false} selectedStatus={selectedStatus} />
+              <div className="relative">
+                <button
+                  onClick={() => setInfo(true)}
+                  className="hidden md:block primary-btn text-sm md:text-base whitespace-nowrap"
+                  disabled={selectedStatus !== 'start'}
+                >
+                  Info Calls
+                </button>
+                <button onClick={() => setInfo(true)} className="block md:hidden text-sm md:text-base">
+                  <FaPhoneSquareAlt className="text-primary dark:text-[#00498e]" />
+                </button>
+              </div>
 
               <div className="relative">
                 <button
@@ -78,26 +76,19 @@ const TopBar = () => {
               </div>
             </>
           )) || (
-            <ul className="flex gap-x-3 md:gap-x-6 mb-0">
+            <ul className="flex gap-x-3 mb-0">
               <Link
                 to={'/webphone/dashboard'}
-                className={`text-sm md:text-base focus:no-underline hover:no-underline hover:outline-none focus:outline-none ${
+                className={`text-sm md:text-base ${
                   location.pathname === '/webphone/dashboard' ? 'primary-btn-outline' : 'primary-btn'
                 }`}
               >
                 Dashboard
               </Link>
+
               <Link
                 to={'/webphone/agent-dashboard'}
-                className={`text-sm md:text-base focus:no-underline sm:block hidden hover:no-underline hover:outline-none focus:outline-none ${
-                  location.pathname === '/webphone/agent-dashboard' ? 'primary-btn-outline' : 'primary-btn'
-                }`}
-              >
-                Agent Dashboard
-              </Link>
-              <Link
-                to={'/webphone/agent-dashboard'}
-                className={`text-sm md:text-base focus:no-underline block sm:hidden hover:no-underline hover:outline-none focus:outline-none ${
+                className={`text-sm md:text-base ${
                   location.pathname === '/webphone/agent-dashboard' ? 'primary-btn-outline' : 'primary-btn'
                 }`}
               >

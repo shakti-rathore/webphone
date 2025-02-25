@@ -39,9 +39,22 @@ function Login() {
     return errors;
   };
 
-  const delay = async (ms, message) => {
-    setTimer(ms / 1000);
+  const delay = async (ms, daysExpired) => {
+    let message = 'Verifying subscription status...';
+    if (daysExpired <= 1) {
+      message = 'Your subscription expired yesterday.';
+    } else if (daysExpired > 1 && daysExpired <= 2) {
+      message = 'Your subscription expired 2 days ago.';
+    } else if (daysExpired > 2 && daysExpired <= 3) {
+      message = 'Your subscription expired 3 days ago.';
+    } else if (daysExpired > 3 && daysExpired <= 4) {
+      message = 'Your subscription expired 4 days ago.';
+    } else if (daysExpired > 4) {
+      message = 'Your subscription expired more than 4 days ago.';
+    }
+
     setLoaderMessage(message);
+    setTimer(ms / 1000);
     setIsLoading(true);
 
     for (let i = ms / 1000; i > 0; i--) {
@@ -64,7 +77,7 @@ function Login() {
 
       try {
         const headers = { 'Content-Type': 'application/json' };
-        const response = await fetch(`https://samwad.iotcom.io/userlogin/${username}`, {
+        const response = await fetch(`https://${window.location.origin}.iotcom.io/userlogin/${username}`, {
           method: 'POST',
           headers,
           body: JSON.stringify({ username, password }),
@@ -94,7 +107,12 @@ function Login() {
         if (differenceInDays < 3 && differenceInDays > 0) {
           toast.error('Your subscription is about to expire. Please renew soon!');
           localStorage.setItem('token', JSON.stringify(data));
-        } else if (differenceInDays < 0) {
+          toast.success('Login successfully');
+          navigate('/webphone/dashboard');
+          return;
+        }
+
+        if (differenceInDays < 0) {
           const daysExpired = Math.abs(differenceInDays);
 
           if (daysExpired > 5) {
@@ -102,14 +120,22 @@ function Login() {
             return;
           }
 
+          // Pass the days expired to the delay function to set appropriate message
           if (daysExpired <= 1) {
-            await delay(10000, 'Subscription expired yesterday...');
-          } else if (daysExpired <= 3) {
-            await delay(20000, 'Subscription expired over 2 days ago...');
-          } else if (daysExpired <= 4) {
-            await delay(30000, 'Subscription expired over 3 days ago...');
-          } else if (daysExpired <= 5) {
-            await delay(60000, 'Subscription expired over 4 days ago...');
+            await delay(10000, daysExpired);
+            toast.error('Subscription expired yesterday...');
+          } else if (daysExpired > 1 && daysExpired <= 2) {
+            await delay(15000, daysExpired);
+            toast.error('Subscription expired 2 days ago...');
+          } else if (daysExpired > 2 && daysExpired <= 3) {
+            await delay(20000, daysExpired);
+            toast.error('Subscription expired 3 days ago...');
+          } else if (daysExpired > 3 && daysExpired <= 4) {
+            await delay(30000, daysExpired);
+            toast.error('Subscription expired 4 days ago...');
+          } else if (daysExpired > 4 && daysExpired <= 5) {
+            await delay(60000, daysExpired);
+            toast.error('Subscription expired more than 4 days ago...');
           }
 
           localStorage.setItem('token', JSON.stringify(data));
@@ -140,7 +166,7 @@ function Login() {
           <div className="grid grid-cols-1 lg:grid-cols-2">
             <div className="hidden lg:block">
               <img
-                src={`https://samwad.iotcom.io/webphone/images/calling.svg`}
+                src={`https://${window.location.origin}.iotcom.io/webphone/images/calling.svg`}
                 alt="Login Image"
                 className="object-cover w-full h-full"
               />

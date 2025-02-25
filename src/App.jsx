@@ -12,7 +12,8 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import ringtoneMp3 from './ringtone.mp3';
 import Modal from './components/table/Modal';
-import CallerInfo from './components/CallerInfo';
+import DropCallsModal from './components/DropCallsModal';
+import InfoModal from './components/InfoModal';
 
 function App() {
   const [
@@ -49,16 +50,21 @@ function App() {
 
   const [seeLogs, setSeeLogs] = useState(false);
   const [callConference, setCallConference] = useState(false);
-  const { username, dropCalls, setDropCalls, selectedBreak, setSelectedStatus } = useContext(HistoryContext);
+  const { username, dropCalls, setDropCalls, selectedBreak, setSelectedStatus, setInfo, info } =
+    useContext(HistoryContext);
   const [usermissedCalls, setUsermissedCalls] = useState([]);
   const [phoneShow, setPhoneShow] = useState(false);
   const tokenData = localStorage.getItem('token');
   const parsedData = JSON.parse(tokenData);
   const userCampaign = parsedData?.userData?.campaign;
+  const adminUser = parsedData?.userData?.adminuser;
+  const userId = parsedData?.userData?.userid;
+  const token = parsedData?.token;
 
   const campaignMissedCallsLength = useMemo(() => {
     return Object.values(usermissedCalls || {}).filter((call) => call?.campaign === userCampaign).length;
   }, [usermissedCalls, userCampaign]);
+  const [adminUserData, setAdminUserData] = useState([]);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -88,13 +94,36 @@ function App() {
 
   const fetchUserMissedCalls = async () => {
     try {
-      const response = await axios.post(`https://samwad.iotcom.io/usermissedCalls/${username}`);
+      const response = await axios.post(`https://${window.location.origin}.iotcom.io/usermissedCalls/${username}`);
       setUsermissedCalls(response.data.result || []);
     } catch (error) {
       console.error('Error fetching missed calls:', error);
       setUsermissedCalls([]);
     }
   };
+
+  const fetchAdminUser = async () => {
+    try {
+      const response = await axios.get(`https://${window.location.origin}.iotcom.io/users/${adminUser}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const filteredData = response.data.result?.filter((item) => item.Status === 'NOT_INUSE' && item.user !== userId);
+
+      setAdminUserData(filteredData || []);
+    } catch (error) {
+      toast.error('Failed to fetch admin user.');
+      console.error('Error fetching admin user:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (info) {
+      fetchAdminUser();
+    }
+  }, [info]);
 
   useEffect(() => {
     if (status === 'start') {
@@ -146,7 +175,7 @@ function App() {
     };
 
     try {
-      const response = await axios.post(`https://samwad.iotcom.io/addModifyContact`, payload);
+      const response = await axios.post(`https://${window.location.origin}.iotcom.io/addModifyContact`, payload);
       if (response.data) {
         toast.success(response.data.message || 'Contact saved successfully.');
       } else {
@@ -164,7 +193,7 @@ function App() {
 
   return (
     <>
-      <div className="w-7 h-7 md:flex hidden rounded-full bg-red-500 items-center z-50 justify-center fixed top-2  right-[20rem] lg:right-[22rem] text-white text-sm">
+      <div className="w-7 h-7 md:flex hidden rounded-full bg-red-500 items-center z-50 justify-center fixed top-2 right-[20.3rem] text-white text-sm">
         {campaignMissedCallsLength}
       </div>
 
@@ -179,13 +208,23 @@ function App() {
             formData={formData}
           />
         )}
+        {info && (
+          <Modal isOpen={info} onClose={() => setInfo(false)} title={`Users Not In Use (${adminUserData.length})`}>
+            <InfoModal
+              adminUserData={adminUserData}
+              handleCall={handleCall}
+              setPhoneNumber={setPhoneNumber}
+              setInfo={setInfo}
+            />
+          </Modal>
+        )}
         {dropCalls && (
           <Modal
             isOpen={dropCalls}
             onClose={() => setDropCalls(false)}
-            title={`User Missed Calls (${campaignMissedCallsLength})`}
+            title={`Users Missed Calls (${campaignMissedCallsLength})`}
           >
-            <CallerInfo usermissedCalls={usermissedCalls} setDropCalls={setDropCalls} username={username} />
+            <DropCallsModal usermissedCalls={usermissedCalls} setDropCalls={setDropCalls} username={username} />
           </Modal>
         )}
         {/* {(ringtone.length > 0 && status !== 'calling') && (
