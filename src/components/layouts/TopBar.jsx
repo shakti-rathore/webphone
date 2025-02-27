@@ -29,7 +29,7 @@ const TopBar = () => {
       <header className="bg-white h-16 flex items-center p-4 justify-between dark:bg-[#1a1a1a] border-b dark:border-[#333] border-[#ddd] sticky top-0 z-50">
         <div className="flex gap-x-12 items-center">
           <Link to="/webphone/dashboard">
-            <img src={`${window.location.origin}/webphone/images/logo.png`} alt="Logo" width={48} height={48} />
+            <img src={`https://esamwad.iotcom.io/webphone/images/logo.png`} alt="Logo" width={48} height={48} />
           </Link>
         </div>
 
@@ -43,7 +43,9 @@ const TopBar = () => {
             <>
               <Link
                 to="/webphone/agent-dashboard"
-                className="primary-btn text-sm md:text-base hover:no-underline hover:outline-0 focus:outline-0 focus:no-underline"
+                className={`primary-btn text-sm md:text-base hover:no-underline hover:outline-0 focus:outline-0 focus:no-underline ${
+                  selectedStatus !== 'start' ? 'pointer-events-none' : ''
+                }`}
               >
                 Agent
               </Link>
@@ -53,7 +55,7 @@ const TopBar = () => {
                 <button
                   onClick={() => setInfo(true)}
                   className="hidden md:block primary-btn text-sm md:text-base whitespace-nowrap"
-                  disabled={selectedStatus !== 'start'}
+                  // disabled={selectedStatus !== 'start'}
                 >
                   Info Calls
                 </button>

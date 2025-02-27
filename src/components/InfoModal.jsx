@@ -1,12 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { FiPhone } from 'react-icons/fi';
 
-const InfoModal = ({ adminUserData, handleCall, setPhoneNumber, setInfo }) => {
+const InfoModal = ({
+  adminUserData,
+  handleCall,
+  setPhoneNumber,
+  setInfo,
+  status,
+  setConferenceNumber,
+  handleCalls,
+}) => {
   const [pendingCall, setPendingCall] = useState(null);
 
   useEffect(() => {
     if (pendingCall) {
-      handleCall();
+      if (status !== 'start') {
+        handleCalls();
+      } else {
+        handleCall();
+      }
       setInfo(false);
       setPendingCall(null);
     }
@@ -14,7 +26,11 @@ const InfoModal = ({ adminUserData, handleCall, setPhoneNumber, setInfo }) => {
 
   const handleUserCall = (user) => {
     const trimmedUser = user.split('@')[0];
-    setPhoneNumber(trimmedUser);
+    if (status !== 'start') {
+      setConferenceNumber(trimmedUser);
+    } else {
+      setPhoneNumber(trimmedUser);
+    }
     setPendingCall(true);
   };
 
