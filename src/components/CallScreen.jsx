@@ -70,8 +70,9 @@ const CallScreen = ({
             <BsPersonFill className="text-white text-2xl" />
           </div>
           <marquee className="text-2xl font-bold text-primary mb-2">
-            {conferenceNumber || (phoneNumber && phoneNumber) || (userCall && userCall.contactNumber)}
-            {isMerged && phoneNumber && ' Conference with ' + conferenceNumber}
+            {isMerged && phoneNumber && conferenceNumber
+              ? `${phoneNumber} Conference with ${conferenceNumber}`
+              : conferenceNumber || phoneNumber || userCall?.contactNumber}
           </marquee>
           {!isRunning ? (
             <span className="text-gray-500">Calling...</span>
