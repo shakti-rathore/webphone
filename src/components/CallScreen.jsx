@@ -3,7 +3,6 @@ import { IoIosKeypad } from 'react-icons/io';
 import { IoCloseCircleOutline, IoCloseCircle } from 'react-icons/io5';
 import { ImPhoneHangUp } from 'react-icons/im';
 import { FaStopCircle } from 'react-icons/fa';
-import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 import { useContext, useEffect, useState } from 'react';
 import KeyPad from './KeyPad';
 import { MdCallMerge } from 'react-icons/md';
@@ -11,6 +10,7 @@ import { FcCallTransfer } from 'react-icons/fc';
 import toast from 'react-hot-toast';
 import HistoryContext from '../context/HistoryContext';
 import axios from 'axios';
+import maskPhoneNumber from '../hooks/maskPhoneNumber';
 
 const CallScreen = ({
   conferenceNumber,
@@ -37,7 +37,9 @@ const CallScreen = ({
   const [showKeyPad, setShowKeyPad] = useState(false);
   const [muted, setMuted] = useState(false);
   const [isMerged, setIsMerged] = useState(false);
-  const formatPhoneNumber = useFormatPhoneNumber();
+  const tokenData = localStorage.getItem('token');
+  const parsedData = JSON.parse(tokenData);
+  const adminUser = parsedData?.userData?.adminuser;
   const { username } = useContext(HistoryContext);
 
   const handleTransfer = async () => {
@@ -71,7 +73,15 @@ const CallScreen = ({
           </div>
           <marquee className="text-2xl font-bold text-primary mb-2">
             {isMerged && phoneNumber && conferenceNumber
-              ? `${phoneNumber} Conference with ${conferenceNumber}`
+              ? adminUser === 'warrgyi'
+                ? `${maskPhoneNumber(phoneNumber)} Conference with ${maskPhoneNumber(conferenceNumber)}`
+                : `${phoneNumber} Conference with ${conferenceNumber}`
+              : adminUser === 'warrgyi'
+              ? conferenceNumber
+                ? maskPhoneNumber(conferenceNumber)
+                : phoneNumber
+                ? maskPhoneNumber(phoneNumber)
+                : maskPhoneNumber(userCall?.contactNumber)
               : conferenceNumber || phoneNumber || userCall?.contactNumber}
           </marquee>
           {!isRunning ? (

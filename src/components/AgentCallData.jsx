@@ -6,6 +6,7 @@ import CommonTable from './table/CommonTable';
 import AudioPlayer from './AudioPlayer';
 import 'rsuite/dist/rsuite.min.css';
 import toast from 'react-hot-toast';
+import maskPhoneNumber from '../hooks/maskPhoneNumber';
 
 const AgentCallData = () => {
   const [callDetails, setCallDetails] = useState([]);
@@ -312,6 +313,7 @@ const AgentCallData = () => {
     {
       label: 'Caller',
       accessor: 'Caller',
+      render: (value) => maskPhoneNumber(value),
     },
     {
       label: 'Campaign',
@@ -358,7 +360,6 @@ const AgentCallData = () => {
         }
       },
     },
-
     {
       label: 'Disposition',
       accessor: 'Disposition',

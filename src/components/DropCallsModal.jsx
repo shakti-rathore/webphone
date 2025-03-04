@@ -2,11 +2,13 @@ import React, { useCallback, useMemo } from 'react';
 import { FiPhone } from 'react-icons/fi';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import maskPhoneNumber from '../hooks/maskPhoneNumber';
 
 const DropCallsModal = ({ usermissedCalls, setDropCalls, username }) => {
   const tokenData = localStorage.getItem('token');
   const parsedData = JSON.parse(tokenData);
   const userCampaign = parsedData?.userData?.campaign;
+  const adminUser = parsedData?.userData?.adminuser;
 
   const groupedCalls = useMemo(() => {
     const filteredCalls = Object.values(usermissedCalls || {}).filter((call) => {
@@ -73,7 +75,7 @@ const DropCallsModal = ({ usermissedCalls, setDropCalls, username }) => {
         >
           <div className="flex-grow">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-              {caller}
+              {maskPhoneNumber(caller)}
               <span className="text-sm font-normal text-gray-600">
                 ({data.count} missed {data.count === 1 ? 'call' : 'calls'})
               </span>
