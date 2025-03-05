@@ -40,7 +40,7 @@ const Disposition = ({ bridgeID, setDispositionModal, handleContact, setFormData
       };
 
       const dispositionResponse = await axios.post(
-        `https://esamwad.iotcom.io/user/disposition${username}`,
+        `${window.location.origin}/user/disposition${username}`,
         dispositionData,
         {
           headers: {
