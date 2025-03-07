@@ -36,8 +36,8 @@ const useJssip = () => {
     autoStart: false,
   });
   const navigate = useNavigate();
-  // const originWithoutProtocol = 'esamwad.iotcom.io';
-  const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
+  const originWithoutProtocol = 'esamwad.iotcom.io';
+  // const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
 
   function notifyMe() {
     if (!('Notification' in window)) {
@@ -115,6 +115,14 @@ const useJssip = () => {
     Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeoutMs))]);
 
   const connectioncheck = async () => {
+    const isApiStuck = await checkApiStatus('${window.location.origin}/health', 3000);
+
+    if (isApiStuck) {
+      console.error('API appears to be unresponsive');
+      toast.warning('Server appears to be unresponsive. Retrying...');
+      return true;
+    }
+
     try {
       const response = await withTimeout(
         axios.post(

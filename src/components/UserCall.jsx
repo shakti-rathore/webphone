@@ -1,5 +1,6 @@
 import React from 'react';
 import { InputField } from './table/InputField';
+import maskPhoneNumber from '../hooks/maskPhoneNumber';
 
 const UserCall = ({ formData, setFormData, userCallOpen }) => {
   const handleChange = (e) => {
@@ -32,7 +33,7 @@ const UserCall = ({ formData, setFormData, userCallOpen }) => {
             label="Mobile Number"
             type="text"
             name="number"
-            value={formData.number}
+            value={maskPhoneNumber(formData.number)}
             onChange={handleChange}
             placeholder="Enter Primary Number"
           />
