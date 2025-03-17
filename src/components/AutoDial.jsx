@@ -7,7 +7,7 @@ import { InputField } from './table/InputField';
 import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 import toast from 'react-hot-toast';
 
-const AutoDial = ({ setPhoneNumber, dispositionModal, handleCall,  }) => {
+const AutoDial = ({ setPhoneNumber, dispositionModal, handleCall }) => {
   const { username } = useContext(HistoryContext);
   const [formData, setFormData] = useState({
     fullName: '',

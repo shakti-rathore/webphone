@@ -36,8 +36,8 @@ const useJssip = () => {
     autoStart: false,
   });
   const navigate = useNavigate();
-  const originWithoutProtocol = 'esamwad.iotcom.io';
-  // const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
+  // const originWithoutProtocol = 'esamwad.iotcom.io';
+  const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
 
   function notifyMe() {
     if (!('Notification' in window)) {
@@ -115,15 +115,8 @@ const useJssip = () => {
     Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeoutMs))]);
 
   const connectioncheck = async () => {
-    const isApiStuck = await checkApiStatus('${window.location.origin}/health', 3000);
-
-    if (isApiStuck) {
-      console.error('API appears to be unresponsive');
-      toast.warning('Server appears to be unresponsive. Retrying...');
-      return true;
-    }
-
     try {
+      // Check connection using the userconnection endpoint with a 3-second timeout
       const response = await withTimeout(
         axios.post(
           `${window.location.origin}/userconnection`,
@@ -133,10 +126,12 @@ const useJssip = () => {
         3000
       );
 
+      // Handle unauthorized or logged-out scenarios
       if (response.status === 401 || !response.data.isUserLogin) {
         localStorage.clear();
         window.location.href = '/webphone/login';
-        return;
+        toast.error('Session expired. Please log in again.');
+        return true; // Indicate connection issue
       }
 
       const data = response.data;
@@ -144,11 +139,12 @@ const useJssip = () => {
 
       if (!tokenData?.userData?.campaign) {
         console.error('Campaign information missing in token data');
-        return;
+        return false; // No connection issue, but data problem
       }
 
       const campaign = tokenData.userData.campaign;
 
+      // Handle successful connection response
       if (data.message === 'ok connection for user') {
         if (data.currentCallqueue?.length > 0) {
           if (campaign === data.currentCallqueue[0].campaign) {
@@ -162,23 +158,41 @@ const useJssip = () => {
           setRingtone([]);
           console.log('No current call queue data available');
         }
-      } else if (data.message === 'poor connection problem ,please login again') {
+        return false; // Connection is fine
+      }
+      // Handle poor connection message from server
+      else if (data.message === 'poor connection problem ,please login again') {
         localStorage.clear();
         window.location.href = '/webphone/login';
         toast.error('Connection lost. Please log in again to continue');
         addTimeout('poor-connection');
+        return true; // Indicate connection issue
       }
     } catch (err) {
+      // Handle timeout or network errors
       if (err.message === 'Timeout') {
+        console.error('Connection timed out');
+        toast.warning('Server appears to be unresponsive. Retrying...');
         addTimeout('timeout');
+        return true; // Indicate connection issue
       } else if (err.message.includes('Network')) {
+        console.error('Network error:', err.message);
+        toast.error('Network error. Please check your connection.');
         addTimeout('network');
+        return true; // Indicate connection issue
       } else {
         console.error('Error during connection check:', err);
         if (err.response) {
           console.error('Response data:', err.response.data);
           console.error('Response status:', err.response.status);
+          if (err.response.status === 401) {
+            localStorage.clear();
+            window.location.href = '/webphone/login';
+            toast.error('Session expired. Please log in again.');
+            return true; // Indicate connection issue
+          }
         }
+        return false; // Unknown error, assume connection is okay
       }
     }
   };
