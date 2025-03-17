@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FiPhone } from 'react-icons/fi';
 
-const InfoModal = ({
+const InterModal = ({
   adminUserData,
   handleCall,
   setPhoneNumber,
@@ -70,4 +70,4 @@ const InfoModal = ({
   );
 };
 
-export default InfoModal;
+export default InterModal;

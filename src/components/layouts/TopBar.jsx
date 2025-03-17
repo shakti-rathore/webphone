@@ -51,18 +51,18 @@ const TopBar = () => {
               </Link>
 
               <BreakDropdown dispoWithBreak={false} selectedStatus={selectedStatus} />
-              <div className="relative">
+              {/* <div className="relative">
                 <button
                   onClick={() => setInfo(true)}
                   className="hidden md:block primary-btn text-sm md:text-base whitespace-nowrap"
                   // disabled={selectedStatus !== 'start'}
                 >
-                  Info Calls
+                  Inter Com
                 </button>
                 <button onClick={() => setInfo(true)} className="block md:hidden text-sm md:text-base">
                   <FaPhoneSquareAlt className="text-primary dark:text-[#00498e]" />
                 </button>
-              </div>
+              </div> */}
 
               <div className="relative">
                 <button

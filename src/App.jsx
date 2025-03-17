@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 import ringtoneMp3 from './ringtone.mp3';
 import Modal from './components/table/Modal';
 import DropCallsModal from './components/DropCallsModal';
-import InfoModal from './components/InfoModal';
+import InterModal from './components/InterModal';
 
 function App() {
   const [
@@ -210,7 +210,7 @@ function App() {
         )}
         {info && (
           <Modal isOpen={info} onClose={() => setInfo(false)} title={`Users Not In Use (${adminUserData.length})`}>
-            <InfoModal
+            <InterModal
               adminUserData={adminUserData}
               handleCall={handleCall}
               handleCalls={handleCalls}
