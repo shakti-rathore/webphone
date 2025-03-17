@@ -57,7 +57,7 @@ const TopBar = () => {
                   className="hidden md:block primary-btn text-sm md:text-base whitespace-nowrap"
                   // disabled={selectedStatus !== 'start'}
                 >
-                  Inter Com
+                  intercom
                 </button>
                 <button onClick={() => setInfo(true)} className="block md:hidden text-sm md:text-base">
                   <FaPhoneSquareAlt className="text-primary dark:text-[#00498e]" />
