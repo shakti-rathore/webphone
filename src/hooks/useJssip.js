@@ -772,10 +772,10 @@ const useJssip = () => {
   }, [username, password, navigate]);
 
   const handleCall = () => {
-    // if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 12) {
-    //   toast.error('Phone number must be 10 digit');
-    //   return;
-    // }
+    if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 12) {
+      toast.error('Phone number must be 10 digit');
+      return;
+    }
 
     setHistory((prev) => [
       ...prev,
