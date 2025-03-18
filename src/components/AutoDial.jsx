@@ -133,7 +133,7 @@ const AutoDial = ({ setPhoneNumber, dispositionModal, handleCall }) => {
     }
     if (isManualPhone) {
       const formattedNumber = formatPhoneNumber(formData.phoneNumber);
-      setPhoneNumber(formattedNumber);
+      // setPhoneNumber(formattedNumber);
       handleCall(formattedNumber);
       return;
     }

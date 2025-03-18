@@ -771,11 +771,11 @@ const useJssip = () => {
     };
   }, [username, password, navigate]);
 
-  const handleCall = () => {
-    if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 12) {
-      toast.error('Phone number must be 10 digit');
-      return;
-    }
+  const handleCall = (phoneNumber) => {
+    // if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 12) {
+    //   toast.error('Phone number must be 10 digit');
+    //   return;
+    // }
 
     setHistory((prev) => [
       ...prev,
