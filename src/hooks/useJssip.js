@@ -36,8 +36,8 @@ const useJssip = () => {
     autoStart: false,
   });
   const navigate = useNavigate();
-  // const originWithoutProtocol = 'esamwad.iotcom.io';
-  const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
+  const originWithoutProtocol = 'esamwad.iotcom.io';
+  // const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
 
   function notifyMe() {
     if (!('Notification' in window)) {
@@ -771,7 +771,7 @@ const useJssip = () => {
     };
   }, [username, password, navigate]);
 
-  const handleCall = (phoneNumber) => {
+  const handleCall = (formattedNumber) => {
     // if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 12) {
     //   toast.error('Phone number must be 10 digit');
     //   return;
@@ -791,7 +791,7 @@ const useJssip = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ caller: username, receiver: phoneNumber }),
+      body: JSON.stringify({ caller: username, receiver: phoneNumber || formattedNumber }),
     })
       .then(() => {
         // Remove this line to prevent duplicate call to answercall
