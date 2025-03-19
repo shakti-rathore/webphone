@@ -36,8 +36,8 @@ const useJssip = () => {
     autoStart: false,
   });
   const navigate = useNavigate();
-  const originWithoutProtocol = 'esamwad.iotcom.io';
-  // const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
+  // const originWithoutProtocol = 'esamwad.iotcom.io';
+  const originWithoutProtocol = window.location.origin.replace(/^https?:\/\//, '');
 
   function notifyMe() {
     if (!('Notification' in window)) {
