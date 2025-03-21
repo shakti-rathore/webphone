@@ -24,6 +24,7 @@ const useJssip = () => {
   const [isHeld, setIsHeld] = useState(false);
   const [conferenceStatus, setConferenceStatus] = useState(false);
   const [dispositionModal, setDispositionModal] = useState(false);
+  const [isConnectionLost, setIsConnectionLost] = useState(false);
   const [timeoutArray, setTimeoutArray] = useState([]);
   const offlineToastIdRef = useRef(null);
   const agentSocketRef = useRef(null);
@@ -82,7 +83,7 @@ const useJssip = () => {
 
   const createConferenceCall = async () => {
     try {
-      const response = await fetch(`${window.location.origin}//reqConf/${username}`, {
+      const response = await fetch(`${window.location.origin}/reqConf/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -116,24 +117,26 @@ const useJssip = () => {
 
   const connectioncheck = async () => {
     try {
-      // Check connection using the userconnection endpoint with a 3-second timeout
+      setIsConnectionLost(false); // Reset state before checking connection
+
+      // Ensure request times out if API is stuck
       const response = await withTimeout(
         axios.post(
-          `${window.location.origin}//userconnection`,
+          `${window.location.origin}/userconnection`,
           { user: username },
           { headers: { 'Content-Type': 'application/json' } }
         ),
         3000
       );
 
-      // Handle unauthorized or logged-out scenarios
       if (response.status === 401 || !response.data.isUserLogin) {
         localStorage.clear();
         window.location.href = '/webphone/login';
         toast.error('Session expired. Please log in again.');
         session.terminate();
         stopRecording();
-        return true; // Indicate connection issue
+        setIsConnectionLost(true);
+        return true;
       }
 
       const data = response.data;
@@ -146,22 +149,22 @@ const useJssip = () => {
         toast.error('Invalid session. Please log in again.');
         session.terminate();
         stopRecording();
-        return true; // Indicate connection issue
+        setIsConnectionLost(true);
+        return true;
       }
 
       const campaign = tokenData.userData.campaign;
 
-      // If the response is NOT "ok connection for user", clear storage and redirect
       if (data.message !== 'ok connection for user') {
         localStorage.clear();
         window.location.href = '/webphone/login';
         session.terminate();
         stopRecording();
         toast.error('Connection lost. Please log in again.');
-        return true; // Indicate connection issue
+        setIsConnectionLost(true);
+        return true;
       }
 
-      // Handle successful connection response
       if (data.currentCallqueue?.length > 0) {
         if (campaign === data.currentCallqueue[0].campaign) {
           setTimeoutArray([]);
@@ -175,41 +178,35 @@ const useJssip = () => {
         console.log('No current call queue data available');
       }
 
-      return false; // Connection is fine
+      setIsConnectionLost(false); // Connection is fine
+      return false;
     } catch (err) {
-      // Handle timeout or network errors
       if (err.message === 'Timeout') {
         console.error('Connection timed out');
         toast.warning('Server appears to be unresponsive. Retrying...');
         addTimeout('timeout');
-        return true; // Indicate connection issue
       } else if (err.message.includes('Network')) {
         console.error('Network error:', err.message);
         toast.error('Network error. Please check your connection.');
         addTimeout('network');
-        return true; // Indicate connection issue
       } else {
         console.error('Error during connection check:', err);
-        if (err.response) {
-          console.error('Response data:', err.response.data);
-          console.error('Response status:', err.response.status);
-          if (err.response.status === 401) {
-            localStorage.clear();
-            window.location.href = '/webphone/login';
-            toast.error('Session expired. Please log in again.');
-            session.terminate();
-            stopRecording();
-            return true; // Indicate connection issue
-          }
+        if (err.response && err.response.status === 401) {
+          localStorage.clear();
+          window.location.href = '/webphone/login';
+          toast.error('Session expired. Please log in again.');
+          session.terminate();
+          stopRecording();
         }
-        return false; // Unknown error, assume connection is okay
       }
+      setIsConnectionLost(true); // Set state to true when there's an error
+      return true;
     }
   };
 
   // useEffect(() => {
   //   if (username) {
-  //     const url = `${window.location.origin}//userready/${username}`;
+  //     const url = `${window.location.origin}/userready/${username}`;
   //     axios
   //       .post(url, {}, { headers: { 'Content-Type': 'application/json' } })
   //       .then((response) => {
@@ -223,7 +220,7 @@ const useJssip = () => {
 
   const checkUserReady = async () => {
     try {
-      const url = `${window.location.origin}//userready/${username}`;
+      const url = `${window.location.origin}/userready/${username}`;
       const response = await axios.post(url, {}, { headers: { 'Content-Type': 'application/json' } });
       return response.data;
     } catch (error) {
@@ -355,7 +352,7 @@ const useJssip = () => {
     if (!session) return;
 
     try {
-      const response = await fetch(`${window.location.origin}//reqUnHold/${username}`, {
+      const response = await fetch(`${window.location.origin}/reqUnHold/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -383,7 +380,7 @@ const useJssip = () => {
 
     try {
       if (!isHeld) {
-        await fetch(`${window.location.origin}//reqHold/${username}`, {
+        await fetch(`${window.location.origin}/reqHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -399,7 +396,7 @@ const useJssip = () => {
 
         setIsHeld(true);
       } else {
-        await fetch(`${window.location.origin}//reqUnHold/${username}`, {
+        await fetch(`${window.location.origin}/reqUnHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -636,7 +633,7 @@ const useJssip = () => {
   const answercall = async (incomingNumber = null) => {
     try {
       const response = await axios.post(
-        `${window.location.origin}//useroncall/${username}`,
+        `${window.location.origin}/useroncall/${username}`,
         {},
         {
           headers: {
@@ -799,6 +796,9 @@ const useJssip = () => {
     //   toast.error('Phone number must be 10 digit');
     //   return;
     // }
+    if (isConnectionLost) {
+      return;
+    }
 
     setHistory((prev) => [
       ...prev,
@@ -809,7 +809,7 @@ const useJssip = () => {
     ]);
     localStorage.setItem('dialing', true);
 
-    fetch(`${window.location.origin}//dialnumber`, {
+    fetch(`${window.location.origin}/dialnumber`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -830,7 +830,7 @@ const useJssip = () => {
       if (dispositionModal) {
         try {
           await axios.post(
-            `${window.location.origin}//user/callended${username}`,
+            `${window.location.origin}/user/callended${username}`,
             {},
             {
               headers: {
@@ -877,6 +877,7 @@ const useJssip = () => {
     setDispositionModal,
     userCall,
     timeoutArray,
+    isConnectionLost
   ];
 };
 

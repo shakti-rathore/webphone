@@ -6,7 +6,7 @@ import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 import KeyPad from './KeyPad';
 import NetworkMonitor from './NetworkMonitor';
 
-const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArray }) => {
+const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArray, isConnectionLost }) => {
   const [isHovered, setIsHovered] = useState(false);
   const formatPhoneNumber = useFormatPhoneNumber();
 
@@ -65,6 +65,7 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArra
           <button
             className="p-4 mt-4 bg-green-500 text-white rounded-full hover:bg-green-600 focus:outline-none focus:bg-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
             onClick={handleCall}
+            disabled={isConnectionLost}
           >
             <FiPhone size={20} />
           </button>

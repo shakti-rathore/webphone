@@ -44,7 +44,7 @@ const CallScreen = ({
 
   const handleTransfer = async () => {
     try {
-      const response = await axios.post(`${window.location.origin}//reqTransfer/${username}`, {});
+      const response = await axios.post(`${window.location.origin}/reqTransfer/${username}`, {});
       toast.success('Request successful!');
     } catch (error) {
       console.error('Error:', error);

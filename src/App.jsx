@@ -46,6 +46,7 @@ function App() {
     setDispositionModal,
     userCall,
     timeoutArray,
+    isConnectionLost,
   ] = useJssip();
 
   const [seeLogs, setSeeLogs] = useState(false);
@@ -94,7 +95,7 @@ function App() {
 
   const fetchUserMissedCalls = async () => {
     try {
-      const response = await axios.post(`${window.location.origin}//usermissedCalls/${username}`);
+      const response = await axios.post(`${window.location.origin}/usermissedCalls/${username}`);
       setUsermissedCalls(response.data.result || []);
     } catch (error) {
       console.error('Error fetching missed calls:', error);
@@ -104,7 +105,7 @@ function App() {
 
   const fetchAdminUser = async () => {
     try {
-      const response = await axios.get(`${window.location.origin}//users/${adminUser}`, {
+      const response = await axios.get(`${window.location.origin}/users/${adminUser}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -175,7 +176,7 @@ function App() {
     };
 
     try {
-      const response = await axios.post(`${window.location.origin}//addModifyContact`, payload);
+      const response = await axios.post(`${window.location.origin}/addModifyContact`, payload);
       if (response.data) {
         toast.success(response.data.message || 'Contact saved successfully.');
       } else {
@@ -190,7 +191,7 @@ function App() {
     createConferenceCall();
     setCallConference(false);
   }
-  console.log(status, 'status');
+
   return (
     <>
       <div className="w-7 h-7 md:flex hidden rounded-full bg-red-500 items-center z-50 justify-center fixed top-2 right-[20.3rem] text-white text-sm">
@@ -284,6 +285,7 @@ function App() {
                     handleCall={handleCall}
                     setSeeLogs={setSeeLogs}
                     timeoutArray={timeoutArray}
+                    isConnectionLost={isConnectionLost}
                   />
                 </div>
               ) : status === 'calling' || status === 'conference' ? (
