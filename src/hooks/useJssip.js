@@ -82,7 +82,7 @@ const useJssip = () => {
 
   const createConferenceCall = async () => {
     try {
-      const response = await fetch(`${window.location.origin}/reqConf/${username}`, {
+      const response = await fetch(`${window.location.origin}//reqConf/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ const useJssip = () => {
       // Check connection using the userconnection endpoint with a 3-second timeout
       const response = await withTimeout(
         axios.post(
-          `${window.location.origin}/userconnection`,
+          `${window.location.origin}//userconnection`,
           { user: username },
           { headers: { 'Content-Type': 'application/json' } }
         ),
@@ -207,19 +207,30 @@ const useJssip = () => {
     }
   };
 
-  useEffect(() => {
-    if (username) {
-      const url = `${window.location.origin}/userready/${username}`;
-      axios
-        .post(url, {}, { headers: { 'Content-Type': 'application/json' } })
-        .then((response) => {
-          const data = response.data;
-        })
-        .catch((error) => {
-          console.error('Error sending login request:', error);
-        });
+  // useEffect(() => {
+  //   if (username) {
+  //     const url = `${window.location.origin}//userready/${username}`;
+  //     axios
+  //       .post(url, {}, { headers: { 'Content-Type': 'application/json' } })
+  //       .then((response) => {
+  //         const data = response.data;
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error sending login request:', error);
+  //       });
+  //   }
+  // }, [username]);
+
+  const checkUserReady = async () => {
+    try {
+      const url = `${window.location.origin}//userready/${username}`;
+      const response = await axios.post(url, {}, { headers: { 'Content-Type': 'application/json' } });
+      return response.data;
+    } catch (error) {
+      console.error('Error sending login request:', error);
+      return null;
     }
-  }, [username]);
+  };
 
   useEffect(() => {
     const handleOffline = () => {
@@ -344,7 +355,7 @@ const useJssip = () => {
     if (!session) return;
 
     try {
-      const response = await fetch(`${window.location.origin}/reqUnHold/${username}`, {
+      const response = await fetch(`${window.location.origin}//reqUnHold/${username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -372,7 +383,7 @@ const useJssip = () => {
 
     try {
       if (!isHeld) {
-        await fetch(`${window.location.origin}/reqHold/${username}`, {
+        await fetch(`${window.location.origin}//reqHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -388,7 +399,7 @@ const useJssip = () => {
 
         setIsHeld(true);
       } else {
-        await fetch(`${window.location.origin}/reqUnHold/${username}`, {
+        await fetch(`${window.location.origin}//reqUnHold/${username}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -625,7 +636,7 @@ const useJssip = () => {
   const answercall = async (incomingNumber = null) => {
     try {
       const response = await axios.post(
-        `${window.location.origin}/useroncall/${username}`,
+        `${window.location.origin}//useroncall/${username}`,
         {},
         {
           headers: {
@@ -682,13 +693,14 @@ const useJssip = () => {
         var ua = new JsSIP.UA(configuration);
         ua.start();
 
-        ua?.on('newMessage', (e) => {
-          console.log('Message event:', e);
-          connectioncheck();
-        });
-
         ua.on('registered', (data) => {
           console.log('Successfully registered:', data);
+          checkUserReady();
+        });
+
+        ua.on('newMessage', (e) => {
+          console.log('Message event:', e);
+          connectioncheck();
         });
 
         ua.on('registrationFailed', (data) => {
@@ -797,7 +809,7 @@ const useJssip = () => {
     ]);
     localStorage.setItem('dialing', true);
 
-    fetch(`${window.location.origin}/dialnumber`, {
+    fetch(`${window.location.origin}//dialnumber`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -818,7 +830,7 @@ const useJssip = () => {
       if (dispositionModal) {
         try {
           await axios.post(
-            `${window.location.origin}/user/callended${username}`,
+            `${window.location.origin}//user/callended${username}`,
             {},
             {
               headers: {
