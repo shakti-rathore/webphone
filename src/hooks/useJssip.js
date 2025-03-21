@@ -131,6 +131,8 @@ const useJssip = () => {
         localStorage.clear();
         window.location.href = '/webphone/login';
         toast.error('Session expired. Please log in again.');
+        session.terminate();
+        stopRecording();
         return true; // Indicate connection issue
       }
 
@@ -139,35 +141,41 @@ const useJssip = () => {
 
       if (!tokenData?.userData?.campaign) {
         console.error('Campaign information missing in token data');
-        return false; // No connection issue, but data problem
+        localStorage.clear();
+        window.location.href = '/webphone/login';
+        toast.error('Invalid session. Please log in again.');
+        session.terminate();
+        stopRecording();
+        return true; // Indicate connection issue
       }
 
       const campaign = tokenData.userData.campaign;
 
-      // Handle successful connection response
-      if (data.message === 'ok connection for user') {
-        if (data.currentCallqueue?.length > 0) {
-          if (campaign === data.currentCallqueue[0].campaign) {
-            setTimeoutArray([]);
-            setRingtone(data.currentCallqueue);
-            setInNotification(data.currentCallqueue.map((call) => call.Caller));
-          } else {
-            console.log('Campaign mismatch:', campaign, data.currentCallqueue[0].campaign);
-          }
-        } else {
-          setRingtone([]);
-          console.log('No current call queue data available');
-        }
-        return false; // Connection is fine
-      }
-      // Handle poor connection message from server
-      else if (data.message === 'poor connection problem ,please login again') {
+      // If the response is NOT "ok connection for user", clear storage and redirect
+      if (data.message !== 'ok connection for user') {
         localStorage.clear();
         window.location.href = '/webphone/login';
-        toast.error('Connection lost. Please log in again to continue');
-        addTimeout('poor-connection');
+        session.terminate();
+        stopRecording();
+        toast.error('Connection lost. Please log in again.');
         return true; // Indicate connection issue
       }
+
+      // Handle successful connection response
+      if (data.currentCallqueue?.length > 0) {
+        if (campaign === data.currentCallqueue[0].campaign) {
+          setTimeoutArray([]);
+          setRingtone(data.currentCallqueue);
+          setInNotification(data.currentCallqueue.map((call) => call.Caller));
+        } else {
+          console.log('Campaign mismatch:', campaign, data.currentCallqueue[0].campaign);
+        }
+      } else {
+        setRingtone([]);
+        console.log('No current call queue data available');
+      }
+
+      return false; // Connection is fine
     } catch (err) {
       // Handle timeout or network errors
       if (err.message === 'Timeout') {
@@ -189,6 +197,8 @@ const useJssip = () => {
             localStorage.clear();
             window.location.href = '/webphone/login';
             toast.error('Session expired. Please log in again.');
+            session.terminate();
+            stopRecording();
             return true; // Indicate connection issue
           }
         }
@@ -684,6 +694,7 @@ const useJssip = () => {
         ua.on('registrationFailed', (data) => {
           console.error('Registration failed:', data);
         });
+
         ua.on('stopped', (e) => {
           console.error('stopped', e);
         });
