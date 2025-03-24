@@ -816,10 +816,9 @@ const useJssip = () => {
       },
       body: JSON.stringify({ caller: username, receiver: phoneNumber || formattedNumber }),
     })
-      .then(() => {
-        // Remove this line to prevent duplicate call to answercall
-        // answercall();
-      })
+    .then(() => {
+      setPhoneNumber(phoneNumber || formattedNumber);
+    })
       .catch((error) => {
         console.error('Error dialing:', error);
         toast.error('Failed to initiate the call');
