@@ -26,6 +26,7 @@ const useJssip = () => {
   const [dispositionModal, setDispositionModal] = useState(false);
   const [isConnectionLost, setIsConnectionLost] = useState(false);
   const [timeoutArray, setTimeoutArray] = useState([]);
+  const [isCallended, setIsCallended] = useState(false);
   const offlineToastIdRef = useRef(null);
   const agentSocketRef = useRef(null);
   const customerSocketRef = useRef(null);
@@ -747,7 +748,10 @@ const useJssip = () => {
         pause();
         setStatus('start');
         setPhoneNumber('');
-        setDispositionModal(true);
+        // setDispositionModal(true);
+        // * this is new state added because user callended api was calling after 
+        // * dispostion done api when auto disposition is done
+        setIsCallended(true);
         setConferenceNumber('');
       });
 
@@ -816,9 +820,9 @@ const useJssip = () => {
       },
       body: JSON.stringify({ caller: username, receiver: phoneNumber || formattedNumber }),
     })
-    .then(() => {
-      setPhoneNumber(phoneNumber || formattedNumber);
-    })
+      .then(() => {
+        setPhoneNumber(phoneNumber || formattedNumber);
+      })
       .catch((error) => {
         console.error('Error dialing:', error);
         toast.error('Failed to initiate the call');
@@ -826,7 +830,8 @@ const useJssip = () => {
   };
   useEffect(() => {
     const callApi = async () => {
-      if (dispositionModal) {
+      console.log('calling user/callednde api:', Date.now());
+      if (isCallended) {
         try {
           await axios.post(
             `${window.location.origin}/user/callended${username}`,
@@ -837,6 +842,8 @@ const useJssip = () => {
               },
             }
           );
+          setIsCallended(false);
+          setDispositionModal(true);
         } catch (error) {
           console.error('Error calling callendedd API:', error);
         }
@@ -844,7 +851,7 @@ const useJssip = () => {
     };
 
     callApi();
-  }, [dispositionModal, username]);
+  }, [isCallended, username]);
 
   return [
     ringtone,
