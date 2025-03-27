@@ -47,6 +47,8 @@ function App() {
     userCall,
     timeoutArray,
     isConnectionLost,
+    // isDialbuttonClicked,
+    // setIsDialbuttonClicked,
   ] = useJssip();
 
   const [seeLogs, setSeeLogs] = useState(false);
@@ -255,25 +257,25 @@ function App() {
                 <UserCall userCall={userCall} username={username} formData={formData} setFormData={setFormData} />
               </div>
             )) || (
-              <div className="w-full lg:w-2/3 relative">
-                <AutoDial
-                  setPhoneNumber={setPhoneNumber}
-                  dispositionModal={dispositionModal}
-                  handleCall={handleCall}
-                  phoneNumber={phoneNumber}
-                />
-                <div className="bottom-3 sm:left-64 left-[15rem] whitespace-nowrap absolute">
-                  <button
-                    className="primary-btn"
-                    onClick={() => {
-                      setPhoneShow(!phoneShow);
-                    }}
-                  >
-                    {!phoneShow ? 'Hide Phone' : 'Show Phone'}
-                  </button>
+                <div className="w-full lg:w-2/3 relative">
+                  <AutoDial
+                    setPhoneNumber={setPhoneNumber}
+                    dispositionModal={dispositionModal}
+                    handleCall={handleCall}
+                    phoneNumber={phoneNumber}
+                  />
+                  <div className="bottom-3 sm:left-64 left-[15rem] whitespace-nowrap absolute">
+                    <button
+                      className="primary-btn"
+                      onClick={() => {
+                        setPhoneShow(!phoneShow);
+                      }}
+                    >
+                      {!phoneShow ? 'Hide Phone' : 'Show Phone'}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
             <div className={`w-full ${status !== 'start' ? 'lg:w-2/3' : ''}`}>
               {seeLogs ? (
                 <HistoryScreen setSeeLogs={setSeeLogs} />
@@ -286,6 +288,8 @@ function App() {
                     setSeeLogs={setSeeLogs}
                     timeoutArray={timeoutArray}
                     isConnectionLost={isConnectionLost}
+                    // isDialbuttonClicked={isDialbuttonClicked}
+                    // setIsDialbuttonClicked={setIsDialbuttonClicked}
                   />
                 </div>
               ) : status === 'calling' || status === 'conference' ? (

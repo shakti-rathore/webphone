@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiPhone } from 'react-icons/fi';
 import { VscHistory } from 'react-icons/vsc';
 import { TiBackspaceOutline, TiBackspace } from 'react-icons/ti';
@@ -6,7 +6,7 @@ import useFormatPhoneNumber from '../hooks/useFormatPhoneNumber';
 import KeyPad from './KeyPad';
 import NetworkMonitor from './NetworkMonitor';
 
-const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArray, isConnectionLost }) => {
+const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArray, isConnectionLost}) => {
   const [isHovered, setIsHovered] = useState(false);
   const formatPhoneNumber = useFormatPhoneNumber();
 
@@ -15,6 +15,8 @@ const Home = ({ phoneNumber, setPhoneNumber, handleCall, setSeeLogs, timeoutArra
       handleCall();
     }
   };
+
+  
 
   return (
     <div className="flex flex-col items-center md:justify-center min-h-screen">
