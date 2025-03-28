@@ -179,7 +179,7 @@ const useJssip = () => {
         }
       } else {
         setRingtone([]);
-        console.log('No current call queue data available');
+        // console.log('No current call queue data available');
       }
 
       setIsConnectionLost(false); // Connection is fine
@@ -682,29 +682,29 @@ const useJssip = () => {
     }
   }, [inNotification]);
 
-  const getAverage = (arr) => {
-    if (arr.length === 0) return 0; // Handle empty array case
-    return arr.reduce((sum, num) => sum + num, 0) / arr.length;
-  };
+  // const getAverage = (arr) => {
+  //   if (arr.length === 0) return 0; // Handle empty array case
+  //   return arr.reduce((sum, num) => sum + num, 0) / arr.length;
+  // };
 
-  useEffect(() => {
-    console.log('message difference time :', messageDifference);
-    // console.log('averages per minutes :', avergaeMessageTimePerMinute);
-    if (avergaeMessageTimePerMinute.length > 10) {
-      // Remove oldest difference
-      setAvergaeMessageTimePerMinute((prev) => prev.slice(1));
-    }
-    if (messageDifference.length === 12) {
-      const average = Math.ceil(getAverage(messageDifference));
-      const maxNumber = Math.max(...messageDifference);
-      const avgAndMaxNumberObj = {
-        average,
-        maxNumber,
-      }
-      setAvergaeMessageTimePerMinute((prev) => [...prev, avgAndMaxNumberObj]);
-      setMessageDifference([]);
-    }
-  }, [messageDifference]);
+  // useEffect(() => {
+  //   // console.log('message difference time :', messageDifference);
+  //   // console.log('averages per minutes :', avergaeMessageTimePerMinute);
+  //   if (avergaeMessageTimePerMinute.length > 10) {
+  //     // Remove oldest difference
+  //     setAvergaeMessageTimePerMinute((prev) => prev.slice(1));
+  //   }
+  //   if (messageDifference.length === 12) {
+  //     const average = Math.ceil(getAverage(messageDifference));
+  //     const maxNumber = Math.max(...messageDifference);
+  //     const avgAndMaxNumberObj = {
+  //       average,
+  //       maxNumber,
+  //     }
+  //     setAvergaeMessageTimePerMinute((prev) => [...prev, avgAndMaxNumberObj]);
+  //     setMessageDifference([]);
+  //   }
+  // }, [messageDifference]);
 
   // useEffect(() => {
   //   let isMounted = true; // To prevent state updates after unmount
@@ -746,26 +746,28 @@ const useJssip = () => {
 
       // ✅ Read latest state inside setTimeout
       setMessageDifference((prev) => {
-        if (prev.length < 12) {
-          console.log('running recursion function for checking time :');
-          console.log('messageDifference length :', prev);
-          const lastElement = prev[prev.length - 1];
-          console.log('last element :', lastElement);
-          const timeOfLastElement = lastElement?.messageTime;
-          const currentTime = Date.now();
-          console.log('current time :', currentTime);
-          const difference = currentTime - timeOfLastElement;
-          console.log('difference in messageDifference time check : ', difference);
+        // if (prev.length < 12) {
+        // console.log('running recursion function for checking time :');
+        // console.log('messageDifference length :', prev);
+        const lastElement = prev[prev.length - 1];
+        // console.log('last element :', lastElement);
+        const timeOfLastElement = lastElement?.messageTime;
+        const currentTime = Date.now();
+        // console.log('current time :', currentTime);
+        const difference = currentTime - timeOfLastElement;
+        console.log('difference in messageDifference time check : ', difference);
 
-          if (difference > 14000) {
-            console.log("User is not live");
-            toast.error("User is not live. Please login again.");
-            setTimeout(checkUserLive, 15000);
-            // localStorage.clear();
-            // window.location.href = '/webphone/login';
-            return prev;
-          }
+        if (difference > 14000) {
+          console.log("User is not live");
+          toast.error("User is not live. Please login again.");
+          // setTimeout(checkUserLive, 15000);
+          // localStorage.clear();
+          // window.location.href = '/webphone/login';
+          localStorage.clear();
+          window.location.href = '/webphone/login';
+          return prev;
         }
+        // }
 
         setTimeout(checkUserLive, 15000); // Recursively call every 5 seconds
         return prev;
@@ -800,26 +802,32 @@ const useJssip = () => {
         });
 
         ua.on('newMessage', (e) => {
-          // console.log('Message event:', e?.request?.body);
           const message = e.request.body;
-          const messageTime = parseInt(message?.split(",")[1]?.trim(), 10); // Use parseInt with base 10
-          const difference = Date.now() - messageTime;
+          console.log('message event:', message);
+          // const messageTime = parseInt(message?.split(",")[1]?.trim(), 10); // Use parseInt with base 10
+          // console.log(` 
+          //   ${messageTime}
+          //   ${Date.now()}
+          //   ==============================`
+          // );
+
+          // // console.log('Message time:', messageTime, "current time:", Date.now());
+          // const difference = Date.now() - messageTime;
           const objectToPush = {
-            messageTime,
-            difference,
+            messageTime: Date.now(),
           }
-          // console.log('Difference:', difference);
+          // // console.log('Difference:', difference);
 
           setMessageDifference((prev) => {
             const updatedDifferences = [...prev, objectToPush]; // Add new difference
 
-            // if (updatedDifferences.length > 12) {
-            //   updatedDifferences.shift(); // Remove the first (oldest) element
-            // }
+            if (updatedDifferences.length > 10) {
+              updatedDifferences.shift(); // Remove the first (oldest) element
+            }
 
             return updatedDifferences;
           });
-          // console.log('Message body :', message);
+          console.log('Message body :', message);
           connectioncheck();
         });
 
@@ -939,7 +947,7 @@ const useJssip = () => {
     ]);
     localStorage.setItem('dialing', true);
 
-    fetch(`${window.location.origin}/dialnumber`, {
+    fetch(`${window.location.origin} / dialnumber`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -961,7 +969,7 @@ const useJssip = () => {
       if (isCallended) {
         try {
           await axios.post(
-            `${window.location.origin}/user/callended${username}`,
+            `${window.location.origin} / user / callended${username}`,
             {},
             {
               headers: {
