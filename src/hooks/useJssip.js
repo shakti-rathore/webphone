@@ -947,7 +947,7 @@ const useJssip = () => {
     ]);
     localStorage.setItem('dialing', true);
 
-    fetch(`${window.location.origin} / dialnumber`, {
+    fetch(`${window.location.origin}/dialnumber`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
