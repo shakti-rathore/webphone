@@ -5,7 +5,7 @@ import {
   calculateCallStatistics,
   generateChartData,
   ActivityChart,
-  CallTrendsChart,
+  DispositionChart,
 } from '../hooks/agent-dashboard-utils';
 import { FiClock, FiPhone, FiPhoneOff, FiUser } from 'react-icons/fi';
 import HistoryContext from '../context/HistoryContext';
@@ -153,6 +153,7 @@ const AgentDashboard = () => {
       activityData: filterData,
       timeStats: activityDurations,
       chartData: generateChartData(filterData),
+      summaryCalls: rawData.todayCalls || [],
     });
   };
 
@@ -188,13 +189,13 @@ const AgentDashboard = () => {
       <div className="bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] p-2 sm:p-4 dark:text-white text-gray-800 mb-4 w-full mx-auto">
         <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
           <h3 className="text-base sm:text-lg font-semibold dark:text-white mb-2 sm:mb-0">
-            {(incomingCallData && 'Incoming Call Data') || 'Activity Statistics'}
+            {(incomingCallData && 'Call Logs') || 'Activity Statistics'}
           </h3>
           <button
             className="primary-btn text-xs sm:text-sm px-2 py-1"
             onClick={() => setIncomingCallData(!incomingCallData)}
           >
-            {(!incomingCallData && 'Incoming Call Data') || 'Activity Statistics'}
+            {(!incomingCallData && 'Call Logs') || 'Activity Statistics'}
           </button>
         </div>
         {incomingCallData ? (
@@ -260,9 +261,9 @@ const AgentDashboard = () => {
         </div>
 
         <div className="bg-white dark:bg-[#3333] rounded-lg shadow-[0px_0px_7px_0px_rgba(0,0,0,0.1)] p-2 sm:p-4 dark:text-white text-gray-800">
-          <h3 className="text-base sm:text-lg font-semibold">Call Trends</h3>
+          <h3 className="text-base sm:text-lg font-semibold">Disposition Chart</h3>
           <div className="mt-2 sm:mt-4">
-            <CallTrendsChart data={dashboardData.chartData} />
+            <DispositionChart callsData={dashboardData.summaryCalls || []} />
           </div>
         </div>
       </div>

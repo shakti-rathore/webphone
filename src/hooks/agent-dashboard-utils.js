@@ -1,5 +1,5 @@
 import React from 'react';
-import { LineChart, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, Bar, ResponsiveContainer } from 'recharts';
+import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 // Helper function to convert milliseconds to "h:m:s" format
 export const msToHMS = (duration) => {
@@ -94,82 +94,77 @@ export const generateChartData = (filterData) => {
   }));
 };
 
-// Chart Components with Responsive Design
-export const ActivityChart = ({ data, className = '' }) => (
-  <div className={`w-full h-80 ${className}`}>
-    <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-        <XAxis 
-          dataKey="name" 
-          tickLine={false} 
-          axisLine={{ stroke: '#888' }} 
-          tick={{ fill: '#666', fontSize: 12 }} 
-        />
-        <YAxis 
-          tickLine={false} 
-          axisLine={{ stroke: '#888' }} 
-          tick={{ fill: '#666', fontSize: 12 }} 
-        />
-        <Tooltip 
-          contentStyle={{ 
-            backgroundColor: 'rgba(255,255,255,0.9)', 
-            borderRadius: '8px', 
-            border: '1px solid #ddd' 
-          }} 
-        />
-        <Legend 
-          verticalAlign="bottom" 
-          height={36} 
-          iconType="circle" 
-          iconSize={10}
-        />
-        <Line type="monotone" dataKey="onCall" stroke="#8884d8" name="On Call" strokeWidth={2} dot={false} />
-        <Line type="monotone" dataKey="waiting" stroke="#82ca9d" name="Waiting" strokeWidth={2} dot={false} />
-        <Line type="monotone" dataKey="disposition" stroke="#ffc658" name="Disposition" strokeWidth={2} dot={false} />
-        <Line type="monotone" dataKey="break" stroke="#ff7300" name="Break" strokeWidth={2} dot={false} />
-      </LineChart>
-    </ResponsiveContainer>
-  </div>
-);
+// COLORS for pie slices
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#a28fd0', '#f98d8d'];
 
-export const CallTrendsChart = ({ data, className = '' }) => {
-  const callTrends = data.map((item) => ({
-    name: item.name,
-    totalActivity: item.onCall + item.waiting + item.disposition + item.break,
-  }));
+// 📊 1. ACTIVITY DISTRIBUTION PIE CHART
+export const ActivityChart = ({ data, className = '' }) => {
+  const summary = {
+    INUSE: 0,
+    NOT_INUSE: 0,
+    Disposition: 0,
+    UNAVAILABLE: 0,
+  };
+
+  // Aggregate all status counts
+  data.forEach((item) => {
+    summary.INUSE += item.onCall || 0;
+    summary.NOT_INUSE += item.waiting || 0;
+    summary.Disposition += item.disposition || 0;
+    summary.UNAVAILABLE += item.break || 0;
+  });
+
+  const pieData = [
+    { name: 'On Call', value: summary.INUSE },
+    { name: 'Waiting', value: summary.NOT_INUSE },
+    { name: 'Disposition', value: summary.Disposition },
+    { name: 'Break', value: summary.UNAVAILABLE },
+  ];
 
   return (
     <div className={`w-full h-80 ${className}`}>
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={callTrends} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          <XAxis 
-            dataKey="name" 
-            tickLine={false} 
-            axisLine={{ stroke: '#888' }} 
-            tick={{ fill: '#666', fontSize: 12 }} 
-          />
-          <YAxis 
-            tickLine={false} 
-            axisLine={{ stroke: '#888' }} 
-            tick={{ fill: '#666', fontSize: 12 }} 
-          />
-          <Tooltip 
-            contentStyle={{ 
-              backgroundColor: 'rgba(255,255,255,0.9)', 
-              borderRadius: '8px', 
-              border: '1px solid #ddd' 
-            }} 
-          />
-          <Legend 
-            verticalAlign="bottom" 
-            height={36} 
-            iconType="circle" 
-            iconSize={10}
-          />
-          <Bar dataKey="totalActivity" fill="#8884d8" name="Total Activity" barSize={30} />
-        </BarChart>
+        <PieChart>
+          <Pie data={pieData} cx="50%" cy="50%" outerRadius={100} label dataKey="value" nameKey="name">
+            {pieData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend verticalAlign="bottom" height={36} iconType="circle" iconSize={10} />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
+export const DispositionChart = ({ callsData }) => {
+  const dispositionCounts = callsData.reduce((acc, call) => {
+    const disposition = call.Disposition || 'Unknown';
+    acc[disposition] = (acc[disposition] || 0) + 1;
+    return acc;
+  }, {});
+
+  const chartData = Object.entries(dispositionCounts).map(([name, value]) => ({
+    name,
+    value,
+  }));
+
+  const formatTooltip = (value, name) => [`${value}`, `${name}`];
+  const renderLabel = ({ name, value }) => `${name}: ${value}`;
+
+  return (
+    <div className="w-full h-80">
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie data={chartData} cx="50%" cy="50%" outerRadius={100} label={renderLabel} dataKey="value" nameKey="name">
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip formatter={formatTooltip} />
+          <Legend verticalAlign="bottom" height={36} iconType="circle" iconSize={10} />
+        </PieChart>
       </ResponsiveContainer>
     </div>
   );
