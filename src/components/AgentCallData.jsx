@@ -49,7 +49,7 @@ const AgentCallData = () => {
         enddate: endDate,
       };
 
-      const { data } = await axios.post('${window.location.origin}/agentcallData', payload, {
+      const { data } = await axios.post(`${window.location.origin}/agentcallData`, payload, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${tokenDetails.token}`,

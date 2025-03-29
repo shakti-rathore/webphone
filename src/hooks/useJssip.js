@@ -969,7 +969,7 @@ const useJssip = () => {
       if (isCallended) {
         try {
           await axios.post(
-            `${window.location.origin} / user / callended${username}`,
+            `${window.location.origin}/user/callended${username}`,
             {},
             {
               headers: {
