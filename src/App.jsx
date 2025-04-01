@@ -97,7 +97,7 @@ function App() {
 
   const fetchUserMissedCalls = async () => {
     try {
-      const response = await axios.post(`https://esamwad.iotcom.io/usermissedCalls/${username}`);
+      const response = await axios.post(`${window.location.origin}/usermissedCalls/${username}`);
       setUsermissedCalls(response.data.result || []);
     } catch (error) {
       console.error('Error fetching missed calls:', error);
@@ -107,7 +107,7 @@ function App() {
 
   const fetchAdminUser = async () => {
     try {
-      const response = await axios.get(`https://esamwad.iotcom.io/users/${adminUser}`, {
+      const response = await axios.get(`${window.location.origin}/users/${adminUser}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -178,7 +178,7 @@ function App() {
     };
 
     try {
-      const response = await axios.post(`https://esamwad.iotcom.io/addModifyContact`, payload);
+      const response = await axios.post(`${window.location.origin}/addModifyContact`, payload);
       if (response.data) {
         toast.success(response.data.message || 'Contact saved successfully.');
       } else {
