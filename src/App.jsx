@@ -14,6 +14,7 @@ import ringtoneMp3 from './ringtone.mp3';
 import Modal from './components/table/Modal';
 import DropCallsModal from './components/DropCallsModal';
 import InterModal from './components/InterModal';
+import { FaPhoneAlt, FaPhoneSlash } from 'react-icons/fa';
 
 function App() {
   const [
@@ -200,7 +201,7 @@ function App() {
         {campaignMissedCallsLength}
       </div>
 
-      <div className="min-h-screen w-full">
+      <div className="min-h-screen w-full relative">
         {dispositionModal && (
           <Disposition
             bridgeID={bridgeID}
@@ -249,7 +250,16 @@ function App() {
             </div>
           </marquee>
         )}
-
+        <div className="bottom-3 right-5 whitespace-nowrap fixed z-50">
+          <button
+            className="primary-btn !rounded-full !p-4"
+            onClick={() => {
+              setPhoneShow(!phoneShow);
+            }}
+          >
+            {(!phoneShow && <FaPhoneAlt title='show phone' />) || <FaPhoneSlash title='hide phone' />}
+          </button>
+        </div>
         <div className="w-full mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-3">
           <div className="flex flex-col lg:flex-row items-center gap-5">
             {(status !== 'start' && userCall && (
@@ -257,14 +267,14 @@ function App() {
                 <UserCall userCall={userCall} username={username} formData={formData} setFormData={setFormData} />
               </div>
             )) || (
-                <div className="w-full lg:w-2/3 relative">
-                  <AutoDial
-                    setPhoneNumber={setPhoneNumber}
-                    dispositionModal={dispositionModal}
-                    handleCall={handleCall}
-                    phoneNumber={phoneNumber}
-                  />
-                  <div className="bottom-3 sm:left-64 left-[15rem] whitespace-nowrap absolute">
+              <div className="w-full lg:w-2/3 relative">
+                <AutoDial
+                  setPhoneNumber={setPhoneNumber}
+                  dispositionModal={dispositionModal}
+                  handleCall={handleCall}
+                  phoneNumber={phoneNumber}
+                />
+                {/* <div className="bottom-3 sm:left-64 left-[15rem] whitespace-nowrap absolute">
                     <button
                       className="primary-btn"
                       onClick={() => {
@@ -273,9 +283,9 @@ function App() {
                     >
                       {!phoneShow ? 'Hide Phone' : 'Show Phone'}
                     </button>
-                  </div>
-                </div>
-              )}
+                  </div> */}
+              </div>
+            )}
             <div className={`w-full ${status !== 'start' ? 'lg:w-2/3' : ''}`}>
               {seeLogs ? (
                 <HistoryScreen setSeeLogs={setSeeLogs} />

@@ -963,6 +963,7 @@ const useJssip = () => {
         toast.error('Failed to initiate the call');
       });
   };
+
   useEffect(() => {
     const callApi = async () => {
       console.log('calling user/callednde api:', Date.now());
