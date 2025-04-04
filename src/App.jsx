@@ -179,14 +179,20 @@ function App() {
     };
 
     try {
-      const response = await axios.post(`${window.location.origin}/addModifyContact`, payload);
-      if (response.data) {
+      const response = await axios.post(`${window.location.origin}/addModifyContact`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data?.success) {
         toast.success(response.data.message || 'Contact saved successfully.');
       } else {
-        toast.error('Failed to save contact.');
+        toast.error(response.data.message || 'Failed to save contact.');
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Error occurred.');
+      console.error('Add/Modify contact error:', err);
     }
   };
 
@@ -257,7 +263,7 @@ function App() {
               setPhoneShow(!phoneShow);
             }}
           >
-            {(!phoneShow && <FaPhoneAlt title='show phone' />) || <FaPhoneSlash title='hide phone' />}
+            {(!phoneShow && <FaPhoneAlt title="show phone" />) || <FaPhoneSlash title="hide phone" />}
           </button>
         </div>
         <div className="w-full mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-3">
