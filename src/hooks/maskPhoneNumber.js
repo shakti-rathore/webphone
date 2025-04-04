@@ -1,9 +1,9 @@
 const maskPhoneNumber = (phoneNumber) => {
   const tokenData = localStorage.getItem('token');
   const parsedData = JSON.parse(tokenData);
-  const adminUser = parsedData?.userData?.adminuser;
+  const numberMasking = parsedData?.userData?.numberMasking;
 
-  if (adminUser === 'warrgyi') {
+  if (numberMasking) {
     if (!phoneNumber) return phoneNumber;
 
     if (phoneNumber.startsWith('+91')) {

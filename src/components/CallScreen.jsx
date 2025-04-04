@@ -41,6 +41,7 @@ const CallScreen = ({
   const parsedData = JSON.parse(tokenData);
   const adminUser = parsedData?.userData?.adminuser;
   const { username } = useContext(HistoryContext);
+  const numberMasking = parsedData?.userData?.numberMasking;
 
   const handleTransfer = async () => {
     try {
@@ -72,18 +73,19 @@ const CallScreen = ({
             <BsPersonFill className="text-white text-2xl" />
           </div>
           <marquee className="text-2xl font-bold text-primary mb-2">
-            {isMerged && phoneNumber && conferenceNumber
-              ? adminUser === 'warrgyi'
-                ? `${maskPhoneNumber(phoneNumber)} Conference with ${maskPhoneNumber(conferenceNumber)}`
-                : `${phoneNumber} Conference with ${conferenceNumber}`
-              : adminUser === 'warrgyi'
-              ? conferenceNumber
-                ? maskPhoneNumber(conferenceNumber)
-                : phoneNumber
-                ? maskPhoneNumber(phoneNumber)
-                : maskPhoneNumber(userCall?.contactNumber)
-              : conferenceNumber || phoneNumber || userCall?.contactNumber}
+            {(() => {
+              const maybeMask = (num) => (numberMasking ? maskPhoneNumber(num) : num);
+
+              if (isMerged && phoneNumber && conferenceNumber) {
+                return `${maybeMask(phoneNumber)} Conference with ${maybeMask(conferenceNumber)}`;
+              }
+
+              if (conferenceNumber) return maybeMask(conferenceNumber);
+              if (phoneNumber) return maybeMask(phoneNumber);
+              return maybeMask(userCall?.contactNumber);
+            })()}
           </marquee>
+
           {!isRunning ? (
             <span className="text-gray-500">Calling...</span>
           ) : (

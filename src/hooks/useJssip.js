@@ -205,24 +205,10 @@ const useJssip = () => {
           stopRecording();
         }
       }
-      setIsConnectionLost(true); // Set state to true when there's an error
+      setIsConnectionLost(true);
       return true;
     }
   };
-
-  // useEffect(() => {
-  //   if (username) {
-  //     const url = `${window.location.origin}/userready/${username}`;
-  //     axios
-  //       .post(url, {}, { headers: { 'Content-Type': 'application/json' } })
-  //       .then((response) => {
-  //         const data = response.data;
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error sending login request:', error);
-  //       });
-  //   }
-  // }, [username]);
 
   const checkUserReady = async () => {
     try {
@@ -758,8 +744,8 @@ const useJssip = () => {
         console.log('difference in messageDifference time check : ', difference);
 
         if (difference > 14000) {
-          console.log("User is not live");
-          toast.error("User is not live. Please login again.");
+          console.log('User is not live');
+          toast.error('User is not live. Please login again.');
           // setTimeout(checkUserLive, 15000);
           // localStorage.clear();
           // window.location.href = '/webphone/login';
@@ -772,7 +758,7 @@ const useJssip = () => {
         setTimeout(checkUserLive, 15000); // Recursively call every 5 seconds
         return prev;
       });
-    };
+    }
 
     checkUserLive(); // Start the recursive function
 
@@ -780,7 +766,6 @@ const useJssip = () => {
       isMounted = false; // Cleanup to prevent memory leaks
     };
   }, []);
-
 
   useEffect(() => {
     const initializeJsSIP = () => {
@@ -805,7 +790,7 @@ const useJssip = () => {
           const message = e.request.body;
           console.log('message event:', message);
           // const messageTime = parseInt(message?.split(",")[1]?.trim(), 10); // Use parseInt with base 10
-          // console.log(` 
+          // console.log(`
           //   ${messageTime}
           //   ${Date.now()}
           //   ==============================`
@@ -815,7 +800,7 @@ const useJssip = () => {
           // const difference = Date.now() - messageTime;
           const objectToPush = {
             messageTime: Date.now(),
-          }
+          };
           // // console.log('Difference:', difference);
 
           setMessageDifference((prev) => {
@@ -882,7 +867,7 @@ const useJssip = () => {
         setStatus('start');
         setPhoneNumber('');
         // setDispositionModal(true);
-        // * this is new state added because user callended api was calling after 
+        // * this is new state added because user callended api was calling after
         // * dispostion done api when auto disposition is done
         setIsCallended(true);
         setConferenceNumber('');
