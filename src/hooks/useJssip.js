@@ -62,7 +62,7 @@ const useJssip = () => {
   }
 
   function createNotification() {
-    const options = {
+    const notifiOptions = {
       body: `Incoming call from ${inNotification}`,
       icon: '/badge.png',
       badge: '/badge.png',
@@ -72,7 +72,7 @@ const useJssip = () => {
       requireInteraction: true,
     };
 
-    const notification = new Notification('Incoming Call', options);
+    const notification = new Notification('Incoming Call', notifiOptions);
 
     notification.onclick = function (event) {
       event.preventDefault();
