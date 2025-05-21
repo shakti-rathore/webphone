@@ -771,6 +771,24 @@ const useJssip = () => {
     const initializeJsSIP = () => {
       try {
         var socket = new JsSIP.WebSocketInterface(`wss://${originWithoutProtocol}:8089/ws`);
+
+        // Add direct socket error handling
+        socket.onclose = function (event) {
+          if (!event.wasClean) {
+            console.error('WebSocket connection died unexpectedly');
+            toast.error('Connection lost');
+            localStorage.clear();
+            window.location.href = '/webphone/login';
+          }
+        };
+
+        socket.onerror = function (error) {
+          console.error('WebSocket error:', error);
+          toast.error('Connection failed');
+          localStorage.clear();
+          window.location.href = '/webphone/login';
+        };
+
         var configuration = {
           sockets: [socket],
           session_timers: false,
@@ -825,6 +843,17 @@ const useJssip = () => {
 
         ua.on('stopped', (e) => {
           console.error('stopped', e);
+          // Add logout behavior for stopped event
+          toast.error('Connection stopped');
+          localStorage.clear();
+          window.location.href = '/webphone/login';
+        });
+
+        ua.on('disconnected', (e) => {
+          console.error('UA disconnected', e);
+          toast.error('Connection lost');
+          localStorage.clear();
+          window.location.href = '/webphone/login';
         });
 
         ua.on('newRTCSession', function (e) {
@@ -844,6 +873,7 @@ const useJssip = () => {
       } catch (error) {
         console.error('Error initializing JsSIP:', error);
         toast.error('You Are Logout');
+        localStorage.clear();
         window.location.href = '/webphone/login';
       }
     };
@@ -899,16 +929,40 @@ const useJssip = () => {
       }
     };
 
+    // Function to check socket connection status periodically
+    const checkSocketConnection = () => {
+      if (ua && ua.transport && ua.transport.socket) {
+        const socketState = ua.transport.socket.readyState;
+
+        // WebSocket.CLOSED = 3, WebSocket.CLOSING = 2
+        if (socketState === 3 || socketState === 2) {
+          console.error('Socket connection lost');
+          toast.error('Connection lost');
+          localStorage.clear();
+          window.location.href = '/webphone/login';
+        }
+      }
+    };
+
     initializeJsSIP();
     enumerateDevices();
+
+    // Set up periodic connection check
+    const socketCheckInterval = setInterval(checkSocketConnection, 10000); // Check every 10 seconds
 
     navigator.mediaDevices.addEventListener('devicechange', enumerateDevices);
 
     return () => {
       navigator.mediaDevices.removeEventListener('devicechange', enumerateDevices);
+      clearInterval(socketCheckInterval);
 
       if (ua) {
         ua.off('newMessage');
+        try {
+          ua.stop();
+        } catch (error) {
+          console.error('Error stopping UA:', error);
+        }
       }
     };
   }, [username, password, navigate]);
