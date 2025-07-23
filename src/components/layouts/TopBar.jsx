@@ -14,6 +14,7 @@ import {
 import BreakDropdown from '../BreakDropdown';
 import HistoryContext from '../../context/HistoryContext';
 import { RiMoonLine, RiSunLine } from 'react-icons/ri';
+import { FaGear } from "react-icons/fa6";
 
 const TopBar = () => {
   const toggleTheme = useTheme();
@@ -116,6 +117,7 @@ const TopBar = () => {
 
                   <span className="font-semibold">{campaignName}</span>
                 </li>
+
                 {(location.pathname !== '/webphone/dashboard' && (
                   <li className="hover:bg-gray-100 dark:hover:bg-[#333] transition duration-200">
                     <Link to="/webphone/dashboard" className="flex items-center gap-2 px-4 py-2 w-full">
@@ -131,7 +133,15 @@ const TopBar = () => {
                     </Link>
                   </li>
                 )}
-
+                <li className="hover:bg-gray-100 dark:hover:bg-[#333] transition duration-200">
+                  <Link
+                    to="${window.location.origin}/webphone/login"
+                    className="flex items-center gap-2 px-4 py-2 w-full"
+                  >
+                    <FaGear className="text-purple-500" />
+                    Beta Version
+                  </Link>
+                </li>
                 <li
                   className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] transition duration-200"
                   onClick={handleThemeToggle}
