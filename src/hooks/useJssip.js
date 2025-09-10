@@ -61,8 +61,8 @@ const useJssip = () => {
       var configuration = {
         sockets: [socket],
         session_timers: false,
-        uri: "sip:demo-surya@samwad.iotcom.io",
-        password: "Demo@123",
+        uri: "sip:hostelc-prince@esamwad.iotcom.io",
+        password: "SecureDial@123",
       };
       var ua = new JsSIP.UA(configuration);
       ua.start();
