@@ -21,22 +21,22 @@ const AppRoutes = () => {
     <Router>
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
-        <Route
+        {/* <Route
           path="/webphone/login"
           element={
             <HistoryProvider>
               <Login />
             </HistoryProvider>
           }
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="/webphone/subscription-expired"
           element={
             <HistoryProvider>
               <SubscriptionExpired />
             </HistoryProvider>
           }
-        />
+        /> */}
 
         <Route
           path="/webphone/dashboard"
@@ -48,7 +48,7 @@ const AppRoutes = () => {
             </HistoryProvider>
           }
         />
-        <Route
+        {/* <Route
           path="/webphone/agent-dashboard"
           element={
             <HistoryProvider>
@@ -57,7 +57,7 @@ const AppRoutes = () => {
               </CommonLayout>
             </HistoryProvider>
           }
-        />
+        /> */}
 
         <Route path="*" element={<Navigate to="/webphone/dashboard" replace />} />
       </Routes>

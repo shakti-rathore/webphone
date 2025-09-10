@@ -19,12 +19,12 @@ import { FaGear } from "react-icons/fa6";
 const TopBar = () => {
   const toggleTheme = useTheme();
   const location = useLocation();
-  const { setDropCalls, selectedStatus } = useContext(HistoryContext);
+  const { setDropCalls, selectedStatus,username } = useContext(HistoryContext);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
 
   const tokenData = localStorage.getItem('token');
   const parsedData = JSON.parse(tokenData);
-  const username = parsedData?.userData?.username || 'Guest';
+  // const username = parsedData?.userData?.username || 'Guest';
   const userId = parsedData?.userData?.userid || 'N/A';
   const campaignName = parsedData?.userData?.campaign || 'N/A';
 
@@ -68,7 +68,7 @@ const TopBar = () => {
       </Link>
 
       <div className="flex items-center gap-x-3 flex-wrap md:flex-nowrap">
-        {location.pathname === '/webphone/dashboard' && (
+        {/* {location.pathname === '/webphone/dashboard' && (
           <>
             <button
               onClick={() => setDropCalls(true)}
@@ -79,7 +79,7 @@ const TopBar = () => {
             </button>
             <BreakDropdown dispoWithBreak={false} selectedStatus={selectedStatus} />
           </>
-        )}
+        )} */}
 
         {/* User Dropdown */}
         <div className="relative user-dropdown">
@@ -109,7 +109,7 @@ const TopBar = () => {
               </div>
 
               <ul className="text-sm text-gray-800 dark:text-gray-200 divide-y divide-gray-100 dark:divide-gray-700">
-                <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-[#333] transition duration-200 justify-between">
+                {/* <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-[#333] transition duration-200 justify-between">
                   <div className="flex items-center gap-2">
                     <FaRocket className="text-blue-500" />
                     Campaign Id
@@ -141,7 +141,7 @@ const TopBar = () => {
                     <FaGear className="text-purple-500" />
                     Beta Version
                   </Link>
-                </li>
+                </li> */}
                 <li
                   className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] transition duration-200"
                   onClick={handleThemeToggle}
@@ -149,13 +149,13 @@ const TopBar = () => {
                   <DarkModeToggle toggleTheme={toggleTheme} />
                 </li>
 
-                <li
+                {/* <li
                   className="flex items-center gap-2 px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] transition duration-200"
                   onClick={handleLogout}
                 >
                   <FaSignOutAlt />
                   Logout
-                </li>
+                </li> */}
               </ul>
             </div>
           )}

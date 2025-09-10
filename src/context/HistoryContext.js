@@ -3,18 +3,22 @@ import { createContext, useEffect, useState } from 'react';
 const HistoryContext = createContext({
   history: [],
   setHistory: () => {},
-  username: '',
-  setUsername: () => {},
-  password: '',
-  setPassword: () => {},
+  username: 'demo@surya',
+  password: 'Demo@123',
+  selectedBreak: 'Break',
+  setSelectedBreak: () => {},
+  dropCalls: false,
+  setDropCalls: () => {},
+  info: false,
+  setInfo: () => {},
+  selectedStatus: '',
+  setSelectedStatus: () => {},
 });
 
 export const HistoryProvider = ({ children }) => {
   const callHistory = localStorage.getItem('call-history');
   const initialHistory = callHistory ? JSON.parse(callHistory) : [];
   const [history, setHistory] = useState(initialHistory);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [selectedBreak, setSelectedBreak] = useState('Break');
   const [dropCalls, setDropCalls] = useState(false);
   const [info, setInfo] = useState(false);
@@ -29,20 +33,16 @@ export const HistoryProvider = ({ children }) => {
       value={{
         history,
         setHistory,
-        username,
-        setUsername,
-        password,
-        setPassword,
+        username: 'demo@surya',   // static
+        password: 'Demo@123',     // static
         selectedBreak,
         setSelectedBreak,
         dropCalls,
         setDropCalls,
-        dropCalls,
-        setDropCalls,
-        setInfo,
         info,
-        setSelectedStatus,
+        setInfo,
         selectedStatus,
+        setSelectedStatus,
       }}
     >
       {children}

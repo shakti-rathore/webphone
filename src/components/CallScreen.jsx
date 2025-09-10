@@ -107,15 +107,24 @@ const CallScreen = ({
                 >
                   <BsPause className="text-3xl" />
                 </button>
-                <button
+                {/* <button
                   disabled={!isMerged}
                   onClick={handleTransfer}
                   className={`p-4 rounded-full dark:text-white ${isMerged ? 'opacity-100' : 'opacity-45'}`}
                   title="Call Transfer"
                 >
                   <FcCallTransfer className="text-3xl" />
+                </button> */}
+                <button
+                  className={`p-4 rounded-full ${muted ? 'bg-primary text-white' : 'text-gray-600 dark:text-white'}`}
+                  onClick={() => {
+                    muted ? session.unmute() : session.mute();
+                    setMuted(!muted);
+                  }}
+                  title="Mute"
+                >
+                  <BsMicMute className="text-3xl" />
                 </button>
-
                 <button
                   className="p-4 text-gray-600 dark:text-white rounded-full"
                   onClick={() => setShowKeyPad(true)}
@@ -124,7 +133,8 @@ const CallScreen = ({
                   <IoIosKeypad className="text-3xl" />
                 </button>
               </div>
-              <div className="flex justify-around items-center">
+
+              {/* <div className="flex justify-around items-center">
                 {(conferenceStatus && (
                   <button
                     className="p-4 rounded-full text-gray-600 dark:text-white"
@@ -165,17 +175,8 @@ const CallScreen = ({
                     <span className="ml-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
                   </button>
                 )}
-                <button
-                  className={`p-4 rounded-full ${muted ? 'bg-primary text-white' : 'text-gray-600 dark:text-white'}`}
-                  onClick={() => {
-                    muted ? session.unmute() : session.mute();
-                    setMuted(!muted);
-                  }}
-                  title="Mute"
-                >
-                  <BsMicMute className="text-3xl" />
-                </button>
-              </div>
+                
+              </div> */}
             </div>
           ) : (
             <div className="flex flex-col items-center mb-4 relative">

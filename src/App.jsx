@@ -84,27 +84,27 @@ function App() {
     comment: '',
   });
 
-  useEffect(() => {
-    if (status == 'start') {
-      fetchUserMissedCalls();
-    }
-  }, [status]);
+  // useEffect(() => {
+  //   if (status == 'start') {
+  //     fetchUserMissedCalls();
+  //   }
+  // }, [status]);
 
-  useEffect(() => {
-    if (selectedBreak != 'Break' && ringtone.length >= 0) {
-      fetchUserMissedCalls();
-    }
-  }, [ringtone]);
+  // useEffect(() => {
+  //   if (selectedBreak != 'Break' && ringtone.length >= 0) {
+  //     fetchUserMissedCalls();
+  //   }
+  // }, [ringtone]);
 
-  const fetchUserMissedCalls = async () => {
-    try {
-      const response = await axios.post(`${window.location.origin}/usermissedCalls/${username}`);
-      setUsermissedCalls(response.data.result || []);
-    } catch (error) {
-      console.error('Error fetching missed calls:', error);
-      setUsermissedCalls([]);
-    }
-  };
+  // const fetchUserMissedCalls = async () => {
+  //   try {
+  //     const response = await axios.post(`${window.location.origin}/usermissedCalls/${username}`);
+  //     setUsermissedCalls(response.data.result || []);
+  //   } catch (error) {
+  //     console.error('Error fetching missed calls:', error);
+  //     setUsermissedCalls([]);
+  //   }
+  // };
 
   const fetchAdminUser = async () => {
     try {
@@ -203,9 +203,9 @@ function App() {
 
   return (
     <>
-      <div className="w-7 h-7 flex rounded-full bg-red-500 items-center z-50 justify-center fixed top-2 right-[18rem] md:right-[18.6rem] text-white text-sm">
+      {/* <div className="w-7 h-7 flex rounded-full bg-red-500 items-center z-50 justify-center fixed top-2 right-[18rem] md:right-[18.6rem] text-white text-sm">
         {campaignMissedCallsLength}
-      </div>
+      </div> */}
 
       <div className="min-h-screen w-full relative">
         {dispositionModal && (
@@ -213,12 +213,12 @@ function App() {
             bridgeID={bridgeID}
             setDispositionModal={setDispositionModal}
             userCall={userCall}
-            handleContact={handleContact}
+            // handleContact={handleContact}
             setFormData={setFormData}
             formData={formData}
           />
         )}
-        {info && (
+        {/* {info && (
           <Modal isOpen={info} onClose={() => setInfo(false)} title={`Users Not In Use (${adminUserData.length})`}>
             <InterModal
               adminUserData={adminUserData}
@@ -239,14 +239,14 @@ function App() {
           >
             <DropCallsModal usermissedCalls={usermissedCalls} setDropCalls={setDropCalls} username={username} />
           </Modal>
-        )}
+        )} */}
         {/* {(ringtone.length > 0 && status !== 'calling') && (
           <audio controls autoPlay hidden>
             <source src={ringtoneMp3} type="audio/mp3" />
           </audio>
         )} */}
 
-        {ringtone.length > 0 && (
+        {/* {ringtone.length > 0 && (
           <marquee>
             <div className="text-sm">
               Call Queue: ({ringtone.length})
@@ -255,8 +255,8 @@ function App() {
               </div>
             </div>
           </marquee>
-        )}
-        <div className="bottom-3 right-5 whitespace-nowrap fixed z-50">
+        )} */}
+        {/* <div className="bottom-3 right-5 whitespace-nowrap fixed z-50">
           <button
             className="primary-btn !rounded-full !p-4"
             onClick={() => {
@@ -265,10 +265,10 @@ function App() {
           >
             {(!phoneShow && <FaPhoneAlt title="show phone" />) || <FaPhoneSlash title="hide phone" />}
           </button>
-        </div>
+        </div> */}
         <div className="w-full mx-auto bg-white dark:bg-black/50 rounded-lg shadow p-3">
           <div className="flex flex-col lg:flex-row items-center gap-5">
-            {(status !== 'start' && userCall && (
+            {/* {(status !== 'start' && userCall && (
               <div className="w-full lg:w-2/3">
                 <UserCall userCall={userCall} username={username} formData={formData} setFormData={setFormData} />
               </div>
@@ -280,7 +280,7 @@ function App() {
                   handleCall={handleCall}
                   phoneNumber={phoneNumber}
                 />
-                {/* <div className="bottom-3 sm:left-64 left-[15rem] whitespace-nowrap absolute">
+                <div className="bottom-3 sm:left-64 left-[15rem] whitespace-nowrap absolute">
                     <button
                       className="primary-btn"
                       onClick={() => {
@@ -289,9 +289,9 @@ function App() {
                     >
                       {!phoneShow ? 'Hide Phone' : 'Show Phone'}
                     </button>
-                  </div> */}
+                  </div>
               </div>
-            )}
+            )} */}
             <div className={`w-full ${status !== 'start' ? 'lg:w-2/3' : ''}`}>
               {seeLogs ? (
                 <HistoryScreen setSeeLogs={setSeeLogs} />
@@ -310,14 +310,15 @@ function App() {
                 </div>
               ) : status === 'calling' || status === 'conference' ? (
                 callConference ? (
-                  <CallConference
-                    conferenceNumber={conferenceNumber}
-                    setCallConference={setCallConference}
-                    setConferenceNumber={setConferenceNumber}
-                    handleCall={handleCalls}
-                    setSeeLogs={setSeeLogs}
-                    phoneNumber={phoneNumber}
-                  />
+                  // <CallConference
+                  //   conferenceNumber={conferenceNumber}
+                  //   setCallConference={setCallConference}
+                  //   setConferenceNumber={setConferenceNumber}
+                  //   handleCall={handleCalls}
+                  //   setSeeLogs={setSeeLogs}
+                  //   phoneNumber={phoneNumber}
+                  // />
+                  ''
                 ) : (
                   <CallScreen
                     conferenceNumber={conferenceNumber}
