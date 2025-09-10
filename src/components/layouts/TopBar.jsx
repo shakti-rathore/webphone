@@ -14,22 +14,23 @@ import {
 import BreakDropdown from '../BreakDropdown';
 import HistoryContext from '../../context/HistoryContext';
 import { RiMoonLine, RiSunLine } from 'react-icons/ri';
-import { FaGear } from "react-icons/fa6";
+import { FaGear } from 'react-icons/fa6';
 
 const TopBar = () => {
   const toggleTheme = useTheme();
   const location = useLocation();
-  const { setDropCalls, selectedStatus,username } = useContext(HistoryContext);
+  const { setDropCalls, selectedStatus } = useContext(HistoryContext);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
 
   const tokenData = localStorage.getItem('token');
   const parsedData = JSON.parse(tokenData);
-  // const username = parsedData?.userData?.username || 'Guest';
+  const username = parsedData?.userData?.username || 'Guest';
   const userId = parsedData?.userData?.userid || 'N/A';
   const campaignName = parsedData?.userData?.campaign || 'N/A';
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem('call-history');
+    localStorage.removeItem('token');
     window.location.href = '/webphone/login';
   };
 
@@ -149,13 +150,13 @@ const TopBar = () => {
                   <DarkModeToggle toggleTheme={toggleTheme} />
                 </li>
 
-                {/* <li
+                <li
                   className="flex items-center gap-2 px-4 py-2 text-red-500 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] transition duration-200"
                   onClick={handleLogout}
                 >
                   <FaSignOutAlt />
                   Logout
-                </li> */}
+                </li>
               </ul>
             </div>
           )}
