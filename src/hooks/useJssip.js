@@ -89,7 +89,8 @@ const useJssip = () => {
           phoneNumber,
         },
       ]);
-      ua.call(phoneNumber.replace(" ", ""), options);
+      //ua.call(phoneNumber.replace(" ", ""), options);
+      ua.call(phoneNumber.replace(/\s+/g, "")
       setStatus("calling");
     }
   };
