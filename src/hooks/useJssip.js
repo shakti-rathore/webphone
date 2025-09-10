@@ -90,7 +90,7 @@ const useJssip = () => {
         },
       ]);
       //ua.call(phoneNumber.replace(" ", ""), options);
-      ua.call(phoneNumber.replace(/\s+/g, "")
+      ua.call(phoneNumber.replace(/\s+/g, ""),options);
       setStatus("calling");
     }
   };
